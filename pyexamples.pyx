@@ -1,5 +1,5 @@
 cdef extern from "lib/dxfeed-c-api/tests/ConnectionTest/ConnectionTest.c":
-    int main ()
+    int main (int argc, char* argv[])
 
 def runsampletest():
-    return main()
+    return main(2, [''])
