@@ -14,7 +14,18 @@ examples_extension = Extension(
     include_dirs=["lib/dxfeed-c-api/include/", "lib/dxfeed-c-api/src"],
     libraries=['ws2_32']
 )
+
+connection_ext = Extension(
+    name="pyconnect",
+    sources=["pyconnect.pyx"] + source_files_paths,
+    language='c',
+    include_dirs=["lib/dxfeed-c-api/include/", "lib/dxfeed-c-api/src"],
+    libraries=['ws2_32']
+)
 setup(
-    name="pyexamples",
-    ext_modules=cythonize([examples_extension], language_level=3)
+    name="pyconnect",
+    ext_modules=cythonize([
+        connection_ext,
+        # examples_extension
+        ], language_level=3)
 )
