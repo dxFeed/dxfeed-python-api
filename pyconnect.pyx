@@ -32,5 +32,10 @@ cdef extern from "lib/dxfeed-c-api/include/DXFeed.h":
                                         void* user_data,
                                         dxf_connection_t* connection)
 
+    ERRORCODE dxf_close_connection (dxf_connection_t connection)
+
 def pyconnect():
     return dxf_create_connection("demo.dxfeed.com:7300", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)
+
+def pydisconnect():
+    dxf_close_connection(NULL)

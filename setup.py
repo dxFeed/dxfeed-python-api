@@ -17,15 +17,7 @@ examples_extension = Extension(
 
 connection_ext = Extension(
     name="pyconnect",
-    sources=["pyconnect.pyx", "pydisconnect.pyx"] + source_files_paths,
-    language='c',
-    include_dirs=["lib/dxfeed-c-api/include/", "lib/dxfeed-c-api/src"],
-    libraries=['ws2_32']
-)
-
-disconnection_ext = Extension(
-    name="pydisconnect",
-    sources=["pydisconnect.pyx"] + source_files_paths,
+    sources=["pyconnect.pyx"] + source_files_paths,
     language='c',
     include_dirs=["lib/dxfeed-c-api/include/", "lib/dxfeed-c-api/src"],
     libraries=['ws2_32']
@@ -34,7 +26,6 @@ disconnection_ext = Extension(
 setup(
     name="pyconnect",
     ext_modules=cythonize([
-        disconnection_ext,
         connection_ext,
         # examples_extension
         ], language_level=3)
