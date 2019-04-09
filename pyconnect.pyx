@@ -1,3 +1,5 @@
+import time
+
 cdef extern from "lib/dxfeed-c-api/include/DXTypes.h":
     ctypedef int ERRORCODE
     ctypedef void* dxf_subscription_t
@@ -22,20 +24,37 @@ cdef extern from "lib/dxfeed-c-api/include/DXFeed.h":
                                                 dxf_connection_status_t new_status,
                                                 void* user_data)
 
-    ERRORCODE dxf_create_connection(const char* address,
-                                        const char* authscheme,
-                                        const char* authdata,
-                                        dxf_conn_termination_notifier_t notifier,
-                                        dxf_conn_status_notifier_t conn_status_notifier,
-                                        dxf_socket_thread_creation_notifier_t stcn,
-                                        dxf_socket_thread_destruction_notifier_t stdn,
-                                        void* user_data,
+    ERRORCODE dxf_create_connection (const char* address,
+                                            dxf_conn_termination_notifier_t notifier,
+                                            dxf_conn_status_notifier_t conn_status_notifier,
+                                            dxf_socket_thread_creation_notifier_t stcn,
+                                            dxf_socket_thread_destruction_notifier_t stdn,
+                                            void* user_data,
                                         dxf_connection_t* connection)
 
     ERRORCODE dxf_close_connection (dxf_connection_t connection)
 
-def pyconnect():
-    return dxf_create_connection("demo.dxfeed.com:7300", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)
 
-def pydisconnect():
-    dxf_close_connection(NULL)
+
+# cpdef pyconnect(connection):
+#     return dxf_create_connection("demo.dxfeed.com:7300", NULL, NULL, NULL, NULL, NULL, NULL, NULL, dereference(connection))
+#
+# cpdef pydisconnect(connection):
+#     dxf_close_connection(dereference(connection))
+
+cpdef con_discon():
+    cdef dxf_connection_t connection
+    # global connection
+    # cdef const char dxfeed_host = "demo.dxfeed.com:7300"
+    # print("Connecting to host %s...\n", dxfeed_host)
+    print('connecting')
+    dxf_create_connection("demo.dxfeed.com:7300", NULL, NULL, NULL, NULL, NULL, &connection)
+
+    # pyconnect(connection)
+    print('connected')
+
+    time.sleep(5)
+    print('disconnecting')
+    # pydisconnect(connection)
+    dxf_close_connection(connection)
+    print('disconnected')
