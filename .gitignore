@@ -5,3 +5,5 @@
 build/*
 *.pyd
 *.c
+
+*__pycache__
