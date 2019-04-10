@@ -1,6 +1,6 @@
 import time
 
-cdef extern from "lib/dxfeed-c-api/include/DXTypes.h":
+cdef extern from "DXTypes.h":
     ctypedef int ERRORCODE
     ctypedef void* dxf_subscription_t
     ctypedef void* dxf_connection_t
@@ -9,7 +9,7 @@ cdef extern from "lib/dxfeed-c-api/include/DXTypes.h":
     ctypedef void* dxf_price_level_book_t
     ctypedef void* dxf_regional_book_t
 
-    ctypedef enum dxf_connection_status_t:
+    enum dxf_connection_status_t:
         dxf_cs_not_connected = 0,
         dxf_cs_connected,
         dxf_cs_login_required,
@@ -42,19 +42,35 @@ cdef extern from "lib/dxfeed-c-api/include/DXFeed.h":
 # cpdef pydisconnect(connection):
 #     dxf_close_connection(dereference(connection))
 
-cpdef con_discon():
-    cdef dxf_connection_t connection
-    # global connection
-    # cdef const char dxfeed_host = "demo.dxfeed.com:7300"
-    # print("Connecting to host %s...\n", dxfeed_host)
-    print('connecting')
-    dxf_create_connection("demo.dxfeed.com:7300", NULL, NULL, NULL, NULL, NULL, &connection)
+# cpdef con_discon():
+#     cdef dxf_connection_t connection
+#     # global connection
+#     # cdef const char dxfeed_host = "demo.dxfeed.com:7300"
+#     # print("Connecting to host %s...\n", dxfeed_host)
+#     print('connecting')
+#     dxf_create_connection("demo.dxfeed.com:7300", NULL, NULL, NULL, NULL, NULL, &connection)
+#
+#     # pyconnect(connection)
+#     print('connected')
+#
+#     time.sleep(5)
+#     print('disconnecting')
+#     # pydisconnect(connection)
+#     dxf_close_connection(connection)
+#     print('disconnected')
 
-    # pyconnect(connection)
+cdef dxf_connection_t connection
+
+def pyconnect():
+    print('connecting1')
+    dxf_create_connection("demo.dxfeed.com:7300", NULL, NULL, NULL, NULL, NULL, &connection)
     print('connected')
 
-    time.sleep(5)
+def pydisconnect():
     print('disconnecting')
-    # pydisconnect(connection)
     dxf_close_connection(connection)
     print('disconnected')
+
+def test():
+    pyconnect()
+    pydisconnect()
