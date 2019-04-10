@@ -1,4 +1,5 @@
-
+from pxd_include.DXFeed cimport *
+from pxd_include.DXTypes cimport *
 
 cdef dxf_connection_t connection
 

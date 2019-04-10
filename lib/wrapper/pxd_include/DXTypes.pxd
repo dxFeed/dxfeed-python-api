@@ -14,9 +14,8 @@ cdef extern from "DXTypes.h":
 
 #ifdef _WIN32
 
-#include <wchar.h>
-cdef extern from "<wchar.h>":
-    pass
+#pxd_include <wchar.h>
+from libc.stddef cimport wchar_t
 
 cdef extern from "DXTypes.h":
     ctypedef unsigned char      dxf_bool_t           # 8 bit
@@ -39,8 +38,8 @@ cdef extern from "DXTypes.h":
 
 #else /* POSIX? */
 
-#include <stdint.h>
-#include <wchar.h>
+#pxd_include <stdint.h>
+#pxd_include <wchar.h>
 
 # ctypedef unsigned char    dxf_bool_t           # 8 bit
 # ctypedef int8_t           dxf_byte_t           # 8 bit

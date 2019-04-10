@@ -3,9 +3,9 @@
 #ifndef EVENT_DATA_H_INCLUDED
 #define EVENT_DATA_H_INCLUDED
 
-#include "RecordData.h"
+#pxd_include "RecordData.h"
 from cimport RecordData import *
-#include "DXTypes.h"
+#pxd_include "DXTypes.h"
 from cimport DXTypes import *
 #ifndef OUT
     #define OUT

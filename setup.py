@@ -23,10 +23,19 @@ connection_ext = Extension(
     libraries=['ws2_32']
 )
 
+new_logic_ext = Extension(
+    name="lib",
+    sources=["lib/wrapper/connect.pyx"] + source_files_paths,
+    language='c',
+    include_dirs=["lib/dxfeed-c-api/include/", "lib/dxfeed-c-api/src"],
+    libraries=['ws2_32']
+)
+
 setup(
     name="pyconnect",
     ext_modules=cythonize([
-        connection_ext,
+        new_logic_ext,
+        # connection_ext,
         # examples_extension
         ], language_level=3)
 )
