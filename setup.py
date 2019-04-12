@@ -7,22 +7,6 @@ source_files_directory = Path(__file__).resolve().parent.joinpath('lib', 'dxfeed
 source_files_paths = [str(path) for path in source_files_directory.glob('*.c')]
 source_files_paths.remove(str(source_files_directory.joinpath('Linux.c')))
 
-examples_extension = Extension(
-    name="pyexamples",
-    sources=["pyexamples.pyx"] + source_files_paths,
-    language='c',
-    include_dirs=["lib/dxfeed-c-api/include/", "lib/dxfeed-c-api/src"],
-    libraries=['ws2_32']
-)
-
-connection_ext = Extension(
-    name="pyconnect",
-    sources=["pyconnect.pyx"] + source_files_paths,
-    language='c',
-    include_dirs=["lib/dxfeed-c-api/include/", "lib/dxfeed-c-api/src"],
-    libraries=['ws2_32']
-)
-
 new_logic_ext = Extension(
     name="lib",
     sources=["lib/wrapper/connect.pyx"] + source_files_paths,
@@ -33,9 +17,9 @@ new_logic_ext = Extension(
 
 setup(
     name="pyconnect",
+    packages=['pyconnect'],
+    package_dir={'pyconnect': 'lib'},
     ext_modules=cythonize([
         new_logic_ext,
-        # connection_ext,
-        # examples_extension
         ], language_level=3)
 )

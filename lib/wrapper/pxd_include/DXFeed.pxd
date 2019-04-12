@@ -1,5 +1,4 @@
-from .DXTypes cimport *
-# from EventData cimport *
+include "DXTypes.pxd"
 
 # /* -------------------------------------------------------------------------- */
 # /*
