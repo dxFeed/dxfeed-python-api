@@ -12,17 +12,17 @@ NAME = 'pcapi'
 SRC_DIR = "lib"
 PACKAGES = [SRC_DIR]
 
-# ext_con = Extension(name=SRC_DIR + ".wrapper.connect",
-#                     sources=[SRC_DIR + "/wrapper/connect.pyx"] + source_files_paths,
-#                     libraries=['ws2_32'],
-#                     include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src"])
+ext_con = Extension(name=SRC_DIR + ".wrapper.connect",
+                    sources=[SRC_DIR + "/wrapper/connect.pyx"] + source_files_paths,
+                    libraries=['ws2_32'],
+                    include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src"])
 
-ext_1 = Extension(name=SRC_DIR + ".wrapped",
-                  sources=[SRC_DIR + "/wrapped.pyx"] + source_files_paths,
-                  libraries=['ws2_32'],
-                  include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src"])
+# ext_1 = Extension(name=SRC_DIR + ".wrapped",
+#                   sources=[SRC_DIR + "/wrapped.pyx"] + source_files_paths,
+#                   libraries=['ws2_32'],
+#                   include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src"])
 
-EXTENSIONS = [ext_1]
+EXTENSIONS = [ext_con]
 
 if __name__ == "__main__":
     setup(
