@@ -1,3 +1,4 @@
+
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 from Cython.Distutils import build_ext
@@ -20,25 +21,27 @@ ext_connection = Extension(name=SRC_DIR + ".wrapper.connect",
 ext_subscription = Extension(name=SRC_DIR + ".wrapper.subscribe",
                              sources=[SRC_DIR + "/wrapper/subscribe.pyx"] + source_files_paths,
                              libraries=['ws2_32'],
-                             include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src"])
+                             include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src"] +
+                             [SRC_DIR + '/wrapper/pxd_include'])
 
 EXTENSIONS = [ext_connection, ext_subscription]
 
 if __name__ == "__main__":
     setup(
         # install_requires=REQUIRES,
-          packages=PACKAGES,
-          zip_safe=False,
-          name=NAME,
-          # version=VERSION,
-          # description=DESCR,
-          # author=AUTHOR,
-          # author_email=EMAIL,
-          # url=URL,
-          # license=LICENSE,
-          cmdclass={"build_ext": build_ext},
-          ext_modules=EXTENSIONS
-          )
+        packages=PACKAGES,
+        zip_safe=False,
+        name=NAME,
+        # version=VERSION,
+        # description=DESCR,
+        # author=AUTHOR,
+        # author_email=EMAIL,
+        # url=URL,
+        # license=LICENSE,
+        # package_data={PACKAGES[0]: [SRC_DIR + '/wrapper/pxd_include']},
+        cmdclass={"build_ext": build_ext},
+        ext_modules=EXTENSIONS
+        )
 
 
 
