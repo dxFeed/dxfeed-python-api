@@ -24,7 +24,9 @@ ext_subscription = Extension(name=SRC_DIR + ".wrapper.subscribe",
                              include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src"] +
                              [SRC_DIR + '/wrapper/pxd_include'])
 
-EXTENSIONS = [ext_connection, ext_subscription]
+EXTENSIONS = [ext_connection,
+              # ext_subscription
+              ]
 
 if __name__ == "__main__":
     setup(

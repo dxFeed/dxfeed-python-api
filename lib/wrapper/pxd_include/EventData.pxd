@@ -4,9 +4,9 @@
 #define EVENT_DATA_H_INCLUDED
 
 #pxd_include "RecordData.h"
-from cimport RecordData import *
+from RecordData cimport *
 #pxd_include "DXTypes.h"
-from cimport DXTypes import *
+from DXTypes cimport *
 #ifndef OUT
     #define OUT
 #endif /* OUT */
@@ -60,7 +60,7 @@ cdef extern from "EventData.h":
 
 # // The length of record suffix including including the terminating null character
 #define DXF_RECORD_SUFFIX_SIZE 5
-
+DEF DXF_RECORD_SUFFIX_SIZE = 5
 # /* -------------------------------------------------------------------------- */
 # /*
 # *	Source suffix array
@@ -77,7 +77,7 @@ cdef extern from "EventData.h":
         size_t capacity
 
 
-    cdef dx_order_source_array_t* dx_order_source_array_ptr_t
+    ctypedef dx_order_source_array_t* dx_order_source_array_ptr_t
 
 # /* -------------------------------------------------------------------------- */
 # /*
@@ -208,9 +208,9 @@ cdef extern from "EventData.h":
         dxf_osd_buy = 1,
         dxf_osd_sell = 2
 
-    union _inner_oso:
-        dxf_const_string_t market_maker,
-        dxf_const_string_t spread_symbol
+    # union _inner_oso:
+    #     dxf_const_string_t market_maker,
+    #     dxf_const_string_t spread_symbol
 
 
     struct dxf_order_t:
@@ -226,8 +226,9 @@ cdef extern from "EventData.h":
         dxf_order_side_t side,
         dxf_char_t exchange_code,
         dxf_char_t source[DXF_RECORD_SUFFIX_SIZE],
-        _inner_oso # probably there should be some name (p58 of cython book)
-
+        # _inner_oso # probably there should be some name (p58 of cython book)
+        dxf_const_string_t market_maker,
+        dxf_const_string_t spread_symbol
 
 # /* Time And Sale ------------------------------------------------------------ */
 
@@ -326,8 +327,11 @@ cdef extern from "EventData.h":
     # ctypedef static dxf_const_string_t DXF_ORDER_COMPOSITE_BID_STR = L"COMPOSITE_BID"
     # ctypedef static dxf_const_string_t DXF_ORDER_COMPOSITE_ASK_STR = L"COMPOSITE_ASK"
 
-    cdef static dxf_const_string_t DXF_ORDER_COMPOSITE_BID_STR = "COMPOSITE_BID"
-    cdef static dxf_const_string_t DXF_ORDER_COMPOSITE_ASK_STR = "COMPOSITE_ASK"
+    # cdef static dxf_const_string_t DXF_ORDER_COMPOSITE_BID_STR = "COMPOSITE_BID"
+    # cdef static dxf_const_string_t DXF_ORDER_COMPOSITE_ASK_STR = "COMPOSITE_ASK"
+
+    cdef dxf_const_string_t DXF_ORDER_COMPOSITE_BID_STR = "COMPOSITE_BID"
+    cdef dxf_const_string_t DXF_ORDER_COMPOSITE_ASK_STR = "COMPOSITE_ASK"
 
 # /* -------------------------------------------------------------------------- */
 # /*
@@ -410,7 +414,7 @@ cdef extern from "EventData.h":
 # */
 # /* -------------------------------------------------------------------------- */
 
-    cdef dxf_ulong_t dxf_time_int_field_t
+    ctypedef dxf_ulong_t dxf_time_int_field_t
 
     struct dxf_event_params_t:
         dxf_event_flags_t flags,
@@ -428,11 +432,11 @@ cdef extern from "EventData.h":
 # /* -------------------------------------------------------------------------- */
 
 
-    cdef void (*dxf_event_listener_t) (int event_type, dxf_const_string_t symbol_name,
+    ctypedef void (*dxf_event_listener_t) (int event_type, dxf_const_string_t symbol_name,
                                           const dxf_event_data_t* data, int data_count,
                                           void* user_data)
 
-    cdef void (*dxf_event_listener_v2_t) (int event_type, dxf_const_string_t symbol_name,
+    ctypedef void (*dxf_event_listener_v2_t) (int event_type, dxf_const_string_t symbol_name,
                                           const dxf_event_data_t* data, int data_count,
                                           const dxf_event_params_t* event_params, void* user_data)
 
@@ -481,7 +485,7 @@ cdef extern from "EventData.h":
 #  * You need to call dx_free(params.elements) to free resources.
 #  */
     cdef size_t dx_get_event_subscription_params(dxf_connection_t connection, dx_order_source_array_ptr_t order_source, dx_event_id_t event_id,
-                                        dxf_uint_t subscr_flags, OUT dx_event_subscription_param_list_t* params)
+                                        dxf_uint_t subscr_flags, dx_event_subscription_param_list_t* params)
 
 # /* -------------------------------------------------------------------------- */
 # /*
@@ -489,12 +493,14 @@ cdef extern from "EventData.h":
 # */
 # /* -------------------------------------------------------------------------- */
     #Not sure if it will go
-    struct dxf_snapshot_data_t, *dxf_snapshot_data_ptr_t:
+    struct dxf_snapshot_data_t:
         int event_type,
         dxf_string_t symbol,
 
         size_t records_count,
         const dxf_event_data_t* records
+
+    ctypedef dxf_snapshot_data_t* dxf_snapshot_data_ptr_t
 
 #
 # /* -------------------------------------------------------------------------- */
@@ -506,7 +512,7 @@ cdef extern from "EventData.h":
 # */
 # /* -------------------------------------------------------------------------- */
 #
-# ctypedef void(*dxf_snapshot_listener_t) (const dxf_snapshot_data_ptr_t snapshot_data, void* user_data)
+    ctypedef void(*dxf_snapshot_listener_t) (const dxf_snapshot_data_ptr_t snapshot_data, void* user_data)
 #
 # /* -------------------------------------------------------------------------- */
 # /*
@@ -523,29 +529,31 @@ cdef extern from "EventData.h":
 # #define DXF_IS_TIME_AND_SALE_REMOVAL(t) (((t)->event_flags & dxf_ef_remove_event) != 0)
 # #define DXF_IS_GREEKS_REMOVAL(g) (((g)->event_flags & dxf_ef_remove_event) != 0)
 # #define DXF_IS_SERIES_REMOVAL(s) (((s)->event_flags & dxf_ef_remove_event) != 0)
-# ctypedef void(*dxf_snapshot_inc_listener_t) (const dxf_snapshot_data_ptr_t snapshot_data, int new_snapshot, void* user_data)
+    ctypedef void(*dxf_snapshot_inc_listener_t) (const dxf_snapshot_data_ptr_t snapshot_data, int new_snapshot, void* user_data)
 #
 # /* -------------------------------------------------------------------------- */
 # /*
 # *  Price Level data structs
 # */
 # /* -------------------------------------------------------------------------- */
-# ctypedef struct {
-#     dxf_double_t price
-#     dxf_long_t size
-#     dxf_long_t time
-# } dxf_price_level_element_t
-#
-# ctypedef struct {
-#     dxf_const_string_t symbol
-#
-#     size_t bids_count
-#     const dxf_price_level_element_t *bids
-#
-#     size_t asks_count
-#     const dxf_price_level_element_t *asks
-# } dxf_price_level_book_data_t, *dxf_price_level_book_data_ptr_t
-#
+    struct dxf_price_level_element_t:
+        dxf_double_t price
+        dxf_long_t size
+        dxf_long_t time
+
+
+
+    struct dxf_price_level_book_data_t:
+        dxf_const_string_t symbol
+
+        size_t bids_count
+        const dxf_price_level_element_t *bids
+
+        size_t asks_count
+        const dxf_price_level_element_t *asks
+
+    ctypedef dxf_price_level_book_data_t* dxf_price_level_book_data_ptr_t
+
 # /* -------------------------------------------------------------------------- */
 # /*
 # *  Price Level listener prototype
@@ -559,7 +567,7 @@ cdef extern from "EventData.h":
 # */
 # /* -------------------------------------------------------------------------- */
 #
-# ctypedef void(*dxf_price_level_book_listener_t) (const dxf_price_level_book_data_ptr_t book, void* user_data)
+    ctypedef void(*dxf_price_level_book_listener_t) (const dxf_price_level_book_data_ptr_t book, void* user_data)
 #
 # /* -------------------------------------------------------------------------- */
 # /*
@@ -570,7 +578,7 @@ cdef extern from "EventData.h":
 # */
 # /* -------------------------------------------------------------------------- */
 #
-# ctypedef void(*dxf_regional_quote_listener_t) (dxf_const_string_t symbol, const dxf_quote_t* quotes, int count, void* user_data)
+    ctypedef void(*dxf_regional_quote_listener_t) (dxf_const_string_t symbol, const dxf_quote_t* quotes, int count, void* user_data)
 #
 # /* -------------------------------------------------------------------------- */
 # /*

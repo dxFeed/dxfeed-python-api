@@ -1,4 +1,5 @@
 from pxd_include.DXFeed cimport *
+
 cdef dxf_connection_t connection
 
 def pyconnect():
