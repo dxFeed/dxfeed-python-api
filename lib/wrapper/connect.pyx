@@ -1,4 +1,4 @@
-from pxd_include.DXFeed cimport *
+from lib.wrapper.pxd_include.DXFeed cimport *
 
 cdef dxf_connection_t connection
 

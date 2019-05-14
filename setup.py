@@ -42,7 +42,7 @@ if __name__ == "__main__":
         # license=LICENSE,
         # package_data={PACKAGES[0]: [SRC_DIR + '/wrapper/pxd_include']},
         cmdclass={"build_ext": build_ext},
-        ext_modules=EXTENSIONS
+        ext_modules=cythonize(EXTENSIONS, language_level=3)
         )
 
 
