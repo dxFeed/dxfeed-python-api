@@ -38,21 +38,25 @@ def py_get_smth():
     cdef Py_ssize_t length
     cdef wchar_t *c_symbols = PyUnicode_AsWideCharString(my_string, &length)
     cdef dxf_event_data_t data
+    cdef dxf_trade_t *trade
     print(f"{dxf_get_last_event(connection, 1, c_symbols, &data)}")
     print('Got')
-    cdef dxf_trade_t* trade
+
 
     if data:
-        trade = <dxf_trade_t*?>data
+        trade = <dxf_trade_t*>data
+        print(f"time {trade.time}")
+        print(f"ex code {trade.exchange_code}")
+
 
         #wprintf("\nSymbol: %s; time=%lld, exchange code=%C, price=%f, size=%ld, tick=%ld, change=%f, day volume=%f, scope=%d\n",
         #        c_symbols, trade.time, trade.exchange_code, trade.price, trade.size, trade.tick, trade.change,
         #        trade.day_volume, <int>trade.scope)
-        # print(f"{trade.time}")
-        # print(f"{trade.exchange_code}")
-        # print(f"{trade.price}")
-        # print(f"{trade.size}")
-        # print(f"{trade.tick}")
+
+        print(f"{trade.exchange_code}")
+        print(f"{trade.price}")
+        print(f"{trade.size}")
+        print(f"{trade.tick}")
         print('if done')
     print('final')
 

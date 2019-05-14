@@ -105,7 +105,7 @@ cdef extern from "EventData.h":
         dxf_dir_up = 5
 
 
-    struct dxf_trade_t:
+    ctypedef struct dxf_trade_t:
         dxf_long_t time,
         dxf_int_t sequence,
         dxf_int_t time_nanos,
