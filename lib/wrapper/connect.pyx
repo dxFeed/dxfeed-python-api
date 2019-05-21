@@ -22,22 +22,34 @@ def pysubscribe():
 cdef extern from "Python.h":
     dxf_const_string_t PyUnicode_AsWideCharString(object, Py_ssize_t *)
 
-# import numpy as np
-# cimport numpy as np
-def py_add_symbol():
-    my_string = u"AAPL"
+from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
+def py_add_symbol(symbols=['AAPL', 'MSFT']):
+    # my_string = u"AAPL"
     # for i in range(len(symbols)):
-    cdef Py_ssize_t length
-    cdef dxf_const_string_t c_symbols = PyUnicode_AsWideCharString(my_string, &length)
-    my_string2 = u"MSFT"
-    cdef Py_ssize_t length2
-    cdef dxf_const_string_t c_symbols2 = PyUnicode_AsWideCharString(my_string2, &length)
+    # cdef Py_ssize_t length
+    # cdef dxf_const_string_t c_symbols = PyUnicode_AsWideCharString(my_string, NULL)
+    # my_string2 = u"MSFT"
+    # cdef Py_ssize_t length2
+    # cdef dxf_const_string_t c_symbols2 = PyUnicode_AsWideCharString(my_string2, NULL)
     # c_symbols = np.array(symbols)
-    cdef dxf_const_string_t c_syms[2]
-    c_syms[:] = [c_symbols, c_symbols2]
+
+    # allocate number * sizeof(double) bytes of memory
+    # cdef double *my_array = <double *> malloc(number * sizeof(double))
+    cdef int number = len(symbols)
+    # cdef dxf_const_string_t *c_syms = <dxf_const_string_t *> malloc(number * sizeof(dxf_const_string_t))
+    cdef dxf_const_string_t *c_syms = <dxf_const_string_t *> PyMem_Malloc(number * sizeof(dxf_const_string_t))
+
+    # cdef dxf_const_string_t c_syms[2]
+    for idx, sym in enumerate(symbols):
+        c_syms[idx] = PyUnicode_AsWideCharString(sym, NULL)
+
+
+
+    # c_syms[:] = [c_symbols, c_symbols2]
     #print(c_syms)
     # c_symbols[1] = my_string2
-    print(f"{dxf_add_symbols(subscription, c_syms, 2)}")
+    print(f"{dxf_add_symbols(subscription, c_syms, number)}")
+    PyMem_Free(c_syms)
     print('added')
 
 cdef extern from "wchar.h":
