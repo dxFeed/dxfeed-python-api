@@ -22,38 +22,17 @@ def pysubscribe():
 cdef extern from "Python.h":
     dxf_const_string_t PyUnicode_AsWideCharString(object, Py_ssize_t *)
 
-from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
-def py_add_symbol(symbols=['AAPL', 'MSFT']):
-    # my_string = u"AAPL"
-    # for i in range(len(symbols)):
-    # cdef Py_ssize_t length
-    # cdef dxf_const_string_t c_symbols = PyUnicode_AsWideCharString(my_string, NULL)
-    # my_string2 = u"MSFT"
-    # cdef Py_ssize_t length2
-    # cdef dxf_const_string_t c_symbols2 = PyUnicode_AsWideCharString(my_string2, NULL)
-    # c_symbols = np.array(symbols)
-
-    # allocate number * sizeof(double) bytes of memory
-    # cdef double *my_array = <double *> malloc(number * sizeof(double))
-    cdef int number = len(symbols)
-    # cdef dxf_const_string_t *c_syms = <dxf_const_string_t *> malloc(number * sizeof(dxf_const_string_t))
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
+def py_add_symbol(symbols: list):
+    cdef int number = len(symbols)  # Number of elements
+    # define array with dynamic memory allocation
     cdef dxf_const_string_t *c_syms = <dxf_const_string_t *> PyMem_Malloc(number * sizeof(dxf_const_string_t))
-
-    # cdef dxf_const_string_t c_syms[2]
+    # create array with cycle
     for idx, sym in enumerate(symbols):
         c_syms[idx] = PyUnicode_AsWideCharString(sym, NULL)
-
-
-
-    # c_syms[:] = [c_symbols, c_symbols2]
-    #print(c_syms)
-    # c_symbols[1] = my_string2
-    print(f"{dxf_add_symbols(subscription, c_syms, number)}")
-    PyMem_Free(c_syms)
+    dxf_add_symbols(subscription, c_syms, number)
+    PyMem_Free(c_syms)  # free memory
     print('added')
-
-cdef extern from "wchar.h":
-    int wprintf(const wchar_t *, ...)
 
 def py_get_smth():
     my_string = u"AAPL"
@@ -70,7 +49,6 @@ def py_get_smth():
             trade = <dxf_trade_t*?>data
             print(f"time {trade.time}")
             print(f"ex code {trade.exchange_code}")
-
             print(f"{trade.price}")
             print(f"{trade.size}")
             print(f"{trade.tick}")
@@ -82,5 +60,5 @@ def py_get_smth():
 def all_in_one():
     pyconnect()
     pysubscribe()
-    py_add_symbol()
+    py_add_symbol(['AAPL', 'MSFT', 'C'])
     py_get_smth()
