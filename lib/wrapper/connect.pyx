@@ -1,10 +1,16 @@
 from lib.wrapper.pxd_include.DXFeed cimport *
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
+
+cdef extern from "Python.h":
+    # Convert unicode to wchar
+    dxf_const_string_t PyUnicode_AsWideCharString(object, Py_ssize_t *)
 
 cdef dxf_connection_t connection
 
-def pyconnect():
+def pyconnect(address='demo.dxfeed.com:7300'):
     print('connecting2')
-    print(f"{dxf_create_connection('demo.dxfeed.com:7300', NULL, NULL, NULL, NULL, NULL, &connection)}")
+    address = address.encode('utf-8')#, 'ignore')
+    print(f"{dxf_create_connection(address, NULL, NULL, NULL, NULL, NULL, &connection)}")
     print('connected')
 
 def pydisconnect():
@@ -19,25 +25,24 @@ def pysubscribe():
     print(f"{dxf_create_subscription(connection, 1, &subscription)}")
     print('suscribed')
 
-cdef extern from "Python.h":
-    dxf_const_string_t PyUnicode_AsWideCharString(object, Py_ssize_t *)
-
-from cpython.mem cimport PyMem_Malloc, PyMem_Free
 def py_add_symbol(symbols: list):
     cdef int number = len(symbols)  # Number of elements
+    cdef int idx # for faster loops
     # define array with dynamic memory allocation
     cdef dxf_const_string_t *c_syms = <dxf_const_string_t *> PyMem_Malloc(number * sizeof(dxf_const_string_t))
     # create array with cycle
     for idx, sym in enumerate(symbols):
         c_syms[idx] = PyUnicode_AsWideCharString(sym, NULL)
+    # call c function
     dxf_add_symbols(subscription, c_syms, number)
+    for idx in range(number):
+        PyMem_Free(c_syms[idx])
     PyMem_Free(c_syms)  # free memory
     print('added')
 
 def py_get_smth():
     my_string = u"AAPL"
-    cdef Py_ssize_t length
-    cdef wchar_t *c_symbols = PyUnicode_AsWideCharString(my_string, &length)
+    cdef wchar_t *c_symbols = PyUnicode_AsWideCharString(my_string, NULL)
     cdef dxf_event_data_t data
     cdef dxf_trade_t *trade
     n=10
