@@ -50,6 +50,7 @@ def event_type_convert(event_type: str):
 
 def dxf_create_connection(address='demo.dxfeed.com:7300'):
     address = address.encode('utf-8')
+    # clib.dxf_create_connection(address, NULL, NULL, NULL, NULL, NULL, cython.address(connection))
     clib.dxf_create_connection(address, NULL, NULL, NULL, NULL, NULL, &connection)
 
 def dxf_close_connection():
@@ -80,30 +81,68 @@ def dxf_add_symbols(symbols: list):
     PyMem_Free(c_syms)
     print('added')
 
-@always_allow_keywords(True)
-def dxf_get_last_event(my_string):
-    cdef clib.wchar_t *c_symbols = PyUnicode_AsWideCharString(my_string, NULL)
-    cdef clib.dxf_event_data_t data
-    cdef clib.dxf_trade_t *trade
-    n=2
-    import time
-    for _ in range(n):
-        # event type in EventData.h (e.g. #define DXF_ET_TRADE         (1 << dx_eid_trade))
-        clib.dxf_get_last_event(connection, 1, c_symbols, &data)
-        if data:
-            trade = <clib.dxf_trade_t*?>data
-            print(f"time {trade.time}")
-            print(f"ex code {trade.exchange_code}")
-            print(f"{trade.price}")
-            print(f"{trade.size}")
-            print(f"{trade.tick}")
-            print('if done')
-        print('final')
-        time.sleep(2)
+# cdef void listener(int event_type, clib.dxf_const_string_t symbol_name,
+#                    const clib.dxf_event_data_t* data, int data_count, void* user_data):
+#     cdef int et_trade = event_type_convert('Trade')
+#     # if event_type == et_trade:
+#     cdef clib.dxf_trade_t* trades = <clib.dxf_trade_t*?>data
+#     for  i in range(data_count):
+#         # print(f"time {trades.time}")
+#         # print(f"ex code {trades.exchange_code}")
+#         print(trades.price)
+#         print(trades.size)
+#         print(trades.tick)
+# cimport lib.wrapper.listener
+
+cdef void listener(int event_type, clib.dxf_const_string_t symbol_name,
+                   const clib.dxf_event_data_t* data, int data_count, void* user_data):
+    #import sys
+    a = 1
+    b = a + 13
+    print(b)
+    #print("Here 1", file=sys.stderr)
+    cdef clib.dxf_trade_t* trades = <clib.dxf_trade_t*?>data
+    print(f"Hi, I'm focking data_count - {data_count}")
+    for  i in range(data_count):
+        print(f"time {trades[i].price}")
+    pass
+
+
+def attach_listener():
+    print("Here 0")
+    # clib.dxf_attach_event_listener(subscription, clib.listener, NULL)
+    clib.dxf_attach_event_listener(subscription, listener, NULL)
+    print("Here 2")
+
+# @always_allow_keywords(True)
+# def dxf_get_last_event(my_string):
+#     cdef clib.wchar_t *c_symbols = PyUnicode_AsWideCharString(my_string, NULL)
+#     cdef clib.dxf_event_data_t data
+#     cdef clib.dxf_trade_t *trade
+#     n=2
+#     import time
+#     for _ in range(n):
+#         # event type in EventData.h (e.g. #define DXF_ET_TRADE         (1 << dx_eid_trade))
+#         clib.dxf_get_last_event(connection, 1, c_symbols, &data)
+#         if data:
+#             trade = <clib.dxf_trade_t*?>data
+#             print(f"time {trade.time}")
+#             print(f"ex code {trade.exchange_code}")
+#             print(f"{trade.price}")
+#             print(f"{trade.size}")
+#             print(f"{trade.tick}")
+#             print('if done')
+#         print('final')
+#         time.sleep(2)
 
 
 def all_in_one():
     dxf_create_connection()
     dxf_create_subscription(event_types='Trade')
     dxf_add_symbols(['AAPL', 'MSFT', 'C'])
-    dxf_get_last_event(my_string='MSFT')
+    attach_listener()
+    import time
+    for a in range(5):
+        print(a)
+        time.sleep(1)
+    # dxf_get_last_event(my_string='MSFT')
