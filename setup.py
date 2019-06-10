@@ -25,8 +25,8 @@ ext_subscription = Extension(name=SRC_DIR + ".wrapper.subscribe",
                              [SRC_DIR + '/wrapper/pxd_include'])
 
 EXTENSIONS = [
-    ext_connection,
-    # ext_subscription,
+    # ext_connection,
+    ext_subscription,
 ]
 
 if __name__ == "__main__":
