@@ -81,6 +81,9 @@ def dxf_add_symbols(symbols: list):
     PyMem_Free(c_syms)
     print('added')
 
+# https://stackoverflow.com/questions/40575432/send-data-from-c-parent-to-python-child-and-back-using-a-pipe
+#
+
 # cdef void listener(int event_type, clib.dxf_const_string_t symbol_name,
 #                    const clib.dxf_event_data_t* data, int data_count, void* user_data):
 #     cdef int et_trade = event_type_convert('Trade')
@@ -94,25 +97,12 @@ def dxf_add_symbols(symbols: list):
 #         print(trades.tick)
 # cimport lib.wrapper.listener
 
-cdef void listener(int event_type, clib.dxf_const_string_t symbol_name,
-                   const clib.dxf_event_data_t* data, int data_count, void* user_data):
-    #import sys
-    a = 1
-    b = a + 13
-    print(b)
-    #print("Here 1", file=sys.stderr)
-    cdef clib.dxf_trade_t* trades = <clib.dxf_trade_t*?>data
-    print(f"Hi, I'm focking data_count - {data_count}")
-    for  i in range(data_count):
-        print(f"time {trades[i].price}")
-    pass
 
-
-def attach_listener():
-    print("Here 0")
-    # clib.dxf_attach_event_listener(subscription, clib.listener, NULL)
-    clib.dxf_attach_event_listener(subscription, listener, NULL)
-    print("Here 2")
+# def attach_listener():
+#     print("Here 0")
+#     # clib.dxf_attach_event_listener(subscription, clib.listener, NULL)
+#     clib.dxf_attach_event_listener(subscription, listener, NULL)
+#     print("Here 2")
 
 # @always_allow_keywords(True)
 # def dxf_get_last_event(my_string):
