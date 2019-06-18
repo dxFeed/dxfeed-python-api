@@ -82,27 +82,39 @@ def dxf_add_symbols(symbols: list):
     print('added')
 
 # https://stackoverflow.com/questions/40575432/send-data-from-c-parent-to-python-child-and-back-using-a-pipe
-#
 
-# cdef void listener(int event_type, clib.dxf_const_string_t symbol_name,
-#                    const clib.dxf_event_data_t* data, int data_count, void* user_data):
-#     cdef int et_trade = event_type_convert('Trade')
-#     # if event_type == et_trade:
-#     cdef clib.dxf_trade_t* trades = <clib.dxf_trade_t*?>data
-#     for  i in range(data_count):
-#         # print(f"time {trades.time}")
-#         # print(f"ex code {trades.exchange_code}")
-#         print(trades.price)
-#         print(trades.size)
-#         print(trades.tick)
-# cimport lib.wrapper.listener
+from cpython cimport array
+import array
+
+cdef array.array a =  array.array('f', [0.1] * 20)
+# a.data.as_floats
+cdef void * u_data =  <void*>a
+
+cdef void listener(int event_type, clib.dxf_const_string_t symbol_name,
+                   const clib.dxf_event_data_t* data, int data_count, void* user_data):
+    # print(1)
+    cdef clib.dxf_trade_t* trades = <clib.dxf_trade_t*?>data
+    a[0] = 23.0
+
+    for  i in range(1, data_count):
+        # print(f"time {trades.time}")
+        # print(f"ex code {trades.exchange_code}")
+        # pass
+        a[i] = trades[i].price
+        # print(trades[i].size)
+        # print(trades[i].tick)
+
+cimport lib.wrapper.pxd_include.Listeners as lis
 
 
-# def attach_listener():
-#     print("Here 0")
-#     # clib.dxf_attach_event_listener(subscription, clib.listener, NULL)
-#     clib.dxf_attach_event_listener(subscription, listener, NULL)
-#     print("Here 2")
+
+def attach_listener():
+    # clib.dxf_attach_event_listener(subscription, listener, u_data)
+    clib.dxf_attach_event_listener(subscription, lis.listener, u_data)
+    # print(u_data)
+
+def detach_listener():
+    clib.dxf_detach_event_listener(subscription, lis.listener)
 
 # @always_allow_keywords(True)
 # def dxf_get_last_event(my_string):
@@ -125,14 +137,17 @@ def dxf_add_symbols(symbols: list):
 #         print('final')
 #         time.sleep(2)
 
-
+import time
 def all_in_one():
     dxf_create_connection()
     dxf_create_subscription(event_types='Trade')
     dxf_add_symbols(['AAPL', 'MSFT', 'C'])
     attach_listener()
-    import time
-    for a in range(5):
-        print(a)
-        time.sleep(1)
+    time.sleep(3)
+    detach_listener()
+    print(a)
+    # import time
+    # for a in range(5):
+    #     print(a)
+    #     time.sleep(1)
     # dxf_get_last_event(my_string='MSFT')
