@@ -7,3 +7,5 @@ build/*
 *.c
 
 *__pycache__
+
+*cython_debug*
