@@ -88,7 +88,10 @@ import array
 
 cdef array.array a =  array.array('f', [0.1] * 20)
 # a.data.as_floats
-cdef void * u_data =  <void*>a
+
+cdef float[::1] arr_memview = a
+cdef void * u_data =  <void*>&arr_memview[0]
+
 
 cdef void listener(int event_type, clib.dxf_const_string_t symbol_name,
                    const clib.dxf_event_data_t* data, int data_count, void* user_data):
@@ -111,6 +114,7 @@ cimport lib.wrapper.pxd_include.Listeners as lis
 def attach_listener():
     # clib.dxf_attach_event_listener(subscription, listener, u_data)
     clib.dxf_attach_event_listener(subscription, lis.listener, u_data)
+    # clib.dxf_attach_event_listener(subscription, lis.listener, &a)
     # print(u_data)
 
 def detach_listener():
