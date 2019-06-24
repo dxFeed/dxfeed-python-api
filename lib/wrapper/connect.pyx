@@ -83,11 +83,15 @@ def dxf_add_symbols(symbols: list):
 
 # https://stackoverflow.com/questions/40575432/send-data-from-c-parent-to-python-child-and-back-using-a-pipe
 
-from cpython cimport array
-import array
+# from cpython cimport array
+# import array
 
-cdef array.array a =  array.array('f', [0.1] * 20)
+# cdef array.array a =  array.array('f', [0.1] * 20)
 # a.data.as_floats
+import numpy as np
+cimport numpy as np
+
+a = np.zeros(5, dtype='f')
 
 cdef float[::1] arr_memview = a
 cdef void * u_data =  <void*>&arr_memview[0]
