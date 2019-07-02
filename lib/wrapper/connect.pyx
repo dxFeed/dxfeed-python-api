@@ -2,6 +2,7 @@ cimport lib.wrapper.pxd_include.DXFeed as clib
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from warnings import warn
 from cython cimport always_allow_keywords
+from libc.stdlib cimport realloc, malloc, free
 
 
 cdef extern from "Python.h":
@@ -81,39 +82,124 @@ def dxf_add_symbols(symbols: list):
     PyMem_Free(c_syms)
     print('added')
 
-# https://stackoverflow.com/questions/40575432/send-data-from-c-parent-to-python-child-and-back-using-a-pipe
+# # https://stackoverflow.com/questions/40575432/send-data-from-c-parent-to-python-child-and-back-using-a-pipe
+#
+# # from cpython cimport array
+# # import array
+#
+# # cdef array.array a =  array.array('f', [0.1] * 20)
+# # a.data.as_floats
+# import numpy as np
+# cimport numpy as np
+#
+# a = np.zeros(7, dtype='f')
+#
+# cdef float[::1] arr_memview = a
+# cdef void * u_data =  <void*>&arr_memview[0]
+#
+# # https://cython.readthedocs.io/en/latest/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers
+# # https://stackoverflow.com/questions/3536153/c-dynamically-growing-array
+#
+# cdef void listener(int event_type, clib.dxf_const_string_t symbol_name,
+#                    const clib.dxf_event_data_t* data, int data_count, void* user_data):
+#     # print(1)
+#     cdef clib.dxf_trade_t* trades = <clib.dxf_trade_t*?>data
+#     a[0] = 23.0
+#
+#     for  i in range(1, data_count):
+#         # print(f"time {trades.time}")
+#         # print(f"ex code {trades.exchange_code}")
+#         # pass
+#         a[i] = trades[i].price
+#         # print(trades[i].size)
+#         # print(trades[i].tick)
 
-# from cpython cimport array
-# import array
-
-# cdef array.array a =  array.array('f', [0.1] * 20)
-# a.data.as_floats
-import numpy as np
-cimport numpy as np
-
-a = np.zeros(5, dtype='f')
-
-cdef float[::1] arr_memview = a
-cdef void * u_data =  <void*>&arr_memview[0]
 
 
-cdef void listener(int event_type, clib.dxf_const_string_t symbol_name,
-                   const clib.dxf_event_data_t* data, int data_count, void* user_data):
-    # print(1)
-    cdef clib.dxf_trade_t* trades = <clib.dxf_trade_t*?>data
-    a[0] = 23.0
 
-    for  i in range(1, data_count):
-        # print(f"time {trades.time}")
-        # print(f"ex code {trades.exchange_code}")
-        # pass
-        a[i] = trades[i].price
-        # print(trades[i].size)
-        # print(trades[i].tick)
+
+
+
+# Linked List realization
+ctypedef struct linked_list
+
+ctypedef struct linked_list:
+    double price
+    double volume
+    bint data
+    linked_list *next_cell
+
+cdef linked_list * linked_list_init():
+    init = <linked_list *>malloc(sizeof(linked_list))
+    init.data = False
+    init.next_cell = NULL
+    return init
+
+cdef linked_list * head = <linked_list *>malloc(sizeof(linked_list))
+
+
+cdef class WrapperClass:
+    """A wrapper class for a C/C++ data structure"""
+    cdef linked_list * _ptr
+    cdef bint ptr_owner
+    cdef linked_list * curr
+    cdef linked_list * next_cell
+    cdef linked_list * init
+#     cdef linked_list * next_node
+
+    def __cinit__(self):
+        self.ptr_owner = False
+
+    def __dealloc__(self):
+        # De-allocate if not null and flag is set
+        if self._ptr is not NULL and self.ptr_owner is True:
+            free(self._ptr)
+            self._ptr = NULL
+
+    @property
+    def price(self):
+        return self._ptr.price if self._ptr is not NULL else None
+
+    @property
+    def volume(self):
+        return self._ptr.volume if self._ptr is not NULL else None
+
+    @staticmethod
+    cdef WrapperClass from_ptr(linked_list *_ptr, bint owner=False):
+        """Factory function to create WrapperClass objects from
+        given my_c_struct pointer.
+
+        Setting ``owner`` flag to ``True`` causes
+        the extension type to ``free`` the structure pointed to by ``_ptr``
+        when the wrapper object is deallocated."""
+        # Call to __new__ bypasses __init__ constructor
+        cdef WrapperClass wrapper = WrapperClass.__new__(WrapperClass)
+        wrapper._ptr = _ptr
+        wrapper.ptr_owner = owner
+        wrapper.curr = _ptr
+        return wrapper
+
+    def add_elem(self, double price, double volume):
+        next_cell = linked_list_init()
+        self.curr.next_cell = next_cell
+        self.curr.price = price
+        self.curr.volume = volume
+        self.curr.data = True
+        self.curr.next_cell.next_cell = NULL
+        self.curr = self.curr.next_cell
+
+    def print_list(self):
+        cur = self._ptr
+        while (cur != NULL):
+            print(cur.price)
+            cur = cur.next_cell
+
+data = WrapperClass.from_ptr(head)
+
 
 cimport lib.wrapper.pxd_include.Listeners as lis
 
-
+cdef void * u_data =  <void*>&head
 
 def attach_listener():
     # clib.dxf_attach_event_listener(subscription, listener, u_data)
@@ -153,7 +239,7 @@ def all_in_one():
     attach_listener()
     time.sleep(3)
     detach_listener()
-    print(a)
+    # print(a)
     # import time
     # for a in range(5):
     #     print(a)

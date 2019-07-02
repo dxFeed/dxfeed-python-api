@@ -4,8 +4,11 @@
 # Python Build files
 build/*
 *.pyd
-*.c
 
+*.c
+!lib/wrapper/pxd_include/*.c
 *__pycache__
 
 *cython_debug*
+
+*Untitled*
