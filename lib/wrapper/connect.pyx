@@ -82,42 +82,6 @@ def dxf_add_symbols(symbols: list):
     PyMem_Free(c_syms)
     print('added')
 
-# # https://stackoverflow.com/questions/40575432/send-data-from-c-parent-to-python-child-and-back-using-a-pipe
-#
-# # from cpython cimport array
-# # import array
-#
-# # cdef array.array a =  array.array('f', [0.1] * 20)
-# # a.data.as_floats
-# import numpy as np
-# cimport numpy as np
-#
-# a = np.zeros(7, dtype='f')
-#
-# cdef float[::1] arr_memview = a
-# cdef void * u_data =  <void*>&arr_memview[0]
-#
-# # https://cython.readthedocs.io/en/latest/src/userguide/extension_types.html#instantiation-from-existing-c-c-pointers
-# # https://stackoverflow.com/questions/3536153/c-dynamically-growing-array
-#
-# cdef void listener(int event_type, clib.dxf_const_string_t symbol_name,
-#                    const clib.dxf_event_data_t* data, int data_count, void* user_data):
-#     # print(1)
-#     cdef clib.dxf_trade_t* trades = <clib.dxf_trade_t*?>data
-#     a[0] = 23.0
-#
-#     for  i in range(1, data_count):
-#         # print(f"time {trades.time}")
-#         # print(f"ex code {trades.exchange_code}")
-#         # pass
-#         a[i] = trades[i].price
-#         # print(trades[i].size)
-#         # print(trades[i].tick)
-
-
-
-
-
 
 
 # Linked List realization
@@ -135,7 +99,7 @@ cdef linked_list * linked_list_init():
     init.next_cell = NULL
     return init
 
-cdef linked_list * head = <linked_list *>malloc(sizeof(linked_list))
+cdef linked_list * head = linked_list_init()
 
 
 cdef class WrapperClass:
@@ -188,18 +152,27 @@ cdef class WrapperClass:
         self.curr.next_cell.next_cell = NULL
         self.curr = self.curr.next_cell
 
+    def delete_list(self):
+        cur = self._ptr
+        nextt = self._ptr
+        while (cur != NULL):
+            nextt = cur.next_cell
+            free(cur)
+            cur = nextt
+        self._ptr[0] = linked_list_init()[0]
+
     def print_list(self):
         cur = self._ptr
         while (cur != NULL):
-            print(cur.price)
+            print(cur.price, cur.volume, cur.data)
             cur = cur.next_cell
 
-data = WrapperClass.from_ptr(head)
+data = WrapperClass.from_ptr(head, owner=True)
 
 
 cimport lib.wrapper.pxd_include.Listeners as lis
 
-cdef void * u_data =  <void*>&head
+cdef void * u_data =  <void*>head
 
 def attach_listener():
     # clib.dxf_attach_event_listener(subscription, listener, u_data)

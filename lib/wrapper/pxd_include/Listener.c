@@ -26,6 +26,8 @@ linked_list * linked_list_init() {
 }
 
 linked_list * add_elem(linked_list * node, double price, double volume) {
+//    printf('\n');
+    printf("Node number %f\n", price);
 	linked_list * next = linked_list_init();
 	node->next = next;
 	node->price = price;
@@ -90,17 +92,11 @@ void listener(int event_type, dxf_const_string_t symbol_name,
 	wprintf(L"%s{symbol=%s, ", dx_event_type_to_string(event_type), symbol_name);
 
     dxf_trade_t* trades = (dxf_trade_t*)data;
-
+    printf(L"written: %i", data_count);
     for (; i < data_count; ++i) {
-          add_elem(a, trades[i].price, trades[i].size);
-//			print_timestamp(trades[i].time);
-//        a[0] = trades[i].exchange_code;
-//        a[1] = trades[i].price;
-//        a[2] = trades[i].size;
-//        a[3] = trades[i].tick;
-//        a[4] = trades[i].change;
-//        a[5] = trades[i].day_volume;
-//        a[6] = trades[i].scope;
+        a = add_elem(a, trades[i].price, trades[i].size);
+        printf(L"written: %f", a->price);
+
         wprintf(L", exchangeCode=%c, price=%f, size=%i, tick=%i, change=%f, day volume=%.0f, scope=%d}\n",
                 trades[i].exchange_code, trades[i].price, trades[i].size, trades[i].tick, trades[i].change,
             trades[i].day_volume, (int)trades[i].scope);
