@@ -93,18 +93,28 @@ ctypedef struct linked_list:
     bint data
     linked_list *next_cell
 
+ctypedef struct linked_list_ext:
+    linked_list * head
+    linked_list * tail
+
 cdef linked_list * linked_list_init():
     init = <linked_list *>malloc(sizeof(linked_list))
     init.data = False
     init.next_cell = NULL
     return init
 
-cdef linked_list * head = linked_list_init()
+cdef linked_list_ext * linked_list_ext_init():
+    init = <linked_list_ext *>malloc(sizeof(linked_list_ext))
+    init.head = linked_list_init()
+    init.tail = init.head
+    return init
+
+cdef linked_list_ext * lle = linked_list_ext_init()
 
 
 cdef class WrapperClass:
     """A wrapper class for a C/C++ data structure"""
-    cdef linked_list * _ptr
+    cdef linked_list_ext * _ptr
     cdef bint ptr_owner
     cdef linked_list * curr
     cdef linked_list * next_cell
@@ -122,14 +132,14 @@ cdef class WrapperClass:
 
     @property
     def price(self):
-        return self._ptr.price if self._ptr is not NULL else None
+        return self._ptr.tail.price if (self._ptr is not NULL) and (self._ptr.tail is not NULL) else None
 
     @property
     def volume(self):
-        return self._ptr.volume if self._ptr is not NULL else None
+        return self._ptr.tail.volume if (self._ptr is not NULL) and (self._ptr.tail is not NULL) else None
 
     @staticmethod
-    cdef WrapperClass from_ptr(linked_list *_ptr, bint owner=False):
+    cdef WrapperClass from_ptr(linked_list_ext *_ptr, bint owner=False):
         """Factory function to create WrapperClass objects from
         given my_c_struct pointer.
 
@@ -140,39 +150,40 @@ cdef class WrapperClass:
         cdef WrapperClass wrapper = WrapperClass.__new__(WrapperClass)
         wrapper._ptr = _ptr
         wrapper.ptr_owner = owner
-        wrapper.curr = _ptr
+        wrapper.curr = _ptr.tail
         return wrapper
 
     def add_elem(self, double price, double volume):
+        curr = self._ptr.tail
         next_cell = linked_list_init()
-        self.curr.next_cell = next_cell
-        self.curr.price = price
-        self.curr.volume = volume
-        self.curr.data = True
-        self.curr.next_cell.next_cell = NULL
-        self.curr = self.curr.next_cell
+        curr.next_cell = next_cell
+        curr.price = price
+        curr.volume = volume
+        curr.data = True
+        self._ptr.tail = next_cell
 
     def delete_list(self):
-        cur = self._ptr
-        nextt = self._ptr
-        while (cur != NULL):
+        cur = self._ptr.head
+        #nextt = self._ptr.head
+        while cur is not NULL:
             nextt = cur.next_cell
             free(cur)
             cur = nextt
-        self._ptr[0] = linked_list_init()[0]
+        self._ptr.head = linked_list_init()
+        self._ptr.tail = self._ptr.head
 
     def print_list(self):
-        cur = self._ptr
-        while (cur != NULL):
+        cur = self._ptr.head
+        while cur is not NULL:
             print(cur.price, cur.volume, cur.data)
             cur = cur.next_cell
 
-data = WrapperClass.from_ptr(head, owner=True)
+data = WrapperClass.from_ptr(lle, owner=True)
 
 
 cimport lib.wrapper.pxd_include.Listeners as lis
 
-cdef void * u_data =  <void*>head
+cdef void * u_data =  <void*> lle
 
 def attach_listener():
     # clib.dxf_attach_event_listener(subscription, listener, u_data)
