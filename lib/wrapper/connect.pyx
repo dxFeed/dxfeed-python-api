@@ -178,6 +178,16 @@ cdef class WrapperClass:
             print(cur.price, cur.volume, cur.data)
             cur = cur.next_cell
 
+    def pop(self):
+        prev_head = self._ptr.head
+        if prev_head.data:
+            result = [prev_head.price, prev_head.volume]
+            self._ptr.head = prev_head.next_cell
+            free(prev_head)
+            return result
+        else:
+            return [None, None]
+
 data = WrapperClass.from_ptr(lle, owner=True)
 
 
