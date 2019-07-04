@@ -1,5 +1,5 @@
 
-cdef extern from "LinkedList.c":
+cdef extern from "LinkedList.h":
     ctypedef struct linked_list
 
     ctypedef struct linked_list :
@@ -12,4 +12,4 @@ cdef extern from "LinkedList.c":
         linked_list * head
         linked_list * tail
 
-    
+    linked_list * linked_list_init()
