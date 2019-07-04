@@ -82,24 +82,14 @@ def dxf_add_symbols(symbols: list):
     PyMem_Free(c_syms)
     print('added')
 
-
-
+# from lib.wrapper.pxd_include.LinkedList cimport linked_list
+from lib.wrapper.pxd_include.LinkedList cimport *
 # Linked List realization
-ctypedef struct linked_list
 
-ctypedef struct linked_list:
-    double price
-    double volume
-    bint data
-    linked_list *next_cell
-
-ctypedef struct linked_list_ext:
-    linked_list * head
-    linked_list * tail
 
 cdef linked_list * linked_list_init():
     init = <linked_list *>malloc(sizeof(linked_list))
-    init.data = False
+    init.data = 0
     init.next_cell = NULL
     return init
 
@@ -159,7 +149,7 @@ cdef class WrapperClass:
         curr.next_cell = next_cell
         curr.price = price
         curr.volume = volume
-        curr.data = True
+        curr.data = 1
         self._ptr.tail = next_cell
 
     def delete_list(self):
@@ -180,7 +170,7 @@ cdef class WrapperClass:
 
     def pop(self):
         prev_head = self._ptr.head
-        if prev_head.data:
+        if prev_head.data == 1:
             result = [prev_head.price, prev_head.volume]
             self._ptr.head = prev_head.next_cell
             free(prev_head)

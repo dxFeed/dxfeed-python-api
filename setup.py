@@ -17,7 +17,7 @@ ext_connection = Extension(name=SRC_DIR + ".wrapper.connect",
                            sources=[SRC_DIR + "/wrapper/connect.pyx"] + source_files_paths,
                            libraries=['ws2_32'],
                            include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src",
-                                         np.get_include()])
+                                         SRC_DIR + '/wrapper/pxd_include'])
 
 ext_subscription = Extension(name=SRC_DIR + ".wrapper.subscribe",
                              sources=[SRC_DIR + "/wrapper/subscribe.pyx"] + source_files_paths,

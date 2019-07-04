@@ -5,28 +5,13 @@
 #include <time.h>
 #include <Windows.h>
 
+#include "LinkedList.h"
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-
-typedef struct node {
-	double price;
-	double volume;
-	bool data;
-	struct node * next;
-} linked_list;
-
-typedef struct {
-    linked_list * head;
-    linked_list * tail;
-} linked_list_ext;
 
 linked_list * linked_list_init() {
 	linked_list * init = (linked_list *)malloc(sizeof(linked_list));
-	init->data = false;
-	init->next = NULL;
+	init->data = 0;
+	init->next_cell = NULL;
 	return init;
 }
 
@@ -34,21 +19,21 @@ void add_elem(linked_list_ext * lle, double price, double volume) {
 //    printf('\n');
     printf("Node number %f\n", price);
     linked_list * node = lle->tail;
-	linked_list * next = linked_list_init();
-	node->next = next;
+	linked_list * next_cell = linked_list_init();
+	node->next_cell = next_cell;
 	node->price = price;
-	node->data = true;
+	node->data = 1;
 	node->volume = volume;
-    lle->tail = next;
+    lle->tail = next_cell;
 };
 
 void print_list(linked_list_ext * lle) {
 
 	linked_list * curr = lle->head;
 	int i = 0;
-	while (curr && curr->data) {
+	while (curr && curr->data == 1) {
 		printf("Node number %o: %f, %f\n", i++, curr->price, curr->volume);
-		curr = curr->next;
+		curr = curr->next_cell;
 	};
 };
 
@@ -70,12 +55,12 @@ void print_list(linked_list_ext * lle) {
 
 void delete_list(linked_list_ext * lle) {
     linked_list * curr = lle->head,
-    			* next = lle->head;
+    			* next_cell = lle->head;
 	printf("-----------1----------\n");
     while (curr) {
-        next = curr->next;
+        next_cell = curr->next_cell;
         free(curr);
-        curr = next;
+        curr = next_cell;
     }
     printf("-----------2----------\n");
     lle->head = linked_list_init();
@@ -100,10 +85,10 @@ void listener(int event_type, dxf_const_string_t symbol_name,
 	wprintf(L"%s{symbol=%s, ", dx_event_type_to_string(event_type), symbol_name);
 
     dxf_trade_t* trades = (dxf_trade_t*)data;
-    printf(L"written: %i", data_count);
+//    printf(L"written: %i", data_count);
     for (; i < data_count; ++i) {
         add_elem(a, trades[i].price, trades[i].size);
-        printf(L"written: %f", a->tail->price);
+//        printf(L"written: %f", a->tail->price);
 
         wprintf(L", exchangeCode=%c, price=%f, size=%i, tick=%i, change=%f, day volume=%.0f, scope=%d}\n",
                 trades[i].exchange_code, trades[i].price, trades[i].size, trades[i].tick, trades[i].change,
