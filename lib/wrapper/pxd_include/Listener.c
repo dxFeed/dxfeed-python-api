@@ -8,13 +8,6 @@
 #include "LinkedList.h"
 
 
-linked_list * linked_list_init() {
-	linked_list * init = (linked_list *)malloc(sizeof(linked_list));
-	init->data = 0;
-	init->next_cell = NULL;
-	return init;
-}
-
 void add_elem(linked_list_ext * lle, double price, double volume) {
 //    printf('\n');
     printf("Node number %f\n", price);

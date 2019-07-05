@@ -17,7 +17,7 @@ typedef struct {
     linked_list * tail;
 } linked_list_ext;
 
-linked_list * linked_list_init();
+
 
 
 
@@ -25,3 +25,5 @@ linked_list * linked_list_init();
 
 
 #endif
+
+linked_list * linked_list_init();

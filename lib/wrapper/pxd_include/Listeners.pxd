@@ -6,6 +6,6 @@ from lib.wrapper.pxd_include.EventData cimport *
 #  */
 # /* -------------------------------------------------------------------------- */
 
-cdef extern from "Listener.c":
+cdef extern from "Listener.h":
     void listener(int event_type, dxf_const_string_t symbol_name,
                   const dxf_event_data_t* data, int data_count, void* user_data)
