@@ -19,7 +19,8 @@ PACKAGES = [SRC_DIR]
 
 ext = Extension(name=SRC_DIR + ".wrapper.pxd_include.LinkedListFunc",
                 sources=[SRC_DIR + "/wrapper/pxd_include/LinkedListFunc.pyx",
-                         ] + source_files_paths + package_c_files_paths,
+                         SRC_DIR + "/wrapper/pxd_include/LinkedList.c"
+                         ],
                 libraries=['ws2_32'],
                 include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src",
                               SRC_DIR + '/wrapper/pxd_include'])
