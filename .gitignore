@@ -12,3 +12,5 @@ build/*
 *cython_debug*
 
 *Untitled*
+
+*.ipynb_checkpoints*
