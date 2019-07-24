@@ -17,8 +17,16 @@ NAME = 'pcapi'
 SRC_DIR = "lib"
 PACKAGES = [SRC_DIR]
 
+ext = Extension(name=SRC_DIR + ".wrapper.pxd_include.LinkedListFunc",
+                sources=[SRC_DIR + "/wrapper/pxd_include/LinkedListFunc.pyx",
+                         ] + source_files_paths + package_c_files_paths,
+                libraries=['ws2_32'],
+                include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src",
+                              SRC_DIR + '/wrapper/pxd_include'])
+
 ext_connection = Extension(name=SRC_DIR + ".wrapper.connect",
-                           sources=[SRC_DIR + "/wrapper/connect.pyx"] + source_files_paths + package_c_files_paths,
+                           sources=[SRC_DIR + "/wrapper/connect.pyx",
+                                    ] + source_files_paths + package_c_files_paths,
                            libraries=['ws2_32'],
                            include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src",
                                          SRC_DIR + '/wrapper/pxd_include'])
@@ -30,6 +38,7 @@ ext_subscription = Extension(name=SRC_DIR + ".wrapper.subscribe",
                              [SRC_DIR + '/wrapper/pxd_include'])
 
 EXTENSIONS = [
+    ext,
     ext_connection,
     # ext_subscription,
 ]
@@ -47,6 +56,7 @@ if __name__ == "__main__":
         # url=URL,
         # license=LICENSE,
         # package_data={PACKAGES[0]: [SRC_DIR + '/wrapper/pxd_include']},
+        # package_data={SRC_DIR + '/wrapper/pxd_include/LinkedListFunc': [SRC_DIR + '/wrapper/pxd_include*.pxd']},
         cmdclass={"build_ext": build_ext},
         ext_modules=cythonize(EXTENSIONS, language_level=3, gdb_debug=True)
         )

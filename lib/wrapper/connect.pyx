@@ -86,11 +86,12 @@ def dxf_add_symbols(symbols: list):
 from lib.wrapper.pxd_include.LinkedList cimport *
 # Linked List realization
 
-cdef linked_list_ext * linked_list_ext_init():
-    init = <linked_list_ext *>malloc(sizeof(linked_list_ext))
-    init.head = linked_list_init()
-    init.tail = init.head
-    return init
+# cdef linked_list_ext * linked_list_ext_init():
+#     init = <linked_list_ext *>malloc(sizeof(linked_list_ext))
+#     init.head = linked_list_init()
+#     init.tail = init.head
+#     return init
+from lib.wrapper.pxd_include.LinkedListFunc cimport *
 
 cdef linked_list_ext * lle = linked_list_ext_init()
 
