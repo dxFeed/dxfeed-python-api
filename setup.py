@@ -33,15 +33,15 @@ ext_connection = Extension(name=SRC_DIR + ".wrapper.connect",
                                          SRC_DIR + '/wrapper/pxd_include'])
 
 ext_subscription = Extension(name=SRC_DIR + ".wrapper.subscribe",
-                             sources=[SRC_DIR + "/wrapper/subscribe.pyx"] + source_files_paths,
+                             sources=[SRC_DIR + "/wrapper/subscribe.pyx"] + source_files_paths + package_c_files_paths,
                              libraries=['ws2_32'],
                              include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src"] +
-                             [SRC_DIR + '/wrapper/pxd_include'])
+                                          [SRC_DIR + '/wrapper/pxd_include'])
 
 EXTENSIONS = [
     ext,
-    ext_connection,
-    # ext_subscription,
+    # ext_connection,
+    ext_subscription,
 ]
 
 if __name__ == "__main__":

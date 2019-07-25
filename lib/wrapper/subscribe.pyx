@@ -2,25 +2,112 @@ cimport lib.wrapper.pxd_include.DXFeed as clib
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from warnings import warn
 from cython cimport always_allow_keywords
+from lib.wrapper.pxd_include.LinkedList cimport *
+from lib.wrapper.pxd_include.LinkedListFunc cimport *
+cimport lib.wrapper.pxd_include.Listeners as lis
+from libc.stdlib cimport realloc, malloc, free
 
 
 cdef extern from "Python.h":
     # Convert unicode to wchar
     clib.dxf_const_string_t PyUnicode_AsWideCharString(object, Py_ssize_t *)
 
+# Wrapper over linked list
+cdef class WrapperClass:
+    """A wrapper class for a C/C++ data structure"""
+    cdef linked_list_ext * _ptr
+    cdef bint ptr_owner
+    cdef linked_list * curr
+    cdef linked_list * next_cell
+    cdef linked_list * init
+#     cdef linked_list * next_node
+
+    def __cinit__(self):
+        self.ptr_owner = False
+
+    def __dealloc__(self):
+        # De-allocate if not null and flag is set
+        if self._ptr is not NULL and self.ptr_owner is True:
+            free(self._ptr)
+            self._ptr = NULL
+
+    @property
+    def price(self):
+        return self._ptr.tail.price if (self._ptr is not NULL) and (self._ptr.tail is not NULL) else None
+
+    @property
+    def volume(self):
+        return self._ptr.tail.volume if (self._ptr is not NULL) and (self._ptr.tail is not NULL) else None
+
+    @staticmethod
+    cdef WrapperClass from_ptr(linked_list_ext *_ptr, bint owner=False):
+        """Factory function to create WrapperClass objects from
+        given my_c_struct pointer.
+
+        Setting ``owner`` flag to ``True`` causes
+        the extension type to ``free`` the structure pointed to by ``_ptr``
+        when the wrapper object is deallocated."""
+        # Call to __new__ bypasses __init__ constructor
+        cdef WrapperClass wrapper = WrapperClass.__new__(WrapperClass)
+        wrapper._ptr = _ptr
+        wrapper.ptr_owner = owner
+        wrapper.curr = _ptr.tail
+        return wrapper
+
+    def add_elem(self, double price, double volume):
+        curr = self._ptr.tail
+        next_cell = linked_list_init()
+        curr.next_cell = next_cell
+        curr.price = price
+        curr.volume = volume
+        curr.data = 1
+        self._ptr.tail = next_cell
+
+    def delete_list(self):
+        cur = self._ptr.head
+        #nextt = self._ptr.head
+        while cur is not NULL:
+            nextt = cur.next_cell
+            free(cur)
+            cur = nextt
+        self._ptr.head = linked_list_init()
+        self._ptr.tail = self._ptr.head
+
+    def print_list(self):
+        cur = self._ptr.head
+        while cur is not NULL:
+            print(cur.price, cur.volume, cur.data)
+            cur = cur.next_cell
+
+    def pop(self):
+        prev_head = self._ptr.head
+        if prev_head.data == 1:
+            result = [prev_head.price, prev_head.volume]
+            self._ptr.head = prev_head.next_cell
+            free(prev_head)
+            return result
+        else:
+            return [None, None]
+
 cdef class Subscription:
     cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
+    # from LinkedListFunc
+    cdef linked_list_ext * lle
+    cdef WrapperClass data
+    cdef void * u_data
 
     cdef int et_type_int
     def __init__(self, EventType):
         self.et_type_int = self.event_type_convert(EventType)
+        # pointer and data
+        self.lle = linked_list_ext_init()
+        self.data = WrapperClass.from_ptr(self.lle, owner=True)
+        self.u_data =  <void*> self.lle
 
-    # def __cinit__(self):
-    #     cdef clib.dxf_connection_t connection
-    #     cdef clib.dxf_subscription_t subscription
-    #     self.connection = connection
-    #     self.subscription = NULL
+    @property
+    def data(self):
+        return self.data
 
     def event_type_convert(self, event_type: str):
         """
@@ -88,54 +175,8 @@ cdef class Subscription:
         PyMem_Free(c_syms)
         print('added')
 
-    # cdef void listener(int event_type, clib.dxf_const_string_t symbol_name,
-    #                    const clib.dxf_event_data_t* data, int data_count, void* user_data) nogil:
-    #     cdef int et_trade = event_type_convert('Trdae')
-    #     # if event_type == et_trade:
-    #     cdef clib.dxf_trade_t* trades = <clib.dxf_trade_t*?>data
-    #     with gil:
-    #         for  i in range(data_count):
-    #             # print(f"time {trades.time}")
-    #             # print(f"ex code {trades.exchange_code}")
-    #             print(trades.price)
-    #             print(trades.size)
-    #             print(trades.tick)
+    def attach_listener(self):
+        clib.dxf_attach_event_listener(self.subscription, lis.listener, self.u_data)
 
-
-    # def attach_listener():
-    #     clib.dxf_attach_event_listener(subscription, listener, NULL)
-                #     print_timestamp(trades[i].time);
-                #     wprintf(L", exchangeCode=%c, price=%f, size=%i, tick=%i, change=%f, day volume=%.0f, scope=%d}\n",
-                #             trades[i].exchange_code, trades[i].price, trades[i].size, trades[i].tick, trades[i].change,
-                #         trades[i].day_volume, (int)trades[i].scope);
-                # }
-
-
-    @always_allow_keywords(True)
-    def dxf_get_last_event(self, my_string):
-        cdef clib.wchar_t *c_symbols = PyUnicode_AsWideCharString(my_string, NULL)
-        cdef clib.dxf_event_data_t data
-        cdef clib.dxf_trade_t *trade
-        n=2
-        import time
-        for _ in range(n):
-            # event type in EventData.h (e.g. #define DXF_ET_TRADE         (1 << dx_eid_trade))
-            clib.dxf_get_last_event(self.connection, 1, c_symbols, &data)
-            if data:
-                trade = <clib.dxf_trade_t*?>data
-                print(f"time {trade.time}")
-                print(f"ex code {trade.exchange_code}")
-                print(f"{trade.price}")
-                print(f"{trade.size}")
-                print(f"{trade.tick}")
-                print('if done')
-            print('final')
-            time.sleep(2)
-
-
-    def all_in_one(self):
-        self.dxf_create_connection()
-        self.dxf_create_subscription()
-        self.dxf_add_symbols(['AAPL', 'MSFT', 'C'])
-        self.dxf_get_last_event(my_string='MSFT')
-        # attach_listener()
+    def detach_listener(self):
+        clib.dxf_detach_event_listener(self.subscription, lis.listener)
