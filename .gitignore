@@ -7,6 +7,7 @@ build/*
 
 *.c
 !lib/wrapper/pxd_include/*.c
+!lib/wrapper/utils/LinkedList.c
 *__pycache__
 
 *cython_debug*
