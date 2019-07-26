@@ -2,10 +2,10 @@ cimport lib.wrapper.pxd_include.DXFeed as clib
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from warnings import warn
 from cython cimport always_allow_keywords
-from lib.wrapper.pxd_include.LinkedList cimport *
-from lib.wrapper.pxd_include.LinkedListFunc cimport *
+from lib.wrapper.utils.LinkedList cimport *
+from lib.wrapper.utils.LinkedListFunc cimport *
 cimport lib.wrapper.Listeners.Listeners as lis
-from libc.stdlib cimport realloc, malloc, free
+from libc.stdlib cimport   free
 
 
 cdef extern from "Python.h":
