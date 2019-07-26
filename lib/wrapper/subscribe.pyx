@@ -5,89 +5,12 @@ from cython cimport always_allow_keywords
 from lib.wrapper.utils.LinkedList cimport *
 from lib.wrapper.utils.LinkedListFunc cimport *
 cimport lib.wrapper.Listeners.Listeners as lis
-from libc.stdlib cimport   free
+from lib.wrapper.utils.wrapper_class cimport WrapperClass
 
 
 cdef extern from "Python.h":
     # Convert unicode to wchar
     clib.dxf_const_string_t PyUnicode_AsWideCharString(object, Py_ssize_t *)
-
-# Wrapper over linked list
-cdef class WrapperClass:
-    """A wrapper class for a C/C++ data structure"""
-    cdef linked_list_ext * _ptr
-    cdef bint ptr_owner
-    cdef linked_list * curr
-    cdef linked_list * next_cell
-    cdef linked_list * init
-#     cdef linked_list * next_node
-
-    def __cinit__(self):
-        self.ptr_owner = False
-
-    def __dealloc__(self):
-        # De-allocate if not null and flag is set
-        if self._ptr is not NULL and self.ptr_owner is True:
-            free(self._ptr)
-            self._ptr = NULL
-
-    @property
-    def price(self):
-        return self._ptr.tail.price if (self._ptr is not NULL) and (self._ptr.tail is not NULL) else None
-
-    @property
-    def volume(self):
-        return self._ptr.tail.volume if (self._ptr is not NULL) and (self._ptr.tail is not NULL) else None
-
-    @staticmethod
-    cdef WrapperClass from_ptr(linked_list_ext *_ptr, bint owner=False):
-        """Factory function to create WrapperClass objects from
-        given my_c_struct pointer.
-
-        Setting ``owner`` flag to ``True`` causes
-        the extension type to ``free`` the structure pointed to by ``_ptr``
-        when the wrapper object is deallocated."""
-        # Call to __new__ bypasses __init__ constructor
-        cdef WrapperClass wrapper = WrapperClass.__new__(WrapperClass)
-        wrapper._ptr = _ptr
-        wrapper.ptr_owner = owner
-        wrapper.curr = _ptr.tail
-        return wrapper
-
-    def add_elem(self, double price, double volume):
-        curr = self._ptr.tail
-        next_cell = linked_list_init()
-        curr.next_cell = next_cell
-        curr.price = price
-        curr.volume = volume
-        curr.data = 1
-        self._ptr.tail = next_cell
-
-    def delete_list(self):
-        cur = self._ptr.head
-        #nextt = self._ptr.head
-        while cur is not NULL:
-            nextt = cur.next_cell
-            free(cur)
-            cur = nextt
-        self._ptr.head = linked_list_init()
-        self._ptr.tail = self._ptr.head
-
-    def print_list(self):
-        cur = self._ptr.head
-        while cur is not NULL:
-            print(cur.price, cur.volume, cur.data)
-            cur = cur.next_cell
-
-    def pop(self):
-        prev_head = self._ptr.head
-        if prev_head.data == 1:
-            result = [prev_head.price, prev_head.volume]
-            self._ptr.head = prev_head.next_cell
-            free(prev_head)
-            return result
-        else:
-            return [None, None]
 
 cdef class Subscription:
     cdef clib.dxf_connection_t connection

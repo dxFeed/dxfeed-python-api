@@ -25,6 +25,14 @@ ext = Extension(name=SRC_DIR + ".wrapper.utils.LinkedListFunc",
                 include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src",
                               SRC_DIR + '/wrapper/pxd_include'] + [SRC_DIR + '/wrapper/utils'])
 
+ext_class = Extension(name=SRC_DIR + ".wrapper.utils.wrapper_class",
+                      sources=[SRC_DIR + "/wrapper/utils/wrapper_class.pyx",
+                               SRC_DIR + "/wrapper/utils/LinkedList.c"
+                               ],
+                      libraries=['ws2_32'],
+                      include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src",
+                                    SRC_DIR + '/wrapper/pxd_include'] + [SRC_DIR + '/wrapper/utils'])
+
 
 ext_subscription = Extension(name=SRC_DIR + ".wrapper.subscribe",
                              sources=[SRC_DIR + "/wrapper/subscribe.pyx"] + source_files_paths + package_c_files_paths,
@@ -36,6 +44,7 @@ ext_subscription = Extension(name=SRC_DIR + ".wrapper.subscribe",
 
 EXTENSIONS = [
     ext,
+    ext_class,
     ext_subscription,
 ]
 
