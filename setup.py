@@ -9,8 +9,8 @@ source_files_directory = Path(__file__).resolve().parent.joinpath('lib', 'dxfeed
 source_files_paths = [str(path) for path in source_files_directory.glob('*.c')]
 source_files_paths.remove(str(source_files_directory.joinpath('Linux.c')))
 
-package_c_files_dir = Path(__file__).resolve().parent.joinpath('lib', 'wrapper', 'pxd_include')
-package_c_files_paths = [str(path) for path in package_c_files_dir.glob('*.c')]
+package_c_files_dir = Path(__file__).resolve().parent.joinpath('lib', 'wrapper')
+package_c_files_paths = [str(path) for path in package_c_files_dir.glob('**/*.c')]
 # package_c_files_paths.remove(str(package_c_files_dir.joinpath('Listener.c')))
 
 NAME = 'pcapi'
@@ -25,22 +25,15 @@ ext = Extension(name=SRC_DIR + ".wrapper.pxd_include.LinkedListFunc",
                 include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src",
                               SRC_DIR + '/wrapper/pxd_include'])
 
-ext_connection = Extension(name=SRC_DIR + ".wrapper.connect",
-                           sources=[SRC_DIR + "/wrapper/connect.pyx",
-                                    ] + source_files_paths + package_c_files_paths,
-                           libraries=['ws2_32'],
-                           include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src",
-                                         SRC_DIR + '/wrapper/pxd_include'])
 
 ext_subscription = Extension(name=SRC_DIR + ".wrapper.subscribe",
                              sources=[SRC_DIR + "/wrapper/subscribe.pyx"] + source_files_paths + package_c_files_paths,
                              libraries=['ws2_32'],
                              include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src"] +
-                                          [SRC_DIR + '/wrapper/pxd_include'])
+                                          [SRC_DIR + '/wrapper/pxd_include'] + [SRC_DIR + '/wrapper/Listeners'])
 
 EXTENSIONS = [
     ext,
-    # ext_connection,
     ext_subscription,
 ]
 

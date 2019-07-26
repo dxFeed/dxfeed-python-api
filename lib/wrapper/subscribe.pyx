@@ -4,7 +4,7 @@ from warnings import warn
 from cython cimport always_allow_keywords
 from lib.wrapper.pxd_include.LinkedList cimport *
 from lib.wrapper.pxd_include.LinkedListFunc cimport *
-cimport lib.wrapper.pxd_include.Listeners as lis
+cimport lib.wrapper.Listeners.Listeners as lis
 from libc.stdlib cimport realloc, malloc, free
 
 
