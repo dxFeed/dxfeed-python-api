@@ -18,8 +18,8 @@ void add_elem(linked_list_ext * lle, double price, double volume, dxf_const_stri
 	node->price = price;
 
 //
-	wcscpy_s(node->symbol,wcslen(symbol), symbol);
-
+//	wcscpy_s(node->symbol,wcslen(symbol), symbol);
+    wcscpy(node->symbol, symbol);
 	node->data = 1;
 	node->volume = volume;
     lle->tail = next_cell;
