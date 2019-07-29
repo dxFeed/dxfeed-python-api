@@ -1,3 +1,4 @@
+from lib.wrapper.pxd_include.DXTypes cimport dxf_const_string_t
 
 cdef extern from "LinkedList.h":
     ctypedef struct linked_list
@@ -5,6 +6,7 @@ cdef extern from "LinkedList.h":
     ctypedef struct linked_list :
         double price
         double volume
+        dxf_const_string_t symbol
         int data
         linked_list * next_cell
 

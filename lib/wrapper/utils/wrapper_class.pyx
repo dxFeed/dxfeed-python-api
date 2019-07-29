@@ -1,6 +1,10 @@
 from lib.wrapper.utils.LinkedList cimport *
 from lib.wrapper.utils.LinkedListFunc cimport *
 from libc.stdlib cimport free
+from lib.wrapper.pxd_include.DXTypes cimport dxf_const_string_t
+
+cdef dxf_const_string_t abc
+
 
 # Wrapper over linked list
 cdef class WrapperClass:
