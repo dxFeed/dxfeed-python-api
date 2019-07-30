@@ -1,19 +1,10 @@
 from lib.wrapper.utils.LinkedList cimport *
 from lib.wrapper.utils.LinkedListFunc cimport *
 from libc.stdlib cimport free
-from lib.wrapper.pxd_include.DXTypes cimport dxf_const_string_t
 
-from cpython.unicode cimport PyUnicode_FromUnicode
-from cpython.ref cimport PyObject
+from lib.wrapper.utils.helpers cimport unicode_from_dxf_const_string_t
 
-cdef extern from *:
-    PyObject * PyUnicode_FromWideChar(dxf_const_string_t w, Py_ssize_t size)
 
-cdef object _unicode(dxf_const_string_t wcs):
-    if wcs == NULL:
-      return ''
-    ret_val = <object>PyUnicode_FromWideChar(wcs, -1)
-    return ret_val
 
 # Wrapper over linked list
 cdef class WrapperClass:
@@ -73,14 +64,14 @@ cdef class WrapperClass:
     def print_list(self):
         cur = self._ptr.head
         while cur is not NULL:
-            res = [cur.price, cur.volume, cur.data, _unicode(cur.symbol)]
+            res = [cur.price, cur.volume, cur.data, unicode_from_dxf_const_string_t(cur.symbol)]
             print(res)
             cur = cur.next_cell
 
     def pop(self):
         prev_head = self._ptr.head
         if prev_head.data == 1:
-            result = [prev_head.price, prev_head.volume, _unicode(prev_head.symbol)]
+            result = [prev_head.price, prev_head.volume, unicode_from_dxf_const_string_t(prev_head.symbol)]
             self._ptr.head = prev_head.next_cell
             free(prev_head)
             return result
