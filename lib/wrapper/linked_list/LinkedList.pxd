@@ -1,17 +1,17 @@
 from lib.wrapper.pxd_include.DXTypes cimport dxf_const_string_t
 
 cdef extern from "LinkedList.h":
-    ctypedef struct linked_list
+    ctypedef struct node1
 
-    ctypedef struct linked_list :
+    ctypedef struct node1 :
         double price
         double volume
         dxf_const_string_t symbol
         int data
-        linked_list * next_cell
+        node1 * next_cell
 
     ctypedef struct linked_list_ext:
-        linked_list * head
-        linked_list * tail
+        node1 * head
+        node1 * tail
 
-    linked_list * linked_list_init()
+    node1 * linked_list_init()

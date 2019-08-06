@@ -4,8 +4,8 @@
 #include "LinkedList.h"
 
 
-linked_list * linked_list_init() {
-	linked_list * init = (linked_list *)malloc(sizeof(linked_list));
+node1 * linked_list_init() {
+	node1 * init = (node1 *)malloc(sizeof(node1));
 	init->data = 0;
 	init->symbol = (dxf_const_string_t)malloc(100);
 	init->next_cell = NULL;

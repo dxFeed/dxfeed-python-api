@@ -6,17 +6,17 @@
 #include <stdlib.h>
 #include "DXTypes.h"
 
-typedef struct linked_list {
+typedef struct node1 {
 	double price;
 	double volume;
 	dxf_const_string_t symbol;
 	int data;
-	struct linked_list * next_cell;
-} linked_list;
+	struct node1 * next_cell;
+} node1;
 
 typedef struct {
-    linked_list * head;
-    linked_list * tail;
+    node1 * head;
+    node1 * tail;
 } linked_list_ext;
 
 
@@ -28,4 +28,4 @@ typedef struct {
 
 #endif
 
-linked_list * linked_list_init();
+node1 * linked_list_init();
