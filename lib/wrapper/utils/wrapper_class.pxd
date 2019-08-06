@@ -1,5 +1,5 @@
-from lib.wrapper.utils.LinkedList cimport *
-from lib.wrapper.utils.LinkedListFunc cimport *
+from lib.wrapper.linked_list.LinkedList cimport *
+from lib.wrapper.linked_list.LinkedListFunc cimport *
 
 # Wrapper over linked list
 cdef class WrapperClass:

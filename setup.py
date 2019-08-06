@@ -17,9 +17,9 @@ NAME = 'pcapi'
 SRC_DIR = "lib"
 PACKAGES = [SRC_DIR]
 
-ext = Extension(name=SRC_DIR + ".wrapper.utils.LinkedListFunc",
-                sources=[SRC_DIR + "/wrapper/utils/LinkedListFunc.pyx",
-                         SRC_DIR + "/wrapper/utils/LinkedList.c"
+ext = Extension(name=SRC_DIR + ".wrapper.linked_list.LinkedListFunc",
+                sources=[SRC_DIR + "/wrapper/linked_list/LinkedListFunc.pyx",
+                         SRC_DIR + "/wrapper/linked_list/LinkedList.c"
                          ],
                 libraries=['ws2_32'],
                 include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src",
@@ -34,7 +34,7 @@ ext_helpers = Extension(name=SRC_DIR + ".wrapper.utils.helpers",
 
 ext_class = Extension(name=SRC_DIR + ".wrapper.utils.wrapper_class",
                       sources=[SRC_DIR + "/wrapper/utils/wrapper_class.pyx",
-                               SRC_DIR + "/wrapper/utils/LinkedList.c"
+                               SRC_DIR + "/wrapper/linked_list/LinkedList.c"
                                ],
                       libraries=['ws2_32'],
                       include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src",

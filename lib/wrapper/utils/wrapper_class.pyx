@@ -1,5 +1,5 @@
-from lib.wrapper.utils.LinkedList cimport *
-from lib.wrapper.utils.LinkedListFunc cimport *
+from lib.wrapper.linked_list.LinkedList cimport *
+from lib.wrapper.linked_list.LinkedListFunc cimport *
 from libc.stdlib cimport free
 
 from lib.wrapper.utils.helpers cimport unicode_from_dxf_const_string_t

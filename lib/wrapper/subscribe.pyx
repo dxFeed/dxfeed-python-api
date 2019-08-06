@@ -2,8 +2,8 @@ cimport lib.wrapper.pxd_include.DXFeed as clib
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from warnings import warn
 from cython cimport always_allow_keywords
-from lib.wrapper.utils.LinkedList cimport *
-from lib.wrapper.utils.LinkedListFunc cimport *
+from lib.wrapper.linked_list.LinkedList cimport *
+from lib.wrapper.linked_list.LinkedListFunc cimport *
 cimport lib.wrapper.Listeners.Listeners as lis
 from lib.wrapper.utils.wrapper_class cimport WrapperClass
 
