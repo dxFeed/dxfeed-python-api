@@ -6,8 +6,9 @@ build/*
 *.pyd
 
 *.c
+*.cpp
 !lib/wrapper/pxd_include/*.c
-!lib/wrapper/utils/LinkedList.c
+!lib/wrapper/linked_list/LinkedList.c
 !lib/wrapper/Listeners/Listener.c
 *__pycache__
 

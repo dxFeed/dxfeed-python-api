@@ -1,36 +1,33 @@
+# distutils: language = c++
+
 cimport lib.wrapper.pxd_include.DXFeed as clib
-from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from warnings import warn
 from cython cimport always_allow_keywords
-from lib.wrapper.linked_list.LinkedList cimport *
-from lib.wrapper.linked_list.LinkedListFunc cimport *
-cimport lib.wrapper.Listeners.Listeners as lis
-from lib.wrapper.utils.wrapper_class cimport WrapperClass
+from lib.wrapper.utils.helpers cimport *
+
+from lib.wrapper.listeners.listener cimport *
+
+
 
 
 cdef extern from "Python.h":
     # Convert unicode to wchar
     clib.dxf_const_string_t PyUnicode_AsWideCharString(object, Py_ssize_t *)
 
+
+
+
+
 cdef class Subscription:
     cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
     # from LinkedListFunc
-    cdef linked_list_ext * lle
-    cdef WrapperClass data
     cdef void * u_data
 
     cdef int et_type_int
     def __init__(self, EventType):
         self.et_type_int = self.event_type_convert(EventType)
         # pointer and data
-        self.lle = linked_list_ext_init()
-        self.data = WrapperClass.from_ptr(self.lle, owner=True)
-        self.u_data =  <void*> self.lle
-
-    @property
-    def data(self):
-        return self.data
 
     def event_type_convert(self, event_type: str):
         """
@@ -85,21 +82,11 @@ cdef class Subscription:
     def dxf_add_symbols(self, symbols: list):
         cdef int number = len(symbols)  # Number of elements
         cdef int idx # for faster loops
-        # define array with dynamic memory allocation
-        cdef clib.dxf_const_string_t *c_syms = <clib.dxf_const_string_t *> PyMem_Malloc(number * sizeof(clib.dxf_const_string_t))
-        # create array with cycle
         for idx, sym in enumerate(symbols):
-            c_syms[idx] = PyUnicode_AsWideCharString(sym, NULL)
-        # call c function
-        clib.dxf_add_symbols(self.subscription, c_syms, number)
-        # free memory
-        for idx in range(number):
-            PyMem_Free(c_syms[idx])
-        PyMem_Free(c_syms)
-        print('added')
+            clib.dxf_add_symbol(self.subscription, dxf_const_string_t_from_unicode(sym))
 
     def attach_listener(self):
-        clib.dxf_attach_event_listener(self.subscription, lis.listener, self.u_data)
+        clib.dxf_attach_event_listener(self.subscription, some_listener, self.u_data)
 
     def detach_listener(self):
-        clib.dxf_detach_event_listener(self.subscription, lis.listener)
+        clib.dxf_detach_event_listener(self.subscription, some_listener)
