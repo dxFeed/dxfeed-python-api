@@ -1,4 +1,3 @@
-# distutils: language = c++
 
 cimport lib.wrapper.pxd_include.DXFeed as clib
 from warnings import warn

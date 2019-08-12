@@ -1,4 +1,3 @@
-# distutils: language = c++
 from lib.wrapper.pxd_include.DXTypes cimport dxf_const_string_t
 from cpython.ref cimport PyObject
 

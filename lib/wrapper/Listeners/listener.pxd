@@ -1,4 +1,3 @@
-# distutils: language = c++
 
 from lib.wrapper.pxd_include.DXTypes cimport dxf_int_t, dxf_const_string_t
 from lib.wrapper.pxd_include.EventData cimport dxf_event_data_t, dxf_trade_t

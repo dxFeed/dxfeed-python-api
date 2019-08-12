@@ -1,4 +1,3 @@
-# distutils: language = c++
 cdef object unicode_from_dxf_const_string_t(dxf_const_string_t wcs):
     if wcs == NULL:
       return ''

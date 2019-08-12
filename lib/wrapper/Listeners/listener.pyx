@@ -1,4 +1,3 @@
-# distutils: language = c++
 
 from libc.stdio cimport printf
 from lib.wrapper.utils.helpers cimport *
