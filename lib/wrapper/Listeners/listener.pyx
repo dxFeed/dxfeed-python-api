@@ -1,12 +1,9 @@
 from libc.stdio cimport printf
 from lib.wrapper.utils.helpers cimport *
-import cython
 
-TRADE_COLUMNS = ['a','b']
 
-cdef dict listener_mapping
+TRADE_COLUMNS = ['Symbol', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume', 'Time']
 
-@cython.exceptval(-1, check=False)
 cdef void trade_default_listener(int event_type, dxf_const_string_t symbol_name,
 			            const dxf_event_data_t* data, int data_count, void* user_data):
 
@@ -18,11 +15,11 @@ cdef void trade_default_listener(int event_type, dxf_const_string_t symbol_name,
         py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
                                 trades[i].price,
                                 trades[i].exchange_code,
-                                trades[i].price,
                                 trades[i].size,
                                 trades[i].tick,
                                 trades[i].change,
-                                trades[i].day_volume
+                                trades[i].day_volume,
+                                trades[i].time
                                 ]
                                )
         printf(", exchangeCode=%c, price=%f, size=%i, tick=%i, change=%f, day volume=%.0f}\n",
@@ -48,7 +45,3 @@ cdef void quote_default_listener(int event_type, dxf_const_string_t symbol_name,
 					quotes[i].ask_price,
 					quotes[i].ask_size
                                        ])
-    # , (int)quotes[i].scope)
-    # pass
-
-# listener_mapping.update({'Trade': trade_default_listener})

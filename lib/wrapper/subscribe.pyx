@@ -4,7 +4,9 @@ from warnings import warn
 from cython cimport always_allow_keywords
 from lib.wrapper.utils.helpers cimport *
 
-from lib.wrapper.listeners.listener cimport *
+cimport lib.wrapper.listeners.listener as lis
+# for importing variables
+import lib.wrapper.listeners.listener as lis
 
 
 
@@ -91,12 +93,12 @@ cdef class Subscription:
         for idx, sym in enumerate(symbols):
             clib.dxf_add_symbol(self.subscription, dxf_const_string_t_from_unicode(sym))
 
-    cdef void listener2(self):
-        pass
 
     def attach_listener(self):
-        # clib.dxf_attach_event_listener(self.subscription, self.listener2, self.u_data)
-        clib.dxf_attach_event_listener(self.subscription, quote_default_listener, self.u_data)
+        if self.event_type_str == 'Trade':
+            self.data['columns'] = lis.TRADE_COLUMNS
+            clib.dxf_attach_event_listener(self.subscription, lis.trade_default_listener, self.u_data)
+        clib.dxf_attach_event_listener(self.subscription, lis.quote_default_listener, self.u_data)
     def detach_listener(self):
-        # clib.dxf_detach_event_listener(self.subscription, self.listener2)
-        clib.dxf_detach_event_listener(self.subscription, quote_default_listener)
+        clib.dxf_detach_event_listener(self.subscription, lis.trade_default_listener)
+        # clib.dxf_detach_event_listener(self.subscription, quote_default_listener)
