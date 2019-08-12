@@ -8,30 +8,27 @@ from lib.wrapper.listeners.listener cimport *
 
 
 
-
-cdef extern from "Python.h":
-    # Convert unicode to wchar
-    clib.dxf_const_string_t PyUnicode_AsWideCharString(object, Py_ssize_t *)
-
-
-
-
-
 cdef class Subscription:
     cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
-    # from LinkedListFunc
     cdef dict data
     cdef void * u_data
+    cdef object event_type_str
 
 
     cdef int et_type_int
-    def __init__(self, EventType):
-        self.et_type_int = self.event_type_convert(EventType)
+
+    def __init__(self, event_type):
+
+        self.et_type_int = self.event_type_convert(event_type)
+        self.event_type_str = event_type
         self.data = {'columns': [],
                      'data': []}
         self.u_data = <void *>self.data
-        # pointer and data
+
+
+
+
 
     @property
     def data(self):
@@ -99,7 +96,7 @@ cdef class Subscription:
 
     def attach_listener(self):
         # clib.dxf_attach_event_listener(self.subscription, self.listener2, self.u_data)
-        clib.dxf_attach_event_listener(self.subscription, some_listener, self.u_data)
+        clib.dxf_attach_event_listener(self.subscription, quote_default_listener, self.u_data)
     def detach_listener(self):
         # clib.dxf_detach_event_listener(self.subscription, self.listener2)
-        clib.dxf_detach_event_listener(self.subscription, some_listener)
+        clib.dxf_detach_event_listener(self.subscription, quote_default_listener)

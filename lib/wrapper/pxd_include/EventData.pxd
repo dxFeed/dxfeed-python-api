@@ -126,7 +126,7 @@ cdef extern from "EventData.h":
 
 # /* Quote -------------------------------------------------------------------- */
 
-    struct dxf_quote_t:
+    ctypedef struct dxf_quote_t:
         dxf_long_t time,
         dxf_int_t sequence,
         dxf_int_t time_nanos,
@@ -150,7 +150,7 @@ cdef extern from "EventData.h":
         dxf_pt_final = 3
 
 
-    struct dxf_summary_t:
+    ctypedef struct dxf_summary_t:
         dxf_dayid_t day_id,
         dxf_double_t day_open_price,
         dxf_double_t day_high_price,
