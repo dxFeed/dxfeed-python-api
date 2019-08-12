@@ -1,7 +1,7 @@
 # distutils: language = c++
 
-from cpython.ref cimport PyObject
 from libc.stdio cimport printf
+from lib.wrapper.utils.helpers cimport *
 cdef void some_listener(int event_type, dxf_const_string_t symbol_name,
 			            const dxf_event_data_t* data, int data_count, void* user_data):
     cdef dxf_int_t i = 0
@@ -10,7 +10,8 @@ cdef void some_listener(int event_type, dxf_const_string_t symbol_name,
     
     printf("{symbol=%s, ", symbol_name)
     for i in range(data_count):
-        py_data['data'].append([trades[i].price,
+        py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
+                                trades[i].price,
                                 trades[i].exchange_code,
                                 trades[i].price,
                                 trades[i].size,
