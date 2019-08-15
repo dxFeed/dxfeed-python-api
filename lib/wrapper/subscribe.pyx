@@ -7,6 +7,7 @@ from lib.wrapper.utils.helpers cimport *
 cimport lib.wrapper.listeners.listener as lis
 # for importing variables
 import lib.wrapper.listeners.listener as lis
+from lib.wrapper.pxd_include.EventData cimport *
 
 
 
@@ -16,6 +17,7 @@ cdef class Subscription:
     cdef dict data
     cdef void * u_data
     cdef object event_type_str
+    cdef dxf_event_listener_t listener
 
 
     cdef int et_type_int
@@ -27,6 +29,7 @@ cdef class Subscription:
         self.data = {'columns': [],
                      'data': []}
         self.u_data = <void *>self.data
+        self.listener = NULL
 
 
 
@@ -97,8 +100,16 @@ cdef class Subscription:
     def attach_listener(self):
         if self.event_type_str == 'Trade':
             self.data['columns'] = lis.TRADE_COLUMNS
-            clib.dxf_attach_event_listener(self.subscription, lis.trade_default_listener, self.u_data)
-        clib.dxf_attach_event_listener(self.subscription, lis.quote_default_listener, self.u_data)
+            self.listener =  lis.trade_default_listener
+        elif self.event_type_str == 'Quote':
+            self.data['columns'] = lis.QUOTE_COLUMNS
+            self.listener =  lis.quote_default_listener
+        elif self.event_type_str == 'Summary':
+            self.data['columns'] = lis.SUMMARY_COLUMNS
+            self.listener = lis.summary_default_listener
+
+        clib.dxf_attach_event_listener(self.subscription, self.listener, self.u_data)
+
     def detach_listener(self):
-        clib.dxf_detach_event_listener(self.subscription, lis.trade_default_listener)
+        clib.dxf_detach_event_listener(self.subscription, self.listener)
         # clib.dxf_detach_event_listener(self.subscription, quote_default_listener)

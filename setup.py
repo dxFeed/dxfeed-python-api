@@ -17,13 +17,6 @@ NAME = 'test'
 SRC_DIR = "lib"
 PACKAGES = [SRC_DIR]
 
-ext_string = Extension(name=SRC_DIR + ".wrapper.utils.string_converter",
-                       sources=[SRC_DIR + "/wrapper/utils/string_converter.cpp"],
-                       libraries=['ws2_32'],
-                       include_dirs=[SRC_DIR + "/dxfeed-c-api/include/", SRC_DIR + "/dxfeed-c-api/src"] +
-                                                                  [SRC_DIR + '/wrapper/pxd_include'] +
-                                                                  [SRC_DIR + '/wrapper/utils']
-                       )
 
 ext_lis = Extension(name=SRC_DIR + ".wrapper.listeners.listener",
                        sources=[SRC_DIR + "/wrapper/listeners/listener.pyx"],
