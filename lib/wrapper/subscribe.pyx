@@ -1,13 +1,62 @@
-
 cimport lib.wrapper.pxd_include.DXFeed as clib
 from warnings import warn
 from cython cimport always_allow_keywords
 from lib.wrapper.utils.helpers cimport *
+from lib.wrapper.utils.helpers import *
 
 cimport lib.wrapper.listeners.listener as lis
 # for importing variables
 import lib.wrapper.listeners.listener as lis
 from lib.wrapper.pxd_include.EventData cimport *
+
+
+cdef class ConnectionClass:
+    cdef clib.dxf_connection_t connection
+
+    # @property
+    # def ptr(self):
+    #     return <uintptr_t>self.connection
+
+    cpdef SubscriptionClass make_new_subscription(self):
+        cdef SubscriptionClass out = SubscriptionClass()
+        # print(<uintptr_t>&out.connection)
+        # print(<uintptr_t>self.connection)
+        out.connection = self.connection
+        # print(<uintptr_t>out.connection)
+        # printf(<uintptr_t>out.connection == <uintptr_t>self.connection)
+        return out
+
+cdef class SubscriptionClass:
+    cdef clib.dxf_connection_t connection
+    cdef clib.dxf_subscription_t subscription
+    cdef dxf_event_listener_t listener
+    cdef object event_type_str
+    cdef dict data
+    cdef void * u_data
+
+    def __init__(self):
+        self.data = {'columns': [],
+                     'data': []}
+        self.u_data = <void *>self.data
+        self.listener = NULL
+
+    @property
+    def data(self):
+        return self.data
+
+def dxf_create_connection(address='demo.dxfeed.com:7300'):
+    cc = ConnectionClass()
+    address = address.encode('utf-8')
+    clib.dxf_create_connection(address, NULL, NULL, NULL, NULL, NULL, &cc.connection)
+    return cc
+
+def dxf_create_subscription(ConnectionClass cc, event_type):
+    sc = cc.make_new_subscription()
+    sc.event_type_str = event_type
+    et_type_int = event_type_convert(event_type)
+    clib.dxf_create_subscription(sc.connection, et_type_int, &sc.subscription)
+    return sc
+
 
 
 
@@ -107,6 +156,9 @@ cdef class Subscription:
         elif self.event_type_str == 'Summary':
             self.data['columns'] = lis.SUMMARY_COLUMNS
             self.listener = lis.summary_default_listener
+        elif self.event_type_str == 'Profile':
+            self.data['columns'] = lis.PROFILE_COLUMNS
+            self.listener = lis.profile_default_listener
 
         clib.dxf_attach_event_listener(self.subscription, self.listener, self.u_data)
 

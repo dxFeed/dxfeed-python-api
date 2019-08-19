@@ -10,7 +10,7 @@ cdef void trade_default_listener(int event_type, dxf_const_string_t symbol_name,
     cdef dxf_trade_t* trades = <dxf_trade_t*>data
     cdef dict py_data = <dict>user_data
     
-    printf("{symbol=%s, ", symbol_name)
+    # printf("{symbol=%s, ", symbol_name)
     for i in range(data_count):
         py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
                                 trades[i].price,
@@ -22,9 +22,9 @@ cdef void trade_default_listener(int event_type, dxf_const_string_t symbol_name,
                                 trades[i].time
                                 ]
                                )
-        printf(", exchangeCode=%c, price=%f, size=%i, tick=%i, change=%f, day volume=%.0f}\n",
-                trades[i].exchange_code, trades[i].price, trades[i].size, trades[i].tick, trades[i].change,
-            trades[i].day_volume)
+        # printf(", exchangeCode=%c, price=%f, size=%i, tick=%i, change=%f, day volume=%.0f}\n",
+        #         trades[i].exchange_code, trades[i].price, trades[i].size, trades[i].tick, trades[i].change,
+        #     trades[i].day_volume)
 
 QUOTE_COLUMNS = [
     'Symbol', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize',
@@ -64,5 +64,31 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
                                 summary[i].prev_day_close_price,
                                 summary[i].prev_day_volume,
                                 summary[i].open_interest
+                                ]
+                               )
+
+
+PROFILE_COLUMNS = [
+    'Symbol', 'Beta', 'EPS', 'DivFreq', 'exd_div_amount',
+              'exd_div_date', '_52_high_price', '_52_low_price', 'shares',
+              'description', 'raw_flags', 'status_reason'
+]
+cdef void profile_default_listener(int event_type, dxf_const_string_t symbol_name,
+			                     const dxf_event_data_t* data, int data_count, void* user_data):
+    cdef dxf_profile_t* p = <dxf_profile_t*>data
+    cdef dict py_data = <dict>user_data
+    for i in range(data_count):
+        py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
+                                p[i].beta,
+                                p[i].eps,
+                                p[i].div_freq,
+                                p[i].exd_div_amount,
+                                p[i].exd_div_date,
+                                p[i]._52_high_price,
+                                p[i]._52_low_price,
+                                p[i].shares,
+                                unicode_from_dxf_const_string_t(p[i].description),
+                                p[i].raw_flags,
+                                unicode_from_dxf_const_string_t(p[i].status_reason)
                                 ]
                                )

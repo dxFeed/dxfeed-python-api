@@ -7,6 +7,9 @@ from lib.wrapper.pxd_include.EventData cimport *
 #  */
 # /* -------------------------------------------------------------------------- */
 
+cdef int DXF_SUCCESS = 1
+cdef int DXF_FAILURE = 0
+
 cdef extern from "DXFeed.h":
  
 # /* -------------------------------------------------------------------------- */

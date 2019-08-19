@@ -87,7 +87,7 @@ cdef extern from "EventData.h":
 
     ctypedef void* dxf_event_data_t
 
-    enum dxf_order_scope_t:
+    ctypedef enum dxf_order_scope_t:
         dxf_osc_composite = 0,
         dxf_osc_regional = 1,
         dxf_osc_aggregate = 2,
@@ -96,7 +96,7 @@ cdef extern from "EventData.h":
 
 # /* Trade & Trade ETH -------------------------------------------------------- */
 
-    enum dxf_direction_t:
+    ctypedef enum dxf_direction_t:
         dxf_dir_undefined = 0,
         dxf_dir_down = 1,
         dxf_dir_zero_down = 2,
@@ -143,7 +143,7 @@ cdef extern from "EventData.h":
 
 # /* Summary ------------------------------------------------------------------ */
 
-    enum dxf_price_type_t:
+    ctypedef enum dxf_price_type_t:
         dxf_pt_regular = 0,
         dxf_pt_indicative = 1,
         dxf_pt_preliminary = 2,
@@ -168,19 +168,19 @@ cdef extern from "EventData.h":
 
 # /* Profile ------------------------------------------------------------------ */
 
-    enum dxf_trading_status_t:
+    ctypedef enum dxf_trading_status_t:
       dxf_ts_undefined = 0,
       dxf_ts_halted = 1,
       dxf_ts_active = 2
 
 
-    enum dxf_short_sale_restriction_t:
+    ctypedef enum dxf_short_sale_restriction_t:
       dxf_ssr_undefined = 0,
       dxf_ssr_active = 1,
       dxf_ssr_inactive = 2
 
 
-    struct dxf_profile_t:
+    ctypedef struct dxf_profile_t:
         dxf_double_t beta,
         dxf_double_t eps,
         dxf_int_t div_freq,
@@ -203,7 +203,7 @@ cdef extern from "EventData.h":
 
 # /* Order & Spread Order ----------------------------------------------------- */
 
-    enum dxf_order_side_t:
+    ctypedef enum dxf_order_side_t:
         dxf_osd_undefined = 0,
         dxf_osd_buy = 1,
         dxf_osd_sell = 2
@@ -213,7 +213,7 @@ cdef extern from "EventData.h":
     #     dxf_const_string_t spread_symbol
 
 
-    struct dxf_order_t:
+    ctypedef struct dxf_order_t:
         dxf_event_flags_t event_flags,
         dxf_long_t index,
         dxf_long_t time,
@@ -232,13 +232,13 @@ cdef extern from "EventData.h":
 
 # /* Time And Sale ------------------------------------------------------------ */
 
-    enum dxf_tns_type_t:
+    ctypedef enum dxf_tns_type_t:
         dxf_tnst_new = 0,
         dxf_tnst_correction = 1,
         dxf_tnst_cancel = 2
 
 
-    struct dxf_time_and_sale_t:
+    ctypedef struct dxf_time_and_sale_t:
         dxf_event_flags_t event_flags,
         dxf_long_t index,
         dxf_long_t time,
@@ -260,7 +260,7 @@ cdef extern from "EventData.h":
 
 
 # /* Candle ------------------------------------------------------------------- */
-    struct dxf_candle_t:
+    ctypedef struct dxf_candle_t:
         dxf_event_flags_t event_flags,
         dxf_long_t index,
         dxf_long_t time,
@@ -279,7 +279,7 @@ cdef extern from "EventData.h":
 
 
 # /* Greeks ------------------------------------------------------------------- */
-    struct dxf_greeks_t:
+    ctypedef struct dxf_greeks_t:
         dxf_event_flags_t event_flags,
         dxf_long_t index,
         dxf_long_t time,
@@ -300,7 +300,7 @@ cdef extern from "EventData.h":
     cdef dx_underlying_t dxf_underlying_t
 
 # /* Series ------------------------------------------------------------------- */
-    struct dxf_series_t:
+    ctypedef struct dxf_series_t:
         dxf_event_flags_t event_flags,
         dxf_long_t index,
         dxf_long_t time,
@@ -313,7 +313,7 @@ cdef extern from "EventData.h":
         dxf_double_t interest
 
 
-    struct dxf_configuration_t:
+    ctypedef struct dxf_configuration_t:
         dxf_int_t version,
         dxf_string_t object
 
@@ -343,7 +343,7 @@ cdef extern from "EventData.h":
 #define DXF_CANDLE_EXCHANGE_CODE_ATTRIBUTE_DEFAULT DXF_CANDLE_EXCHANGE_CODE_COMPOSITE_ATTRIBUTE
 #define DXF_CANDLE_PERIOD_VALUE_ATTRIBUTE_DEFAULT 1.0
 
-    enum dxf_candle_price_attribute_t:
+    ctypedef enum dxf_candle_price_attribute_t:
         dxf_cpa_last,
         dxf_cpa_bid,
         dxf_cpa_ask,
@@ -355,7 +355,7 @@ cdef extern from "EventData.h":
         dxf_cpa_default = dxf_cpa_last
 
 
-    enum dxf_candle_session_attribute_t:
+    ctypedef enum dxf_candle_session_attribute_t:
         dxf_csa_any,
         dxf_csa_regular,
 
@@ -364,7 +364,7 @@ cdef extern from "EventData.h":
         dxf_csa_default = dxf_csa_any
 
 
-    enum dxf_candle_type_period_attribute_t:
+    ctypedef enum dxf_candle_type_period_attribute_t:
         dxf_ctpa_tick,
         dxf_ctpa_second,
         dxf_ctpa_minute,
@@ -384,7 +384,7 @@ cdef extern from "EventData.h":
         dxf_ctpa_default = dxf_ctpa_tick
 
 
-    enum dxf_candle_alignment_attribute_t:
+    ctypedef enum dxf_candle_alignment_attribute_t:
         dxf_caa_midnight,
         dxf_caa_session,
 
@@ -399,7 +399,7 @@ cdef extern from "EventData.h":
 #  */
 # /* -------------------------------------------------------------------------- */
 
-    enum dxf_event_flag:
+    ctypedef enum dxf_event_flag:
         dxf_ef_tx_pending = 0x01,
         dxf_ef_remove_event = 0x02,
         dxf_ef_snapshot_begin = 0x04,
@@ -416,7 +416,7 @@ cdef extern from "EventData.h":
 
     ctypedef dxf_ulong_t dxf_time_int_field_t
 
-    struct dxf_event_params_t:
+    ctypedef struct dxf_event_params_t:
         dxf_event_flags_t flags,
         dxf_time_int_field_t time_int_field,
         dxf_ulong_t snapshot_key
