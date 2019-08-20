@@ -1,5 +1,0 @@
-
-
-def test():
-    pyconnect()
-    pydisconnect()

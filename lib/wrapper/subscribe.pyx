@@ -81,6 +81,13 @@ def dxf_attach_listener(SubscriptionClass sc):
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
 
+def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns: list):
+    sc.data['columns'] = columns
+    sc.listener = fw.func
+    if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
+        process_last_error()
+
+
 def detach_listener(SubscriptionClass sc):
     if not clib.dxf_detach_event_listener(sc.subscription, sc.listener):
         process_last_error()

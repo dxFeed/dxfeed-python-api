@@ -1,6 +1,14 @@
 from lib.wrapper.utils.helpers cimport *
 
+cdef class FuncWrapper:
+    def __cinit__(self):
+       self.func = NULL
 
+    @staticmethod
+    cdef FuncWrapper make_from_ptr(dxf_event_listener_t f):
+        cdef FuncWrapper out = FuncWrapper()
+        out.func = f
+        return out
 
 TRADE_COLUMNS = ['Symbol', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume', 'Time']
 cdef void trade_default_listener(int event_type, dxf_const_string_t symbol_name,

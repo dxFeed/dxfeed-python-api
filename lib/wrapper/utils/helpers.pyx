@@ -2,7 +2,8 @@ from warnings import warn
 from lib.wrapper.pxd_include.DXErrorCodes cimport *
 from lib.wrapper.pxd_include.DXFeed cimport *
 from lib.wrapper.pxd_include.DXTypes cimport *
-
+from pathlib import Path
+import lib
 
 cdef object unicode_from_dxf_const_string_t(dxf_const_string_t wcs):
     if wcs == NULL:
@@ -64,3 +65,8 @@ cdef void process_last_error():
         print("Error occurred and successfully retrieved:\n",
               f"error code = {error_code}, description = {unicode_from_dxf_const_string_t(error_descr)}")
     print("An error occurred but the error subsystem failed to initialize\n")
+
+def get_include():
+    out_dir = list()
+    out_dir.append(str(Path(lib.__file__).resolve().parent.joinpath('dxfeed-c-api', 'include')))
+    return out_dir
