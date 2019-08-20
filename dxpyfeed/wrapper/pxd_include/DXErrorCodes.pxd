@@ -1,4 +1,4 @@
-from lib.wrapper.pxd_include.DXTypes cimport *
+from dxpyfeed.wrapper.pxd_include.DXTypes cimport *
 
 cdef extern from "DXErrorCodes.h":
     ctypedef enum dx_error_code_t:

@@ -4,9 +4,9 @@
 #define EVENT_DATA_H_INCLUDED
 
 #pxd_include "RecordData.h"
-from lib.wrapper.pxd_include.RecordData cimport *
+from dxpyfeed.wrapper.pxd_include.RecordData cimport *
 #pxd_include "DXTypes.h"
-from lib.wrapper.pxd_include.DXTypes cimport *
+from dxpyfeed.wrapper.pxd_include.DXTypes cimport *
 #ifndef OUT
     #define OUT
 #endif /* OUT */

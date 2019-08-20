@@ -2,16 +2,14 @@ from setuptools import Extension
 from Cython.Build import cythonize
 from pathlib import Path
 
-
-source_files_directory = Path(__file__).resolve().parent.joinpath('lib', 'dxfeed-c-api', 'src')
+source_files_directory = Path(__file__).resolve().parent.joinpath('dxpyfeed', 'dxfeed-c-api', 'src')
 source_files_paths = [str(path) for path in source_files_directory.glob('*.c')]
 source_files_paths.remove(str(source_files_directory.joinpath('Linux.c')))
 
-package_c_files_dir = Path(__file__).resolve().parent.joinpath('lib', 'wrapper')
+package_c_files_dir = Path(__file__).resolve().parent.joinpath('dxpyfeed', 'wrapper')
 package_c_files_paths = [str(path) for path in package_c_files_dir.glob('**/*.c')]
 
-NAME = 'test'
-SRC_DIR = 'lib'
+SRC_DIR = 'dxpyfeed'
 PACKAGES = [SRC_DIR]
 
 
@@ -31,17 +29,17 @@ ext_helpers = Extension(name=SRC_DIR + '.wrapper.utils.helpers',
                                       SRC_DIR + '/wrapper/pxd_include'] + [SRC_DIR + '/wrapper/utils'])
 
 
-ext_subscription = Extension(name=SRC_DIR + '.wrapper.subscribe',
-                             sources=[SRC_DIR + '/wrapper/subscribe.pyx'] + source_files_paths + package_c_files_paths,
-                             libraries=['ws2_32'],
-                             include_dirs=[SRC_DIR + '/dxfeed-c-api/include/', SRC_DIR + '/dxfeed-c-api/src'] +
-                                          [SRC_DIR + '/wrapper/pxd_include'] +
-                                          [SRC_DIR + '/wrapper/utils'])
+ext_dxfeed = Extension(name=SRC_DIR + '.wrapper.DXFeedPy',
+                       sources=[SRC_DIR + '/wrapper/DXFeedPy.pyx'] + source_files_paths + package_c_files_paths,
+                       libraries=['ws2_32'],
+                       include_dirs=[SRC_DIR + '/dxfeed-c-api/include/', SRC_DIR + '/dxfeed-c-api/src'] +
+                                    [SRC_DIR + '/wrapper/pxd_include'] +
+                                    [SRC_DIR + '/wrapper/utils'])
 
 EXTENSIONS = [
     ext_lis,
     ext_helpers,
-    ext_subscription,
+    ext_dxfeed,
 ]
 
 

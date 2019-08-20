@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "lib"
+name = "dxpyfeed"
 version = "0.0.1"
 description = "Python API via C API"
 authors = ["Ivan"]

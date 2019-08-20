@@ -1,6 +1,6 @@
 # include "DXTypes.pxd"
-from lib.wrapper.pxd_include.DXTypes cimport *
-from lib.wrapper.pxd_include.EventData cimport *
+from dxpyfeed.wrapper.pxd_include.DXTypes cimport *
+from dxpyfeed.wrapper.pxd_include.EventData cimport *
 # /* -------------------------------------------------------------------------- */
 # /*
 #  *	DXFeed API generic types

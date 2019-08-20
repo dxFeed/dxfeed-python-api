@@ -1,9 +1,9 @@
 from warnings import warn
-from lib.wrapper.pxd_include.DXErrorCodes cimport *
-from lib.wrapper.pxd_include.DXFeed cimport *
-from lib.wrapper.pxd_include.DXTypes cimport *
+from dxpyfeed.wrapper.pxd_include.DXErrorCodes cimport *
+from dxpyfeed.wrapper.pxd_include.DXFeed cimport *
+from dxpyfeed.wrapper.pxd_include.DXTypes cimport *
 from pathlib import Path
-import lib
+import dxpyfeed
 
 cdef object unicode_from_dxf_const_string_t(dxf_const_string_t wcs):
     if wcs == NULL:
@@ -16,17 +16,17 @@ cdef dxf_const_string_t dxf_const_string_t_from_unicode(object symbol):
 
 def event_type_convert(event_type: str):
     """
-    The function converts event type given as string to int, used in C dxfeed lib
+    The function converts event type given as string to int, used in C dxfeed dxpyfeed
 
     Parameters
     ----------
     event_type: str
-        Event type: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'Time&Sale', 'Candle', 'TradeETH', 'SpreadOrder',
+        Event type: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
                     'Greeks', 'THEO_PRICE', 'Underlying', 'Series', 'Configuration' or ''
     Returns
     -------
     : int
-        Integer that corresponds to event type in C dxfeed lib
+        Integer that corresponds to event type in C dxfeed dxpyfeed
     """
     et_mapping = {
         'Trade': 1,
@@ -34,7 +34,7 @@ def event_type_convert(event_type: str):
         'Summary': 4,
         'Profile': 8,
         'Order': 16,
-        'Time&Sale': 32,
+        'TimeAndSale': 32,
         'Candle': 64,
         'TradeETH': 128,
         'SpreadOrder': 256,
@@ -68,5 +68,5 @@ cdef void process_last_error():
 
 def get_include():
     out_dir = list()
-    out_dir.append(str(Path(lib.__file__).resolve().parent.joinpath('dxfeed-c-api', 'include')))
+    out_dir.append(str(Path(dxpyfeed.__file__).resolve().parent.joinpath('dxfeed-c-api', 'include')))
     return out_dir

@@ -25,7 +25,7 @@
 #define RECORD_DATA_H_INCLUDED
 
 #include "DXTypes.h"
-from lib.wrapper.pxd_include.DXTypes cimport *
+from dxpyfeed.wrapper.pxd_include.DXTypes cimport *
 # /* -------------------------------------------------------------------------- */
 # /*
 #  *	Record type constants

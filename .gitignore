@@ -18,5 +18,6 @@ build/*
 
 *.ipynb_checkpoints*
 
+Pipfile*
 poetry.lock
 dist*

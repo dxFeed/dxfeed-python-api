@@ -1,4 +1,4 @@
-from lib.wrapper.pxd_include.DXTypes cimport dxf_const_string_t
+from dxpyfeed.wrapper.pxd_include.DXTypes cimport dxf_const_string_t
 from cpython.ref cimport PyObject
 
 cdef extern from *:
