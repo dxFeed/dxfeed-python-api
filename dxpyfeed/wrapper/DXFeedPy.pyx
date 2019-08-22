@@ -2,6 +2,7 @@ from dxpyfeed.wrapper.utils.helpers cimport *
 from dxpyfeed.wrapper.utils.helpers import *
 cimport dxpyfeed.wrapper.pxd_include.DXFeed as clib
 cimport dxpyfeed.wrapper.listeners.listener as lis
+from libc.stdlib cimport free
 # for importing variables
 import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
@@ -33,6 +34,13 @@ cdef class SubscriptionClass:
                      'data': []}
         self.u_data = <void *>self.data
         self.listener = NULL
+
+    def __dealloc__(self):
+        self.data = NULL
+        free(self.data)
+        free(self.u_data)
+        free(self.listener)
+        free(self.subscription)
 
     @property
     def data(self):

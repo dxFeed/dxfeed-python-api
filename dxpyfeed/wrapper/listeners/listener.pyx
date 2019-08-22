@@ -130,7 +130,7 @@ cdef void time_and_sale_default_listener(int event_type, dxf_const_string_t symb
                                )
 
 CANDLE_COLUMNS = [
-    'Symbol', 'event_flags', 'index', 'time', 'sequence', 'count', 'open', 'high', 'low', 'close', 'volume',
+    'Symbol', 'index', 'time', 'sequence', 'count', 'open', 'high', 'low', 'close', 'volume',
               'vwap', 'bid_volume', 'ask_volume', 'open_interest', 'imp_volatility',
 ]
 cdef void candle_default_listener(int event_type, dxf_const_string_t symbol_name,
@@ -139,7 +139,6 @@ cdef void candle_default_listener(int event_type, dxf_const_string_t symbol_name
     cdef dict py_data = <dict>user_data
     for i in range(data_count):
         py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
-                                candle[i].event_flags,
                                 candle[i].index,
                                 candle[i].time,
                                 candle[i].sequence,
