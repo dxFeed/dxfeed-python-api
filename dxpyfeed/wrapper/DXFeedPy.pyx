@@ -36,8 +36,6 @@ cdef class SubscriptionClass:
         self.listener = NULL
 
     def __dealloc__(self):
-        self.data = NULL
-        free(self.data)
         free(self.u_data)
         free(self.listener)
         free(self.subscription)
