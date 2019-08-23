@@ -1,11 +1,28 @@
 from dxpyfeed.wrapper.utils.helpers cimport *
 from dxpyfeed.wrapper.utils.helpers import *
 cimport dxpyfeed.wrapper.pxd_include.DXFeed as clib
+cimport dxpyfeed.wrapper.pxd_include.DXErrorCodes as dxec
 cimport dxpyfeed.wrapper.listeners.listener as lis
 from libc.stdlib cimport free
 # for importing variables
 import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
+
+
+cdef void process_last_error():
+    cdef int error_code = dxec.dx_ec_success
+    cdef dxf_const_string_t error_descr = NULL
+    cdef int res
+
+    res = clib.dxf_get_last_error(&error_code, &error_descr)
+
+    if res == clib.DXF_SUCCESS:
+        if error_code == dxec.dx_ec_success:
+            print("no error information is stored")
+
+        print("Error occurred and successfully retrieved:\n",
+              f"error code = {error_code}, description = {unicode_from_dxf_const_string_t(error_descr)}")
+    print("An error occurred but the error subsystem failed to initialize\n")
 
 
 cdef class ConnectionClass:
