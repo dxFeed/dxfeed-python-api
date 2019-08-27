@@ -4,6 +4,7 @@ cimport dxpyfeed.wrapper.pxd_include.DXFeed as clib
 cimport dxpyfeed.wrapper.pxd_include.DXErrorCodes as dxec
 cimport dxpyfeed.wrapper.listeners.listener as lis
 from libc.stdlib cimport free
+from datetime import datetime
 # for importing variables
 import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
@@ -86,7 +87,7 @@ def dxf_create_connection(address='demo.dxfeed.com:7300'):
         return
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type):
+def dxf_create_subscription(ConnectionClass cc, event_type, candle_time=None):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass
     Parameters
@@ -96,6 +97,8 @@ def dxf_create_subscription(ConnectionClass cc, event_type):
     event_type
         Event type: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
                     'Greeks', 'THEO_PRICE', 'Underlying', 'Series', 'Configuration' or ''
+    candle_time: str
+        String of %Y-%m-%d %H:%M:%S datetime format for retrieving candles. By default set to now
 
     Returns
     -------
@@ -105,7 +108,20 @@ def dxf_create_subscription(ConnectionClass cc, event_type):
     sc = cc.make_new_subscription()
     sc.event_type_str = event_type
     et_type_int = event_type_convert(event_type)
-    if not clib.dxf_create_subscription(sc.connection, et_type_int, &sc.subscription):
+
+    if event_type == 'Candle':
+        if not candle_time:
+            candle_time = datetime.utcnow()
+        else:
+            try:
+                candle_time = datetime.strptime(candle_time, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                raise Exception("Inapropriate date format, should be %Y-%m-%d %H:%M:%S")
+        timestamp = int((candle_time - datetime(1970, 1, 1)).total_seconds() * 1000)
+        if not clib.dxf_create_subscription_timed(sc.connection, et_type_int, timestamp, &sc.subscription):
+            process_last_error()
+            return
+    elif not clib.dxf_create_subscription(sc.connection, et_type_int, &sc.subscription):
         process_last_error()
         return
     return sc
