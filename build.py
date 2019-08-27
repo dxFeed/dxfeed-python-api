@@ -1,4 +1,4 @@
-from setuptools import Extension
+from setuptools import Extension, find_packages
 from Cython.Build import cythonize
 from pathlib import Path
 import platform
@@ -18,29 +18,27 @@ package_c_files_paths = [str(path) for path in package_c_files_dir.glob('**/*.c'
 SRC_DIR = 'dxpyfeed'
 PACKAGES = [SRC_DIR]
 
+c_lib = ('c_lib', {'sources': source_files_paths,
+                   'libraries':libs,
+                   })
+
 
 ext_lis = Extension(name=SRC_DIR + '.wrapper.listeners.listener',
                     sources=[SRC_DIR + '/wrapper/listeners/listener.pyx'],
                     libraries=libs,
-                    include_dirs=[SRC_DIR + '/dxfeed-c-api/include/', SRC_DIR + '/dxfeed-c-api/src'] +
-                                 [SRC_DIR + '/wrapper/pxd_include'] +
-                                 [SRC_DIR + '/wrapper/utils']
                     )
 
 
 ext_helpers = Extension(name=SRC_DIR + '.wrapper.utils.helpers',
                         sources=[SRC_DIR + '/wrapper/utils/helpers.pyx'],
                         libraries=libs,
-                        include_dirs=[SRC_DIR + '/dxfeed-c-api/include/', SRC_DIR + '/dxfeed-c-api/src',
-                                      SRC_DIR + '/wrapper/pxd_include'] + [SRC_DIR + '/wrapper/utils'])
+                        )
 
 
 ext_dxfeed = Extension(name=SRC_DIR + '.wrapper.DXFeedPy',
-                       sources=[SRC_DIR + '/wrapper/DXFeedPy.pyx'] + source_files_paths + package_c_files_paths,
+                       sources=[SRC_DIR + '/wrapper/DXFeedPy.pyx'] + package_c_files_paths,
                        libraries=libs,
-                       include_dirs=[SRC_DIR + '/dxfeed-c-api/include/', SRC_DIR + '/dxfeed-c-api/src'] +
-                                    [SRC_DIR + '/wrapper/pxd_include'] +
-                                    [SRC_DIR + '/wrapper/utils'])
+                       )
 
 EXTENSIONS = [
     ext_lis,
@@ -53,4 +51,9 @@ def build(setup_kwargs):
     setup_kwargs.update({
         'ext_modules': cythonize(EXTENSIONS, language_level=3),
         'zip_safe': False,
+        'libraries': [c_lib],
+        'include_dirs': [SRC_DIR + '/dxfeed-c-api/include/',
+                         SRC_DIR + '/dxfeed-c-api/src',
+                         SRC_DIR + '/wrapper/pxd_include',
+                         SRC_DIR + '/wrapper/utils']
     })
