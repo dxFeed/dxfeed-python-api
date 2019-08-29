@@ -241,3 +241,44 @@ cdef void underlying_default_listener(int event_type, dxf_const_string_t symbol_
                                 underlying[i].put_call_ratio,
                                 ]
                                )
+
+SERIES_COLUMNS = [
+    'Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Sequence', 'Expiration', 'Volatility', 'PutCallRatio',
+              'ForwardPrice', 'Dividend', 'Interest'
+]
+
+cdef void series_default_listener(int event_type, dxf_const_string_t symbol_name,
+			                     const dxf_event_data_t* data, int data_count, void* user_data):
+    cdef dxf_series_t* series = <dxf_series_t*>data
+    cdef dict py_data = <dict>user_data
+    for i in range(data_count):
+        py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
+                                series[i].event_flags,
+                                series[i].index,
+                                series[i].time,
+                                series[i].sequence,
+                                series[i].sequence,
+                                series[i].expiration,
+                                series[i].volatility,
+                                series[i].put_call_ratio,
+                                series[i].forward_price,
+                                series[i].dividend,
+                                series[i].interest
+                                ]
+                               )
+
+CONFIGURATION_COLUMNS = [
+    'Symbol', 'Version', 'Object'
+]
+
+cdef void configuration_default_listener(int event_type, dxf_const_string_t symbol_name,
+			                     const dxf_event_data_t* data, int data_count, void* user_data):
+    cdef dxf_configuration_t* config = <dxf_configuration_t*>data
+    cdef dict py_data = <dict>user_data
+    for i in range(data_count):
+        py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
+                                config[i].version,
+                                unicode_from_dxf_const_string_t(config[i].object),
+                                ]
+                               )
+
