@@ -211,7 +211,7 @@ THEO_PRICE_COLUMNS = [
 
 cdef void theo_price_default_listener(int event_type, dxf_const_string_t symbol_name,
 			                     const dxf_event_data_t* data, int data_count, void* user_data):
-    cdef dx_theo_price_t* theo_price = <dx_theo_price_t*>data
+    cdef dxf_theo_price_t* theo_price = <dxf_theo_price_t*>data
     cdef dict py_data = <dict>user_data
     for i in range(data_count):
         py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
@@ -222,5 +222,22 @@ cdef void theo_price_default_listener(int event_type, dxf_const_string_t symbol_
                                 theo_price[i].gamma,
                                 theo_price[i].dividend,
                                 theo_price[i].interest
+                                ]
+                               )
+
+UNDERLYING_COLUMNS = [
+    'Symbol', 'Volatility', 'FrontVolatility', 'BackVolatility', 'PutCallRatio'
+]
+
+cdef void underlying_default_listener(int event_type, dxf_const_string_t symbol_name,
+			                     const dxf_event_data_t* data, int data_count, void* user_data):
+    cdef dxf_underlying_t* underlying = <dxf_underlying_t*>data
+    cdef dict py_data = <dict>user_data
+    for i in range(data_count):
+        py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
+                                underlying[i].volatility,
+                                underlying[i].front_volatility,
+                                underlying[i].back_volatility,
+                                underlying[i].put_call_ratio,
                                 ]
                                )

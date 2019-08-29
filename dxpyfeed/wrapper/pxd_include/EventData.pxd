@@ -293,11 +293,11 @@ cdef extern from "EventData.h":
 
 # /* TheoPrice ---------------------------------------------------------------- */
 # /* Event and record are the same */
-    cdef dx_theo_price_t dxf_theo_price_t
+    ctypedef dx_theo_price_t dxf_theo_price_t
 
 # /* Underlying --------------------------------------------------------------- */
 # /* Event and record are the same */
-    cdef dx_underlying_t dxf_underlying_t
+    ctypedef dx_underlying_t dxf_underlying_t
 
 # /* Series ------------------------------------------------------------------- */
     ctypedef struct dxf_series_t:

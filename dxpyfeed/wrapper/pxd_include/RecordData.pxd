@@ -32,7 +32,7 @@ from dxpyfeed.wrapper.pxd_include.DXTypes cimport *
 #  */
 # /* -------------------------------------------------------------------------- */
 cdef extern from "RecordData.h":
-    enum dx_record_info_id_t:
+    ctypedef enum dx_record_info_id_t:
         dx_rid_begin = 0,
         dx_rid_trade = dx_rid_begin,
         dx_rid_quote,
@@ -68,7 +68,7 @@ cdef extern from "RecordData.h":
 #  */
 # /* -------------------------------------------------------------------------- */
 
-    struct dx_trade_t:
+    ctypedef struct dx_trade_t:
         dxf_int_t time
         dxf_int_t sequence
         dxf_int_t time_nanos
@@ -83,7 +83,7 @@ cdef extern from "RecordData.h":
 
     ctypedef dx_trade_t dx_trade_eth_t
 
-    struct dx_quote_t:
+    ctypedef struct dx_quote_t:
         dxf_int_t sequence
         dxf_int_t time_nanos
         dxf_int_t bid_time
@@ -95,7 +95,7 @@ cdef extern from "RecordData.h":
         dxf_double_t ask_price
         dxf_int_t ask_size
 
-    struct dx_summary_t:
+    ctypedef struct dx_summary_t:
         dxf_dayid_t day_id
         dxf_double_t day_open_price
         dxf_double_t day_high_price
@@ -108,7 +108,7 @@ cdef extern from "RecordData.h":
         dxf_int_t flags
 
 
-    struct dx_profile_t:
+    ctypedef struct dx_profile_t:
         dxf_double_t beta
         dxf_double_t eps
         dxf_int_t div_freq
@@ -127,7 +127,7 @@ cdef extern from "RecordData.h":
         dxf_const_string_t status_reason
 
 cdef extern from "RecordData.h":
-    struct dx_market_maker_t:
+    ctypedef struct dx_market_maker_t:
         dxf_char_t mm_exchange
         dxf_int_t mm_id
         dxf_int_t mmbid_time
@@ -139,7 +139,7 @@ cdef extern from "RecordData.h":
         dxf_int_t mmask_size
         dxf_int_t mmask_count
 
-    struct dx_order_t:
+    ctypedef struct dx_order_t:
         dxf_int_t index
         dxf_int_t time
         dxf_int_t time_nanos
@@ -151,7 +151,7 @@ cdef extern from "RecordData.h":
         dxf_int_t mmid
 
 
-    struct dx_spread_order_t:
+    ctypedef struct dx_spread_order_t:
         dxf_int_t index
         dxf_int_t time
         dxf_int_t time_nanos
@@ -163,7 +163,7 @@ cdef extern from "RecordData.h":
         dxf_const_string_t spread_symbol
 
 
-    struct dx_time_and_sale_t:
+    ctypedef struct dx_time_and_sale_t:
         dxf_int_t time
         dxf_int_t sequence
         dxf_char_t exchange_code
@@ -176,7 +176,7 @@ cdef extern from "RecordData.h":
         dxf_const_string_t buyer
         dxf_const_string_t seller
 
-    struct dx_candle_t:
+    ctypedef struct dx_candle_t:
         dxf_int_t time
         dxf_int_t sequence
         dxf_double_t count
@@ -191,7 +191,7 @@ cdef extern from "RecordData.h":
         dxf_int_t open_interest
         dxf_double_t imp_volatility
 
-    struct dx_greeks_t:
+    ctypedef struct dx_greeks_t:
         dxf_int_t time
         dxf_int_t sequence
         dxf_double_t price
@@ -212,13 +212,13 @@ cdef extern from "RecordData.h":
         dxf_double_t dividend
         dxf_double_t interest
 
-    struct dx_underlying_t:
+    ctypedef struct dx_underlying_t:
         dxf_double_t volatility
         dxf_double_t front_volatility
         dxf_double_t back_volatility
         dxf_double_t put_call_ratio
 
-    struct dx_series_t:
+    ctypedef struct dx_series_t:
         dxf_int_t index
         dxf_int_t time
         dxf_int_t sequence
@@ -230,7 +230,7 @@ cdef extern from "RecordData.h":
         dxf_double_t interest
 
 
-    struct dx_configuration_t:
+    ctypedef struct dx_configuration_t:
         dxf_int_t version
         dxf_byte_array_t object
 
