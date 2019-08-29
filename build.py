@@ -18,9 +18,9 @@ package_c_files_paths = [str(path) for path in package_c_files_dir.glob('**/*.c'
 SRC_DIR = 'dxpyfeed'
 PACKAGES = [SRC_DIR]
 
-c_lib = ('c_lib', {'sources': source_files_paths,
+dxfeed = ('dxfeed', {'sources': source_files_paths,
                    'libraries':libs,
-                   })
+                     })
 
 
 ext_lis = Extension(name=SRC_DIR + '.wrapper.listeners.listener',
@@ -51,7 +51,7 @@ def build(setup_kwargs):
     setup_kwargs.update({
         'ext_modules': cythonize(EXTENSIONS, language_level=3),
         'zip_safe': False,
-        'libraries': [c_lib],
+        'libraries': [dxfeed],
         'include_dirs': [SRC_DIR + '/dxfeed-c-api/include/',
                          SRC_DIR + '/dxfeed-c-api/src',
                          SRC_DIR + '/wrapper/pxd_include',
