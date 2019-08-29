@@ -170,6 +170,15 @@ def dxf_attach_listener(SubscriptionClass sc):
     elif sc.event_type_str == 'Order':
         sc.data['columns'] = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
+    elif sc.event_type_str == 'TradeETH':
+        sc.data['columns'] = lis.TRADE_COLUMNS
+        sc.listener =  lis.trade_default_listener
+    elif sc.event_type_str == 'SpreadOrder':
+        sc.data['columns'] = lis.ORDER_COLUMNS
+        sc.listener = lis.order_default_listener
+    elif sc.event_type_str == 'Greeks':
+        sc.data['columns'] = lis.GREEKS_COLUMNS
+        sc.listener = lis.greeks_default_listener
     else:
         raise Exception(f'No default listener for {sc.event_type_str} event type')
 

@@ -10,7 +10,7 @@ cdef class FuncWrapper:
         out.func = f
         return out
 
-TRADE_COLUMNS = ['Symbol', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume', 'Time']
+TRADE_COLUMNS = ['Symbol', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume', 'Time', 'IsETH']
 cdef void trade_default_listener(int event_type, dxf_const_string_t symbol_name,
 			            const dxf_event_data_t* data, int data_count, void* user_data):
 
@@ -25,7 +25,8 @@ cdef void trade_default_listener(int event_type, dxf_const_string_t symbol_name,
                                 trades[i].tick,
                                 trades[i].change,
                                 trades[i].day_volume,
-                                trades[i].time
+                                trades[i].time,
+                                trades[i].is_eth
                                 ]
                                )
 
@@ -178,5 +179,28 @@ cdef void order_default_listener(int event_type, dxf_const_string_t symbol_name,
                                 order[i].exchange_code,
                                 unicode_from_dxf_const_string_t(order[i].market_maker),
                                 unicode_from_dxf_const_string_t(order[i].spread_symbol)
+                                ]
+                               )
+
+GREEKS_COLUMNS = [
+    'Symbol', 'EventFlags', 'Index', 'Time', 'Price', 'Volatility', 'Delta', 'Gamma', 'Theta', 'Rho', 'Vega'
+]
+
+cdef void greeks_default_listener(int event_type, dxf_const_string_t symbol_name,
+			                     const dxf_event_data_t* data, int data_count, void* user_data):
+    cdef dxf_greeks_t* greeks = <dxf_greeks_t*>data
+    cdef dict py_data = <dict>user_data
+    for i in range(data_count):
+        py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
+                                greeks[i].event_flags,
+                                greeks[i].index,
+                                greeks[i].time,
+                                greeks[i].price,
+                                greeks[i].volatility,
+                                greeks[i].delta,
+                                greeks[i].gamma,
+                                greeks[i].theta,
+                                greeks[i].rho,
+                                greeks[i].vega
                                 ]
                                )
