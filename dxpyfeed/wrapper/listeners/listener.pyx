@@ -204,3 +204,23 @@ cdef void greeks_default_listener(int event_type, dxf_const_string_t symbol_name
                                 greeks[i].vega
                                 ]
                                )
+
+THEO_PRICE_COLUMNS = [
+    'Symbol', 'Time', 'Price', 'UnderlyingPrice', 'Delta', 'Gamma', 'Dividend', 'Interest'
+]
+
+cdef void theo_price_default_listener(int event_type, dxf_const_string_t symbol_name,
+			                     const dxf_event_data_t* data, int data_count, void* user_data):
+    cdef dx_theo_price_t* theo_price = <dx_theo_price_t*>data
+    cdef dict py_data = <dict>user_data
+    for i in range(data_count):
+        py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
+                                theo_price[i].time,
+                                theo_price[i].price,
+                                theo_price[i].underlying_price,
+                                theo_price[i].delta,
+                                theo_price[i].gamma,
+                                theo_price[i].dividend,
+                                theo_price[i].interest
+                                ]
+                               )

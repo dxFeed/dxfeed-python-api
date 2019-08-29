@@ -202,7 +202,7 @@ cdef extern from "RecordData.h":
         dxf_double_t rho
         dxf_double_t vega
 
-    struct dx_theo_price_t:
+    ctypedef struct dx_theo_price_t:
         # // To have same record for record and event
         dxf_long_t time
         dxf_double_t price

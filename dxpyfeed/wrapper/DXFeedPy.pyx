@@ -179,6 +179,9 @@ def dxf_attach_listener(SubscriptionClass sc):
     elif sc.event_type_str == 'Greeks':
         sc.data['columns'] = lis.GREEKS_COLUMNS
         sc.listener = lis.greeks_default_listener
+    elif sc.event_type_str == 'TheoPrice':
+        sc.data['columns'] = lis.THEO_PRICE_COLUMNS
+        sc.listener = lis.theo_price_default_listener
     else:
         raise Exception(f'No default listener for {sc.event_type_str} event type')
 

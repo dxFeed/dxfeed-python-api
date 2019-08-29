@@ -22,7 +22,7 @@ def event_type_convert(event_type: str):
     ----------
     event_type: str
         Event type: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
-                    'Greeks', 'THEO_PRICE', 'Underlying', 'Series', 'Configuration' or ''
+                    'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
     Returns
     -------
     : int
@@ -39,7 +39,7 @@ def event_type_convert(event_type: str):
         'TradeETH': 128,
         'SpreadOrder': 256,
         'Greeks': 512,
-        'THEO_PRICE': 1024,
+        'TheoPrice': 1024,
         'Underlying': 2048,
         'Series': 4096,
         'Configuration': 8192,
