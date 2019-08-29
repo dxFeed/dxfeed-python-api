@@ -167,6 +167,9 @@ def dxf_attach_listener(SubscriptionClass sc):
     elif sc.event_type_str == 'Candle':
         sc.data['columns'] = lis.CANDLE_COLUMNS
         sc.listener = lis.candle_default_listener
+    elif sc.event_type_str == 'Order':
+        sc.data['columns'] = lis.ORDER_COLUMNS
+        sc.listener = lis.order_default_listener
     else:
         raise Exception(f'No default listener for {sc.event_type_str} event type')
 
