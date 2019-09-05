@@ -10,7 +10,7 @@ import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
 
 
-cdef void process_last_error():
+cpdef void process_last_error():
     cdef int error_code = dxec.dx_ec_success
     cdef dxf_const_string_t error_descr = NULL
     cdef int res
