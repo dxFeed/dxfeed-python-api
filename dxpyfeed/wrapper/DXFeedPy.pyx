@@ -12,7 +12,9 @@ import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
 
 #for debug
-# from libc.stdint cimport uintptr_t
+from libc.stdint cimport uintptr_t
+import time
+
 
 cpdef void process_last_error():
     cdef int error_code = dxec.dx_ec_success
@@ -44,9 +46,9 @@ cdef class ConnectionClass:
         out.connection = self.connection
         return out
 
-    # @property
-    # def ptr(self):
-    #     return <uintptr_t>self.connection
+    @property
+    def ptr(self):
+        return <uintptr_t>self.connection
 
 cdef class SubscriptionClass:
     """
@@ -75,9 +77,6 @@ cdef class SubscriptionClass:
 
     def __dealloc__(self):
         clib.dxf_close_subscription(self.subscription)
-        free(self.u_data)
-        free(self.listener)
-
 
     @property
     def data(self):
