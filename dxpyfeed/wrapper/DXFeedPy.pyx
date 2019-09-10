@@ -6,10 +6,13 @@ cimport dxpyfeed.wrapper.listeners.listener as lis
 from libc.stdlib cimport free
 from collections import deque
 from datetime import datetime
+import pandas as pd
 # for importing variables
 import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
 
+#for debug
+# from libc.stdint cimport uintptr_t
 
 cpdef void process_last_error():
     cdef int error_code = dxec.dx_ec_success
@@ -36,10 +39,14 @@ cdef class ConnectionClass:
     def __dealloc__(self):
         free(self.connection)
 
-    cpdef SubscriptionClass make_new_subscription(self):
-        cdef SubscriptionClass out = SubscriptionClass()
+    cpdef SubscriptionClass make_new_subscription(self, data_len):
+        cdef SubscriptionClass out = SubscriptionClass(data_len)
         out.connection = self.connection
         return out
+
+    # @property
+    # def ptr(self):
+    #     return <uintptr_t>self.connection
 
 cdef class SubscriptionClass:
     """
@@ -67,10 +74,10 @@ cdef class SubscriptionClass:
         self.listener = NULL
 
     def __dealloc__(self):
-        free(self.subscription)
+        clib.dxf_close_subscription(self.subscription)
         free(self.u_data)
         free(self.listener)
-        free(self.subscription)
+
 
     @property
     def data(self):
@@ -79,6 +86,17 @@ cdef class SubscriptionClass:
     @data.setter
     def data(self, new_val: dict):
         self.data = new_val
+
+    def to_data_frame(self):
+        arr_len = len(self.data['data'])
+        df = pd.DataFrame(list(self.data['data'])[:arr_len], columns=self.data['columns'])
+        if 'Time' in df.columns:
+            df.Time = df.Time.astype('<M8[ms]')
+        if 'BidTime' in df.columns:
+            df.BidTime = df.BidTime.astype('<M8[ms]')
+        if 'AskTime' in df.columns:
+            df.AskTime = df.AskTime.astype('<M8[ms]')
+        return df
 
 def dxf_create_connection(address='demo.dxfeed.com:7300'):
     """

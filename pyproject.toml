@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dxpyfeed"
-version = "0.0.1"
+version = "0.0.3"
 description = "Python API via C API"
 authors = ["Ivan"]
 build = "build.py"
@@ -8,10 +8,12 @@ build = "build.py"
 [tool.poetry.dependencies]
 python = "^3.6"
 cython = "^0.29.13"
+pandas = "^0.25.1"
 
 [tool.poetry.dev-dependencies]
 python = "^3.6"
 cython = "^0.29.13"
+pandas = "^0.25.1"
 
 [build-system]
 requires = ["poetry>=0.12"]
