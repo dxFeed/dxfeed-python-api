@@ -11,10 +11,6 @@ import pandas as pd
 import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
 
-#for debug
-from libc.stdint cimport uintptr_t
-import time
-
 
 cpdef void process_last_error():
     cdef int error_code = dxec.dx_ec_success
@@ -39,16 +35,13 @@ cdef class ConnectionClass:
     cdef clib.dxf_connection_t connection
 
     def __dealloc__(self):
-        free(self.connection)
+        clib.dxf_close_connection(self.connection)
 
     cpdef SubscriptionClass make_new_subscription(self, data_len):
         cdef SubscriptionClass out = SubscriptionClass(data_len)
         out.connection = self.connection
         return out
 
-    @property
-    def ptr(self):
-        return <uintptr_t>self.connection
 
 cdef class SubscriptionClass:
     """
