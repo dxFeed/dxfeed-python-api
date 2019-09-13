@@ -12,7 +12,7 @@ import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
 
 
-cpdef void process_last_error():
+cpdef int process_last_error(verbose=True):
     cdef int error_code = dxec.dx_ec_success
     cdef dxf_const_string_t error_descr = NULL
     cdef int res
@@ -20,12 +20,15 @@ cpdef void process_last_error():
     res = clib.dxf_get_last_error(&error_code, &error_descr)
 
     if res == clib.DXF_SUCCESS:
-        if error_code == dxec.dx_ec_success:
+        if error_code == dxec.dx_ec_success and verbose:
             print("no error information is stored")
 
-        print("Error occurred and successfully retrieved:\n",
-              f"error code = {error_code}, description = {unicode_from_dxf_const_string_t(error_descr)}")
-    print("An error occurred but the error subsystem failed to initialize\n")
+        if verbose:
+            print("Error occurred and successfully retrieved:\n",
+                  f"error code = {error_code}, description = {unicode_from_dxf_const_string_t(error_descr)}")
+    # print("An error occurred but the error subsystem failed to initialize\n")
+
+    return error_code
 
 
 cdef class ConnectionClass:
@@ -139,22 +142,22 @@ def dxf_create_subscription(ConnectionClass cc, event_type, candle_time=None, da
     sc.event_type_str = event_type
     et_type_int = event_type_convert(event_type)
 
-    if event_type == 'Candle':
-        if not candle_time:
-            candle_time = datetime.utcnow()
-        else:
-            try:
-                candle_time = datetime.strptime(candle_time, '%Y-%m-%d %H:%M:%S')
-            except ValueError:
-                raise Exception("Inapropriate date format, should be %Y-%m-%d %H:%M:%S")
+    try:
+        candle_time = datetime.strptime(candle_time, '%Y-%m-%d %H:%M:%S') if candle_time else datetime.utcnow()
         timestamp = int((candle_time - datetime(1970, 1, 1)).total_seconds()) * 1000 - 5000
-        if not clib.dxf_create_subscription_timed(sc.connection, et_type_int, timestamp, &sc.subscription):
-            process_last_error()
-            return
-    elif not clib.dxf_create_subscription(sc.connection, et_type_int, &sc.subscription):
-        process_last_error()
-        return
-    return sc
+    except ValueError:
+        raise Exception("Inapropriate date format, should be %Y-%m-%d %H:%M:%S")
+
+    if event_type == 'Candle':
+        clib.dxf_create_subscription_timed(sc.connection, et_type_int, timestamp, &sc.subscription)
+    else:
+        clib.dxf_create_subscription(sc.connection, et_type_int, &sc.subscription)
+
+    error_code = process_last_error(verbose=False)
+    if error_code:
+        raise Exception(f"Error {error_code} occurred!")
+    else:
+        return sc
 
 def dxf_add_symbols(SubscriptionClass sc, symbols: list):
     """
