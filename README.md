@@ -62,7 +62,7 @@ sub1.data
 sub2.data
 ```
 The data is stored in Subscription class. You can also turn dict to pandas DataFrame simply calling
-`sub1.to_data_frame()`.
+`sub1.to_dataframe()`.
 
 **Detach the listener, if you want to stop recieving data**:
 ```python

@@ -79,15 +79,19 @@ cdef class SubscriptionClass:
     def data(self, new_val: dict):
         self.data = new_val
 
-    def to_data_frame(self):
+    def to_dataframe(self):
+        """
+        Method converts dict of data to the Pandas DataFrame
+
+        Returns
+        -------
+        df: pandas DataFrame
+        """
         arr_len = len(self.data['data'])
         df = pd.DataFrame(list(self.data['data'])[:arr_len], columns=self.data['columns'])
-        if 'Time' in df.columns:
-            df.Time = df.Time.astype('<M8[ms]')
-        if 'BidTime' in df.columns:
-            df.BidTime = df.BidTime.astype('<M8[ms]')
-        if 'AskTime' in df.columns:
-            df.AskTime = df.AskTime.astype('<M8[ms]')
+        time_columns = df.columns[df.columns.str.contains('Time')]
+        for column in time_columns:
+            df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
         return df
 
 def dxf_create_connection(address='demo.dxfeed.com:7300'):
