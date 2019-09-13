@@ -21,19 +21,19 @@ pip3 install dxpyfeed-x.x.x.tar.gz
 All the functions in C API have similar ones in Python with the same name. Not all arguments are
 supported by now, this work is in progress.
 
-Import dxpyfeed library:
+**Import dxpyfeed library**:
 
 ```python
 import dxpyfeed as dxp
 ``` 
 
-Create connection:
+**Create connection**:
 
 ```python
 con = dxp.dxf_create_connection(address='demo.dxfeed.com:7300')
 ```
 
-Create one or several subscriptions of certain event types:
+**Create one or several subscriptions of certain event types**:
 ```python
 sub1 = dxp.dxf_create_subscription(con, 'Trade')
 sub2 = dxp.dxf_create_subscription(con, 'Quote')
@@ -41,13 +41,13 @@ sub2 = dxp.dxf_create_subscription(con, 'Quote')
 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' event types are supported.
 
-Add tickers you want to get data for:
+**Add tickers you want to get data for**:
 ```python
 dxp.dxf_add_symbols(sub1, ['AAPL', 'MSFT'])
 dxp.dxf_add_symbols(sub2, ['AAPL', 'C'])
 ```
 
-Attach listeners:
+**Attach listeners**:
 ```python
 dxp.dxf_attach_listener(sub1)
 dxp.dxf_attach_listener(sub2)
@@ -56,7 +56,7 @@ dxp.dxf_attach_listener(sub2)
 `dxpyfeed` has default listeners for each event type, but you are able to write 
 your custom one. You can find how to do it at `example/Custom listener example.ipynb`.
 
-Look at the data:
+**Look at the data**:
 ```python
 sub1.data
 sub2.data
@@ -64,13 +64,13 @@ sub2.data
 The data is stored in Subscription class. You can also turn dict to pandas DataFrame simply calling
 `sub1.to_data_frame()`.
 
-If you want to stop recieving data, detach the listener:
+**Detach the listener, if you want to stop recieving data**:
 ```python
 dxp.dxf_detach_listener(sub1)
 dxp.dxf_detach_listener(sub2)
 ```
 
-Finally, close your connection:
+**Finally, close your connection**:
 ```python
 dxp.dxf_close_connection(con)
 ```
