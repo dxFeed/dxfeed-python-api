@@ -3,16 +3,29 @@ from dxpyfeed.wrapper.utils.helpers import *
 cimport dxpyfeed.wrapper.pxd_include.DXFeed as clib
 cimport dxpyfeed.wrapper.pxd_include.DXErrorCodes as dxec
 cimport dxpyfeed.wrapper.listeners.listener as lis
-from libc.stdlib cimport free
 from collections import deque
 from datetime import datetime
 import pandas as pd
+
 # for importing variables
 import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
 
 
-cpdef int process_last_error(verbose=True):
+cpdef int process_last_error(verbose: bool=True):
+    """
+    Function retrieves last error
+
+    Parameters
+    ----------
+    verbose: bool
+        If True error description is printed
+        
+    Returns
+    -------
+    error_code: int
+        Error code is returned
+    """
     cdef int error_code = dxec.dx_ec_success
     cdef dxf_const_string_t error_descr = NULL
     cdef int res
@@ -26,7 +39,6 @@ cpdef int process_last_error(verbose=True):
         if verbose:
             print("Error occurred and successfully retrieved:\n",
                   f"error code = {error_code}, description = {unicode_from_dxf_const_string_t(error_descr)}")
-    # print("An error occurred but the error subsystem failed to initialize\n")
 
     return error_code
 
