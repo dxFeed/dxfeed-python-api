@@ -6,6 +6,7 @@ cimport dxpyfeed.wrapper.listeners.listener as lis
 from collections import deque
 from datetime import datetime
 import pandas as pd
+from typing import Optional
 
 # for importing variables
 import dxpyfeed.wrapper.listeners.listener as lis
@@ -130,14 +131,14 @@ def dxf_create_connection(address='demo.dxfeed.com:7300'):
         return
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type, candle_time=None, data_len: int=0):
+def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str]=None, data_len: int=0):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass
     Parameters
     ----------
     cc: ConnectionClass
         Variable with connection information
-    event_type
+    event_type: str
         Event type: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
                     'Greeks', 'THEO_PRICE', 'Underlying', 'Series', 'Configuration' or ''
     candle_time: str
