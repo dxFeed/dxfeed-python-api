@@ -110,13 +110,13 @@ cdef class SubscriptionClass:
             df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
         return df
 
-def dxf_create_connection(address='demo.dxfeed.com:7300'):
+def dxf_create_connection(address: str|unicode|bytes='demo.dxfeed.com:7300'):
     """
     Function creates connection to dxfeed given url address
 
     Parameters
     ----------
-    address
+    address: str
         dxfeed url address
 
     Returns
@@ -126,10 +126,13 @@ def dxf_create_connection(address='demo.dxfeed.com:7300'):
     """
     cc = ConnectionClass()
     address = address.encode('utf-8')
-    if not clib.dxf_create_connection(address, NULL, NULL, NULL, NULL, NULL, &cc.connection):
-        process_last_error()
-        return
-    return cc
+    clib.dxf_create_connection(address, NULL, NULL, NULL, NULL, NULL, &cc.connection)
+
+    error_code = process_last_error(verbose=False)
+    if error_code:
+        raise Exception(f"Error {error_code} occurred!")
+    else:
+        return cc
 
 def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str]=None, data_len: int=0):
     """
@@ -139,7 +142,7 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
     cc: ConnectionClass
         Variable with connection information
     event_type: str
-        Event type: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
+        Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
                     'Greeks', 'THEO_PRICE', 'Underlying', 'Series', 'Configuration' or ''
     candle_time: str
         String of %Y-%m-%d %H:%M:%S datetime format for retrieving candles. By default set to now

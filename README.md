@@ -1,4 +1,4 @@
-# DXPYFEED library
+# dxpyfeed library
 
 This library provides Python API to dxfeed via C API. The code is written in Python and Cython.
 
