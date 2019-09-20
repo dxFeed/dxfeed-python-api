@@ -6,12 +6,37 @@ from pathlib import Path
 import dxpyfeed
 
 cdef object unicode_from_dxf_const_string_t(dxf_const_string_t wcs):
+    """
+    Cython function, callable from C to convert dxf_const_string_t(wchar_t) to unicode
+    
+    Parameters
+    ----------
+    wcs: dxf_const_string_t, wchar_t
+        C string
+        
+    Returns
+    -------
+    unicode
+        Python unicode string
+    """
     if wcs == NULL:
       return ''
     ret_val = <object>PyUnicode_FromWideChar(wcs, -1)
     return ret_val
 
 cdef dxf_const_string_t dxf_const_string_t_from_unicode(object symbol):
+    """
+    Cython function, callable from C that converts python unicode string to wchar_t. 
+    
+    Parameters
+    ----------
+    symbol: unicode
+        Unicode string, usually ticker
+    Returns
+    -------
+    wchar_t
+        Wide Char
+    """
     return PyUnicode_AsWideCharString(symbol, NULL)
 
 def event_type_convert(event_type: str):
@@ -51,22 +76,15 @@ def event_type_convert(event_type: str):
         warn(f'No mapping for {event_type}, please choose one from {et_mapping.keys()}')
         return -16384
 
-cdef void process_last_error():
-    cdef int error_code = dx_ec_success
-    cdef dxf_const_string_t error_descr = NULL
-    cdef int res
-
-    res = dxf_get_last_error(&error_code, &error_descr)
-
-    if res == DXF_SUCCESS:
-        if error_code == dx_ec_success:
-            print("no error information is stored")
-
-        print("Error occurred and successfully retrieved:\n",
-              f"error code = {error_code}, description = {unicode_from_dxf_const_string_t(error_descr)}")
-    print("An error occurred but the error subsystem failed to initialize\n")
-
 def get_include():
+    """
+    Function returns paths to header files of dxfeed-c-api library. Used for writing custom listeners
+
+    Returns
+    -------
+    out_dir: list
+        List of paths to header files
+    """
     out_dir = list()
     out_dir.append(str(Path(dxpyfeed.__file__).resolve().parent.joinpath('dxfeed-c-api', 'include')))
     return out_dir

@@ -195,6 +195,7 @@ def dxf_add_symbols(SubscriptionClass sc, symbols: list):
 def dxf_attach_listener(SubscriptionClass sc):
     """
     Function attaches default listener according to subscription type
+
     Parameters
     ----------
     sc: SubscriptionClass
@@ -251,6 +252,7 @@ def dxf_attach_listener(SubscriptionClass sc):
 def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns: list, data: dict = None):
     """
     Attaches custom listener
+
     Parameters
     ----------
     sc: SubscriptionClass
@@ -273,6 +275,7 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
 def dxf_detach_listener(SubscriptionClass sc):
     """
     Detaches any listener
+
     Parameters
     ----------
     sc: SubscriptionClass
@@ -284,6 +287,7 @@ def dxf_detach_listener(SubscriptionClass sc):
 def dxf_close_connection(ConnectionClass cc):
     """
     Closes connection
+
     Parameters
     ----------
     cc: ConnectionClass
