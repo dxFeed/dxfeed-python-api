@@ -62,11 +62,6 @@ cdef class ConnectionClass:
 cdef class SubscriptionClass:
     """
     Data structure that contains subscription and related fields
-
-    Parameters
-    ----------
-    data_len: int
-        Sets maximum amount of events, that are kept in Subscription class
     """
     cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
@@ -76,6 +71,12 @@ cdef class SubscriptionClass:
     cdef void * u_data
 
     def __init__(self, data_len):
+        """
+        Parameters
+        ----------
+        data_len: int
+            Sets maximum amount of events, that are kept in Subscription class
+        """
         self.data = {'columns': []}
         if data_len > 0:
             self.data.update({'data': deque(maxlen=data_len)})
@@ -133,16 +134,18 @@ def dxf_create_connection(address: Union[str, unicode, bytes]='demo.dxfeed.com:7
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str]=None, data_len: int=0):
+def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str]=None,
+                            data_len: Optional[int]=0):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass
+
     Parameters
     ----------
     cc: ConnectionClass
         Variable with connection information
     event_type: str
-        Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
-                    'Greeks', 'THEO_PRICE', 'Underlying', 'Series', 'Configuration' or ''
+        Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+        'SpreadOrder', 'Greeks', 'THEO_PRICE', 'Underlying', 'Series', 'Configuration' or ''
     candle_time: str
         String of %Y-%m-%d %H:%M:%S datetime format for retrieving candles. By default set to now
     data_len: int
@@ -152,6 +155,7 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
     -------
     sc: SubscriptionClass
         Cython SubscriptionClass with information about subscription
+
     """
     sc = cc.make_new_subscription(data_len=data_len)
     sc.event_type_str = event_type
@@ -176,6 +180,7 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
 def dxf_add_symbols(SubscriptionClass sc, symbols: list):
     """
     Adds symbols to subscription
+
     Parameters
     ----------
     sc: SubscriptionClass
