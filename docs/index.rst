@@ -15,3 +15,8 @@ This library provides Python API to dxfeed via C API. The code is written in Pyt
    :maxdepth: 2
 
    api.rst
+
+.. toctree::
+   :maxdepth: 1
+
+   devs.rst
