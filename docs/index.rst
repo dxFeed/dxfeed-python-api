@@ -10,3 +10,9 @@ This library provides Python API to dxfeed via C API. The code is written in Pyt
    install.rst
    basic_usage.rst
    custom_listener.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: API Reference
+
+   api.rst

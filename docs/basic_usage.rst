@@ -38,6 +38,48 @@ Each subscription should be provided with tickers to get events for:
     dxp.dxf_add_symbols(sub1, ['AAPL', 'MSFT'])
     dxp.dxf_add_symbols(sub2, ['AAPL', 'C'])
 
-Special function called listener should be attached to the subscription to start recieving
+Special function called listener should be attached to the subscription to start receiving
 events. There are default listeners already implemented in dxpyfeed, but you
-can write your own with cython. :ref:`custom_listener_tutorial`
+can write your own with cython: :ref:`custom_listener_tutorial`. To attach
+default listener just call `dxf_attach_listener`
+
+.. code-block:: python
+
+    dxp.dxf_attach_listener(sub1)
+    dxp.dxf_attach_listener(sub2)
+
+The data is kept in `data` property of subscription class as dict with columns and list
+of events. To look at data call this property:
+
+.. code-block:: python
+
+    sub1.data
+    sub2.data
+
+The more convenient way to look at data is to convert it into pandas DataFrame.
+`to_dataframe` method of subscription class is responsible for that:
+
+.. code-block:: python
+
+    sub1.to_dataframe()
+    sub2.to_dataframe()
+
+To stop receiving events just detach the listener:
+
+.. code-block:: python
+
+     dxp.dxf_detach_listener(sub1)
+     dxp.dxf_detach_listener(sub2)
+
+When you are done with subscription you'd better close it:
+
+.. code-block:: python
+
+    dxp.dxf_close_subscription(sub1)
+    dxp.dxf_close_subscription(sub2)
+
+Same with connection:
+
+.. code-block:: python
+
+    dxp.dxf_close_connection(con)
