@@ -1,18 +1,12 @@
-Welcome to dxpyfeed's documentation!
-====================================
+Home
+====
 
-.. automodule:: dxpyfeed.wrapper.DXFeedPy
-    :members:
+This library provides Python API to dxfeed via C API. The code is written in Python and Cython.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   self
+   install.rst
+   basic_usage.rst
+   custom_listener.rst
