@@ -3,5 +3,4 @@
 Custom Listener Tutorial
 ========================
 
-.. raw:: html
-   :file: Custom listener example.html
+.. mdinclude:: CustomListenerExample.md
