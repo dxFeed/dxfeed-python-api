@@ -1,6 +1,3 @@
-.. _custom_listener_tutorial:
+.. _custom_listener:
 
-Custom Listener Tutorial
-========================
-
-.. mdinclude:: CustomListenerExample.md
+.. include:: CustomListenerExample.rst

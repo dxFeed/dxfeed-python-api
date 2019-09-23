@@ -40,7 +40,7 @@ Each subscription should be provided with tickers to get events for:
 
 Special function called listener should be attached to the subscription to start receiving
 events. There are default listeners already implemented in dxpyfeed, but you
-can write your own with cython: :ref:`custom_listener_tutorial`. To attach
+can write your own with cython: :ref:`custom_listener`. To attach
 default listener just call `dxf_attach_listener`
 
 .. code-block:: python
