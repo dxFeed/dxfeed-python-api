@@ -50,9 +50,6 @@ cdef class ConnectionClass:
     """
     cdef clib.dxf_connection_t connection
 
-    def __dealloc__(self):
-        clib.dxf_close_connection(self.connection)
-
     cpdef SubscriptionClass make_new_subscription(self, data_len):
         cdef SubscriptionClass out = SubscriptionClass(data_len)
         out.connection = self.connection
@@ -127,7 +124,6 @@ def dxf_create_connection(address: Union[str, unicode, bytes]='demo.dxfeed.com:7
     cc = ConnectionClass()
     address = address.encode('utf-8')
     clib.dxf_create_connection(address, NULL, NULL, NULL, NULL, NULL, &cc.connection)
-
     error_code = process_last_error(verbose=False)
     if error_code:
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
@@ -286,4 +282,7 @@ def dxf_close_connection(ConnectionClass cc):
     """
     if not clib.dxf_close_connection(cc.connection):
         process_last_error()
+
+def dxf_close_subscription(SubscriptionClass sc):
+    clib.dxf_close_subscription(sc.subscription)
 
