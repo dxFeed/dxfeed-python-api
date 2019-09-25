@@ -56,11 +56,18 @@ cdef class ConnectionClass:
     """
     cdef clib.dxf_connection_t connection
     cdef cppdq[clib.dxf_subscription_t *] sub_ptr_list
+    cdef int subs_order
+
+    def __init__(self):
+        self.subs_order = 0
 
     def sub_ptr(self):
         # while not self.sub_ptr_list.empty():
         for i in range(self.sub_ptr_list.size()):
-            print(<uintptr_t>self.sub_ptr_list[i][0])
+            if self.sub_ptr_list[i]:
+                print(<uintptr_t>self.sub_ptr_list[i][0])
+            else:
+                print('deallocated')
 
     def __dealloc__(self):
         dxf_close_connection(self)
@@ -69,6 +76,9 @@ cdef class ConnectionClass:
         cdef SubscriptionClass out = SubscriptionClass(data_len)
         out.connection = self.connection
         self.sub_ptr_list.push_back(&out.subscription)
+        out.subscription_order = self.subs_order
+        self.subs_order += 1
+        out.con_sub_list_ptr = &self.sub_ptr_list
         return out
 
 
@@ -83,6 +93,8 @@ cdef class SubscriptionClass:
     """
     cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
+    cdef int subscription_order
+    cdef cppdq[clib.dxf_subscription_t *] * con_sub_list_ptr
     cdef dxf_event_listener_t listener
     cdef object event_type_str
     cdef dict data
@@ -106,6 +118,7 @@ cdef class SubscriptionClass:
             print('dealloc')
             clib.dxf_close_subscription(self.subscription)
             self.subscription = NULL
+            self.con_sub_list_ptr[0][self.subscription_order] = NULL
 
     @property
     def data(self):
@@ -307,7 +320,7 @@ def dxf_close_connection(ConnectionClass cc):
 
     # close all subscriptions before closing the connection
     for i in range(cc.sub_ptr_list.size()):
-        if cc.sub_ptr_list[i][0]:
+        if cc.sub_ptr_list[i]:
             print(<uintptr_t>cc.sub_ptr_list[i][0])
             clib.dxf_close_subscription(cc.sub_ptr_list[i][0])
             cc.sub_ptr_list[i][0] = NULL
