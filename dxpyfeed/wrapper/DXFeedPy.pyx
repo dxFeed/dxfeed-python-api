@@ -14,8 +14,8 @@ from typing import Optional, Union
 # for importing variables
 import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
-
-
+# for debugging
+# from libc.stdint cimport uintptr_t
 
 
 cpdef int process_last_error(verbose: bool=True):
@@ -48,26 +48,18 @@ cpdef int process_last_error(verbose: bool=True):
 
     return error_code
 
-from libc.stdint cimport uintptr_t
-
 cdef class ConnectionClass:
     """
     Data structure that contains connection
     """
     cdef clib.dxf_connection_t connection
+    # sub_ptr_list contains pointers to all subscriptions related to current connection
     cdef cppdq[clib.dxf_subscription_t *] sub_ptr_list
+    # each subscription has its own index in a list
     cdef int subs_order
 
     def __init__(self):
         self.subs_order = 0
-
-    def sub_ptr(self):
-        # while not self.sub_ptr_list.empty():
-        for i in range(self.sub_ptr_list.size()):
-            if self.sub_ptr_list[i]:
-                print(<uintptr_t>self.sub_ptr_list[i][0])
-            else:
-                print('deallocated')
 
     def __dealloc__(self):
         dxf_close_connection(self)
@@ -75,10 +67,10 @@ cdef class ConnectionClass:
     cpdef SubscriptionClass make_new_subscription(self, data_len):
         cdef SubscriptionClass out = SubscriptionClass(data_len)
         out.connection = self.connection
-        self.sub_ptr_list.push_back(&out.subscription)
-        out.subscription_order = self.subs_order
+        self.sub_ptr_list.push_back(&out.subscription) # append pointer to new subscription
+        out.subscription_order = self.subs_order # assign each subscription an index
         self.subs_order += 1
-        out.con_sub_list_ptr = &self.sub_ptr_list
+        out.con_sub_list_ptr = &self.sub_ptr_list # reverse pointer to pointers list
         return out
 
 
@@ -93,8 +85,8 @@ cdef class SubscriptionClass:
     """
     cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
-    cdef int subscription_order
-    cdef cppdq[clib.dxf_subscription_t *] * con_sub_list_ptr
+    cdef int subscription_order # index in list of subscription pointers
+    cdef cppdq[clib.dxf_subscription_t *] * con_sub_list_ptr # pointer to list of subscription pointers
     cdef dxf_event_listener_t listener
     cdef object event_type_str
     cdef dict data
@@ -110,14 +102,11 @@ cdef class SubscriptionClass:
         self.u_data = <void *>self.data
         self.listener = NULL
 
-    def sub_ptr(self):
-        return <uintptr_t>self.subscription
-
     def __dealloc__(self):
-        if self.subscription:
-            print('dealloc')
+        if self.subscription: # if connection is not closed
             clib.dxf_close_subscription(self.subscription)
-            self.subscription = NULL
+            # self.subscription = NULL
+            # mark subscription as closed in list of pointers to subscriptions
             self.con_sub_list_ptr[0][self.subscription_order] = NULL
 
     @property
@@ -320,10 +309,9 @@ def dxf_close_connection(ConnectionClass cc):
 
     # close all subscriptions before closing the connection
     for i in range(cc.sub_ptr_list.size()):
-        if cc.sub_ptr_list[i]:
-            print(<uintptr_t>cc.sub_ptr_list[i][0])
+        if cc.sub_ptr_list[i]: # subscription should not be closed previously
             clib.dxf_close_subscription(cc.sub_ptr_list[i][0])
-            cc.sub_ptr_list[i][0] = NULL
+            cc.sub_ptr_list[i][0] = NULL # mark subscription as closed
 
     cc.sub_ptr_list.clear()
 
@@ -331,6 +319,15 @@ def dxf_close_connection(ConnectionClass cc):
         process_last_error()
 
 def dxf_close_subscription(SubscriptionClass sc):
-    clib.dxf_close_subscription(sc.subscription)
-    sc.subscription = NULL
+    """
+    Closes subscription
+
+    Parameters
+    ----------
+    sc: SubscriptionClass
+        SubscriptionClass with information about subscription
+    """
+    if sc.subscription:
+        clib.dxf_close_subscription(sc.subscription)
+        sc.subscription = NULL
 
