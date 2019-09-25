@@ -1,3 +1,6 @@
+# distutils: language = c++
+from libcpp.deque cimport deque as cppdq
+
 from dxpyfeed.wrapper.utils.helpers cimport *
 from dxpyfeed.wrapper.utils.helpers import *
 cimport dxpyfeed.wrapper.pxd_include.DXFeed as clib
@@ -11,6 +14,8 @@ from typing import Optional, Union
 # for importing variables
 import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
+
+
 
 
 cpdef int process_last_error(verbose: bool=True):
@@ -43,16 +48,27 @@ cpdef int process_last_error(verbose: bool=True):
 
     return error_code
 
+from libc.stdint cimport uintptr_t
 
 cdef class ConnectionClass:
     """
     Data structure that contains connection
     """
     cdef clib.dxf_connection_t connection
+    cdef cppdq[clib.dxf_subscription_t *] sub_ptr_list
+
+    def sub_ptr(self):
+        # while not self.sub_ptr_list.empty():
+        for i in range(self.sub_ptr_list.size()):
+            print(<uintptr_t>self.sub_ptr_list[i][0])
+
+    def __dealloc__(self):
+        dxf_close_connection(self)
 
     cpdef SubscriptionClass make_new_subscription(self, data_len):
         cdef SubscriptionClass out = SubscriptionClass(data_len)
         out.connection = self.connection
+        self.sub_ptr_list.push_back(&out.subscription)
         return out
 
 
@@ -73,6 +89,7 @@ cdef class SubscriptionClass:
     cdef void * u_data
 
     def __init__(self, data_len):
+        self.subscription = NULL
         self.data = {'columns': []}
         if data_len > 0:
             self.data.update({'data': deque(maxlen=data_len)})
@@ -81,8 +98,14 @@ cdef class SubscriptionClass:
         self.u_data = <void *>self.data
         self.listener = NULL
 
+    def sub_ptr(self):
+        return <uintptr_t>self.subscription
+
     def __dealloc__(self):
-        clib.dxf_close_subscription(self.subscription)
+        if self.subscription:
+            print('dealloc')
+            clib.dxf_close_subscription(self.subscription)
+            self.subscription = NULL
 
     @property
     def data(self):
@@ -275,14 +298,26 @@ def dxf_detach_listener(SubscriptionClass sc):
 def dxf_close_connection(ConnectionClass cc):
     """
     Closes connection
+
     Parameters
     ----------
     cc: ConnectionClass
         Variable with connection information
     """
+
+    # close all subscriptions before closing the connection
+    for i in range(cc.sub_ptr_list.size()):
+        if cc.sub_ptr_list[i][0]:
+            print(<uintptr_t>cc.sub_ptr_list[i][0])
+            clib.dxf_close_subscription(cc.sub_ptr_list[i][0])
+            cc.sub_ptr_list[i][0] = NULL
+
+    cc.sub_ptr_list.clear()
+
     if not clib.dxf_close_connection(cc.connection):
         process_last_error()
 
 def dxf_close_subscription(SubscriptionClass sc):
     clib.dxf_close_subscription(sc.subscription)
+    sc.subscription = NULL
 
