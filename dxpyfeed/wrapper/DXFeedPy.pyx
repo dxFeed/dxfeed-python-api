@@ -174,6 +174,9 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
     sc: SubscriptionClass
         Cython SubscriptionClass with information about subscription
     """
+    if not cc.connection:
+        raise ValueError('Connection is not valid')
+
     sc = cc.make_new_subscription(data_len=data_len)
     sc.event_type_str = event_type
     et_type_int = event_type_convert(event_type)
@@ -204,6 +207,8 @@ def dxf_add_symbols(SubscriptionClass sc, symbols: list):
     symbols: list
         List of symbols to add
     """
+    if not sc.subscription:
+        raise ValueError('Subscription is not valid')
     for idx, sym in enumerate(symbols):
         if not clib.dxf_add_symbol(sc.subscription, dxf_const_string_t_from_unicode(sym)):
             process_last_error()
@@ -216,6 +221,8 @@ def dxf_attach_listener(SubscriptionClass sc):
     sc: SubscriptionClass
         SubscriptionClass with information about subscription
     """
+    if not sc.subscription:
+        raise ValueError('Subscription is not valid')
     if sc.event_type_str == 'Trade':
         sc.data['columns'] = lis.TRADE_COLUMNS
         sc.listener =  lis.trade_default_listener
@@ -278,6 +285,8 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
     data: dict
         Dict with new internal data structure of  SubscriptionClass
     """
+    if not sc.subscription:
+        raise ValueError('Subscription is not valid')
     if data:
         sc.data = data
     sc.data['columns'] = columns
@@ -294,6 +303,8 @@ def dxf_detach_listener(SubscriptionClass sc):
     sc: SubscriptionClass
         SubscriptionClass with information about subscription
     """
+    if not sc.subscription:
+        raise ValueError('Subscription is not valid')
     if not clib.dxf_detach_event_listener(sc.subscription, sc.listener):
         process_last_error()
 
@@ -315,8 +326,9 @@ def dxf_close_connection(ConnectionClass cc):
 
     cc.sub_ptr_list.clear()
 
-    if not clib.dxf_close_connection(cc.connection):
-        process_last_error()
+    if cc.connection:
+        clib.dxf_close_connection(cc.connection)
+        cc.connection = NULL
 
 def dxf_close_subscription(SubscriptionClass sc):
     """
