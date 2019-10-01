@@ -5,7 +5,7 @@ import platform
 
 source_files_directory = Path(__file__).resolve().parent.joinpath('dxpyfeed', 'dxfeed-c-api', 'src')
 source_files_paths = [str(path) for path in source_files_directory.glob('*.c')]
-libs=[]
+libs = []
 if platform.system() == 'Windows':
     source_files_paths.remove(str(source_files_directory.joinpath('Linux.c')))
     libs = ['ws2_32']
@@ -19,32 +19,24 @@ SRC_DIR = 'dxpyfeed'
 PACKAGES = [SRC_DIR]
 
 dxfeed = ('dxfeed', {'sources': source_files_paths,
-                   'libraries':libs,
-                     })
-
+                     'libraries': libs})
 
 ext_lis = Extension(name=SRC_DIR + '.wrapper.listeners.listener',
                     sources=[SRC_DIR + '/wrapper/listeners/listener.pyx'],
-                    libraries=libs,
-                    )
-
+                    libraries=libs)
 
 ext_helpers = Extension(name=SRC_DIR + '.wrapper.utils.helpers',
                         sources=[SRC_DIR + '/wrapper/utils/helpers.pyx'],
-                        libraries=libs,
-                        )
-
+                        libraries=libs)
 
 ext_dxfeed = Extension(name=SRC_DIR + '.wrapper.DXFeedPy',
                        sources=[SRC_DIR + '/wrapper/DXFeedPy.pyx'] + package_c_files_paths,
-                       libraries=libs,
-                       )
+                       libraries=libs)
 
-EXTENSIONS = [
-    ext_lis,
-    ext_helpers,
-    ext_dxfeed,
-]
+EXTENSIONS = [ext_lis,
+              ext_helpers,
+              ext_dxfeed,
+              ]
 
 
 def build(setup_kwargs):

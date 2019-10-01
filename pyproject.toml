@@ -2,7 +2,8 @@
 name = "dxpyfeed"
 version = "0.0.3"
 description = "Python API via C API"
-authors = ["Ivan"]
+authors = ["Ivan Mishalkin <ivan.mishalkin@devexperts.com>",
+           "DxCurrent Team <dxcurrent@devexperts.com>"]
 build = "build.py"
 
 [tool.poetry.dependencies]

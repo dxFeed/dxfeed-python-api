@@ -18,7 +18,7 @@ app.layout = html.Div(
         dcc.Graph(id='live-update-graph'),
         dcc.Interval(
             id='interval-component',
-            interval=1*100, # in milliseconds
+            interval=1*1000, # in milliseconds
             n_intervals=0
         )
     ])
@@ -34,7 +34,7 @@ dxp.dxf_attach_listener(sub)
 @app.callback(Output('live-update-graph', 'figure'),
               [Input('interval-component', 'n_intervals')])
 def update_graph_live(n):
-    df = sub.to_data_frame()
+    df = sub.to_dataframe()
     df.loc[:, 'Time'] = df.BidTime.combine_first(df.AskTime)
     df = df.ffill().bfill()
     df.loc[:, 'MarkPrice'] = (df.AskPrice.values + df.BidPrice.values) / 2
