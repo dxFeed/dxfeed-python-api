@@ -14,11 +14,12 @@ from typing import Optional, Union
 # for importing variables
 import dxpyfeed.wrapper.listeners.listener as lis
 from dxpyfeed.wrapper.pxd_include.EventData cimport *
+
 # for debugging
 # from libc.stdint cimport uintptr_t
 
 
-cpdef int process_last_error(verbose: bool=True):
+cpdef int process_last_error(verbose: bool = True):
     """
     Function retrieves last error
 
@@ -67,12 +68,11 @@ cdef class ConnectionClass:
     cpdef SubscriptionClass make_new_subscription(self, data_len):
         cdef SubscriptionClass out = SubscriptionClass(data_len)
         out.connection = self.connection
-        self.sub_ptr_list.push_back(&out.subscription) # append pointer to new subscription
-        out.subscription_order = self.subs_order # assign each subscription an index
+        self.sub_ptr_list.push_back(&out.subscription)  # append pointer to new subscription
+        out.subscription_order = self.subs_order  # assign each subscription an index
         self.subs_order += 1
-        out.con_sub_list_ptr = &self.sub_ptr_list # reverse pointer to pointers list
+        out.con_sub_list_ptr = &self.sub_ptr_list  # reverse pointer to pointers list
         return out
-
 
 cdef class SubscriptionClass:
     """
@@ -85,12 +85,12 @@ cdef class SubscriptionClass:
     """
     cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
-    cdef int subscription_order # index in list of subscription pointers
-    cdef cppdq[clib.dxf_subscription_t *] * con_sub_list_ptr # pointer to list of subscription pointers
+    cdef int subscription_order  # index in list of subscription pointers
+    cdef cppdq[clib.dxf_subscription_t *] *con_sub_list_ptr  # pointer to list of subscription pointers
     cdef dxf_event_listener_t listener
     cdef object event_type_str
     cdef dict data
-    cdef void * u_data
+    cdef void *u_data
 
     def __init__(self, data_len):
         self.subscription = NULL
@@ -99,11 +99,11 @@ cdef class SubscriptionClass:
             self.data.update({'data': deque(maxlen=data_len)})
         else:
             self.data.update({'data': []})
-        self.u_data = <void *>self.data
+        self.u_data = <void *> self.data
         self.listener = NULL
 
     def __dealloc__(self):
-        if self.subscription: # if connection is not closed
+        if self.subscription:  # if connection is not closed
             clib.dxf_close_subscription(self.subscription)
             # self.subscription = NULL
             # mark subscription as closed in list of pointers to subscriptions
@@ -132,7 +132,7 @@ cdef class SubscriptionClass:
             df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
         return df
 
-def dxf_create_connection(address: Union[str, unicode, bytes]='demo.dxfeed.com:7300'):
+def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com:7300'):
     """
     Function creates connection to dxfeed given url address
 
@@ -154,7 +154,7 @@ def dxf_create_connection(address: Union[str, unicode, bytes]='demo.dxfeed.com:7
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str]=None, data_len: int=0):
+def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str] = None, data_len: int = 0):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass
     Parameters
@@ -225,10 +225,10 @@ def dxf_attach_listener(SubscriptionClass sc):
         raise ValueError('Subscription is not valid')
     if sc.event_type_str == 'Trade':
         sc.data['columns'] = lis.TRADE_COLUMNS
-        sc.listener =  lis.trade_default_listener
+        sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'Quote':
         sc.data['columns'] = lis.QUOTE_COLUMNS
-        sc.listener =  lis.quote_default_listener
+        sc.listener = lis.quote_default_listener
     elif sc.event_type_str == 'Summary':
         sc.data['columns'] = lis.SUMMARY_COLUMNS
         sc.listener = lis.summary_default_listener
@@ -246,7 +246,7 @@ def dxf_attach_listener(SubscriptionClass sc):
         sc.listener = lis.order_default_listener
     elif sc.event_type_str == 'TradeETH':
         sc.data['columns'] = lis.TRADE_COLUMNS
-        sc.listener =  lis.trade_default_listener
+        sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'SpreadOrder':
         sc.data['columns'] = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
@@ -294,7 +294,6 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
 
-
 def dxf_detach_listener(SubscriptionClass sc):
     """
     Detaches any listener
@@ -320,9 +319,9 @@ def dxf_close_connection(ConnectionClass cc):
 
     # close all subscriptions before closing the connection
     for i in range(cc.sub_ptr_list.size()):
-        if cc.sub_ptr_list[i]: # subscription should not be closed previously
+        if cc.sub_ptr_list[i]:  # subscription should not be closed previously
             clib.dxf_close_subscription(cc.sub_ptr_list[i][0])
-            cc.sub_ptr_list[i][0] = NULL # mark subscription as closed
+            cc.sub_ptr_list[i][0] = NULL  # mark subscription as closed
 
     cc.sub_ptr_list.clear()
 
@@ -342,4 +341,3 @@ def dxf_close_subscription(SubscriptionClass sc):
     if sc.subscription:
         clib.dxf_close_subscription(sc.subscription)
         sc.subscription = NULL
-

@@ -11,8 +11,10 @@ cdef class FuncWrapper:
         return out
 
 TRADE_COLUMNS = ['Symbol', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume', 'Time', 'IsETH']
-cdef void trade_default_listener(int event_type, dxf_const_string_t symbol_name,
-			            const dxf_event_data_t* data, int data_count, void* user_data) nogil:
+cdef void trade_default_listener(int event_type,
+                                 dxf_const_string_t symbol_name,
+                                 const dxf_event_data_t* data,
+                                 int data_count, void* user_data) nogil:
 
     cdef dxf_trade_t* trades = <dxf_trade_t*>data
     with gil:
@@ -31,12 +33,14 @@ cdef void trade_default_listener(int event_type, dxf_const_string_t symbol_name,
                                     ]
                                    )
 
-QUOTE_COLUMNS = [
-    'Symbol', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize',
-              'AskTime', 'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope'
-]
-cdef void quote_default_listener(int event_type, dxf_const_string_t symbol_name,
-			                     const dxf_event_data_t* data, int data_count, void* user_data) nogil:
+QUOTE_COLUMNS = ['Symbol', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime', 'AskExchangeCode',
+                 'AskPrice', 'AskSize', 'Scope'
+                 ]
+cdef void quote_default_listener(int event_type,
+                                 dxf_const_string_t symbol_name,
+			                     const dxf_event_data_t* data,
+                                 int data_count,
+                                 void* user_data) nogil:
     cdef dxf_quote_t* quotes = <dxf_quote_t*>data
     with gil:
         py_data = <dict>user_data
@@ -55,10 +59,9 @@ cdef void quote_default_listener(int event_type, dxf_const_string_t symbol_name,
                                     ]
                                    )
 
-SUMMARY_COLUMNS = [
-    'Symbol', 'DayId', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice',
-              'PrevDayId', 'PrevDayClosePrice', 'PrevDayVolume', 'OpenInterest'
-]
+SUMMARY_COLUMNS = ['Symbol', 'DayId', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice', 'PrevDayId', 'PrevDayClosePrice',
+                   'PrevDayVolume', 'OpenInterest'
+                   ]
 cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_name,
 			                     const dxf_event_data_t* data, int data_count, void* user_data) nogil:
     cdef dxf_summary_t* summary = <dxf_summary_t*>data
@@ -78,12 +81,14 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
                                     ]
                                    )
 
-PROFILE_COLUMNS = [
-    'Symbol', 'Beta', 'EPS', 'DivFreq', 'ExdDivAmount', 'ExdDivDate', '52HighPrice', '52LowPrice',
-              'Shares', 'Description', 'RawFlags', 'StatusReason'
-]
-cdef void profile_default_listener(int event_type, dxf_const_string_t symbol_name,
-			                     const dxf_event_data_t* data, int data_count, void* user_data)  nogil:
+PROFILE_COLUMNS = ['Symbol', 'Beta', 'EPS', 'DivFreq', 'ExdDivAmount', 'ExdDivDate', '52HighPrice', '52LowPrice',
+                   'Shares', 'Description', 'RawFlags', 'StatusReason'
+                   ]
+cdef void profile_default_listener(int event_type,
+                                   dxf_const_string_t symbol_name,
+                                   const dxf_event_data_t* data,
+                                   int data_count,
+                                   void* user_data)  nogil:
     cdef dxf_profile_t* p = <dxf_profile_t*>data
     with gil:
         py_data = <dict>user_data
@@ -103,13 +108,15 @@ cdef void profile_default_listener(int event_type, dxf_const_string_t symbol_nam
                                     ]
                                    )
 
-TIME_AND_SALE_COLUMNS = [
-    'Symbol', 'EventFlags', 'Index', 'Time', 'ExchangeCode', 'Price', 'Size', 'BidPrice', 'AskPrice',
-              'ExchangeSaleConditions', 'RawFlags', 'Buyer', 'Seller', 'Side', 'Type', 'IsValidTick',
-              'IsEthTrade', 'TradeThroughExempt', 'IsSpreadLeg'
-]
-cdef void time_and_sale_default_listener(int event_type, dxf_const_string_t symbol_name,
-			                     const dxf_event_data_t* data, int data_count, void* user_data) nogil:
+TIME_AND_SALE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'ExchangeCode', 'Price', 'Size', 'BidPrice',
+                         'AskPrice', 'ExchangeSaleConditions', 'RawFlags', 'Buyer', 'Seller', 'Side', 'Type',
+                         'IsValidTick', 'IsEthTrade', 'TradeThroughExempt', 'IsSpreadLeg'
+                         ]
+cdef void time_and_sale_default_listener(int event_type,
+                                         dxf_const_string_t symbol_name,
+                                         const dxf_event_data_t* data,
+                                         int data_count,
+                                         void* user_data) nogil:
     cdef dxf_time_and_sale_t* tns = <dxf_time_and_sale_t*>data
     with gil:
         py_data = <dict>user_data
@@ -136,12 +143,14 @@ cdef void time_and_sale_default_listener(int event_type, dxf_const_string_t symb
                                     ]
                                    )
 
-CANDLE_COLUMNS = [
-    'Symbol', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close', 'Volume', 'VWap',
-              'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility'
-]
-cdef void candle_default_listener(int event_type, dxf_const_string_t symbol_name,
-			                     const dxf_event_data_t* data, int data_count, void* user_data) nogil:
+CANDLE_COLUMNS = ['Symbol', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close', 'Volume', 'VWap',
+                  'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility'
+                  ]
+cdef void candle_default_listener(int event_type,
+                                  dxf_const_string_t symbol_name,
+                                  const dxf_event_data_t* data,
+                                  int data_count,
+                                  void* user_data) nogil:
     cdef dxf_candle_t* candle = <dxf_candle_t*>data
     with gil:
         py_data = <dict>user_data
@@ -164,13 +173,14 @@ cdef void candle_default_listener(int event_type, dxf_const_string_t symbol_name
                                     ]
                                    )
 
-ORDER_COLUMNS = [
-    'Symbol', 'EventFlags', 'Index', 'Time', 'TimeNanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope', 'Side',
-              'ExchangeCode', 'MarketMaker', 'SpreadSymbol'
-]
-
-cdef void order_default_listener(int event_type, dxf_const_string_t symbol_name,
-			                     const dxf_event_data_t* data, int data_count, void* user_data) nogil:
+ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'TimeNanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
+                 'Side', 'ExchangeCode', 'MarketMaker', 'SpreadSymbol'
+                 ]
+cdef void order_default_listener(int event_type,
+                                 dxf_const_string_t symbol_name,
+			                     const dxf_event_data_t* data,
+                                 int data_count,
+                                 void* user_data) nogil:
     cdef dxf_order_t* order = <dxf_order_t*>data
     with gil:
         py_data = <dict>user_data
@@ -192,12 +202,14 @@ cdef void order_default_listener(int event_type, dxf_const_string_t symbol_name,
                                     ]
                                    )
 
-GREEKS_COLUMNS = [
-    'Symbol', 'EventFlags', 'Index', 'Time', 'Price', 'Volatility', 'Delta', 'Gamma', 'Theta', 'Rho', 'Vega'
-]
-
-cdef void greeks_default_listener(int event_type, dxf_const_string_t symbol_name,
-			                     const dxf_event_data_t* data, int data_count, void* user_data) nogil:
+GREEKS_COLUMNS = [ 'Symbol', 'EventFlags', 'Index', 'Time', 'Price', 'Volatility', 'Delta', 'Gamma', 'Theta', 'Rho',
+                   'Vega'
+                   ]
+cdef void greeks_default_listener(int event_type,
+                                  dxf_const_string_t symbol_name,
+                                  const dxf_event_data_t* data,
+                                  int data_count,
+                                  void* user_data) nogil:
     cdef dxf_greeks_t* greeks = <dxf_greeks_t*>data
     with gil:
         py_data = <dict>user_data
@@ -216,12 +228,12 @@ cdef void greeks_default_listener(int event_type, dxf_const_string_t symbol_name
                                     ]
                                    )
 
-THEO_PRICE_COLUMNS = [
-    'Symbol', 'Time', 'Price', 'UnderlyingPrice', 'Delta', 'Gamma', 'Dividend', 'Interest'
-]
-
-cdef void theo_price_default_listener(int event_type, dxf_const_string_t symbol_name,
-			                     const dxf_event_data_t* data, int data_count, void* user_data) nogil:
+THEO_PRICE_COLUMNS = ['Symbol', 'Time', 'Price', 'UnderlyingPrice', 'Delta', 'Gamma', 'Dividend', 'Interest']
+cdef void theo_price_default_listener(int event_type,
+                                      dxf_const_string_t symbol_name,
+                                      const dxf_event_data_t* data,
+                                      int data_count,
+                                      void* user_data) nogil:
     cdef dxf_theo_price_t* theo_price = <dxf_theo_price_t*>data
     with gil:
         py_data = <dict>user_data
@@ -237,12 +249,12 @@ cdef void theo_price_default_listener(int event_type, dxf_const_string_t symbol_
                                     ]
                                    )
 
-UNDERLYING_COLUMNS = [
-    'Symbol', 'Volatility', 'FrontVolatility', 'BackVolatility', 'PutCallRatio'
-]
-
-cdef void underlying_default_listener(int event_type, dxf_const_string_t symbol_name,
-			                     const dxf_event_data_t* data, int data_count, void* user_data) nogil:
+UNDERLYING_COLUMNS = ['Symbol', 'Volatility', 'FrontVolatility', 'BackVolatility', 'PutCallRatio']
+cdef void underlying_default_listener(int event_type,
+                                      dxf_const_string_t symbol_name,
+                                      const dxf_event_data_t* data,
+                                      int data_count,
+                                      void* user_data) nogil:
     cdef dxf_underlying_t* underlying = <dxf_underlying_t*>data
     with gil:
         py_data = <dict>user_data
@@ -255,13 +267,14 @@ cdef void underlying_default_listener(int event_type, dxf_const_string_t symbol_
                                     ]
                                    )
 
-SERIES_COLUMNS = [
-    'Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Sequence', 'Expiration', 'Volatility', 'PutCallRatio',
-              'ForwardPrice', 'Dividend', 'Interest'
-]
-
-cdef void series_default_listener(int event_type, dxf_const_string_t symbol_name,
-			                     const dxf_event_data_t* data, int data_count, void* user_data) nogil:
+SERIES_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Sequence', 'Expiration', 'Volatility',
+                  'PutCallRatio', 'ForwardPrice', 'Dividend', 'Interest'
+                  ]
+cdef void series_default_listener(int event_type,
+                                  dxf_const_string_t symbol_name,
+                                  const dxf_event_data_t* data,
+                                  int data_count,
+                                  void* user_data) nogil:
     cdef dxf_series_t* series = <dxf_series_t*>data
     with gil:
         py_data = <dict>user_data
@@ -281,12 +294,12 @@ cdef void series_default_listener(int event_type, dxf_const_string_t symbol_name
                                     ]
                                    )
 
-CONFIGURATION_COLUMNS = [
-    'Symbol', 'Version', 'Object'
-]
-
-cdef void configuration_default_listener(int event_type, dxf_const_string_t symbol_name,
-			                     const dxf_event_data_t* data, int data_count, void* user_data) nogil:
+CONFIGURATION_COLUMNS = ['Symbol', 'Version', 'Object']
+cdef void configuration_default_listener(int event_type,
+                                         dxf_const_string_t symbol_name,
+                                         const dxf_event_data_t* data,
+                                         int data_count,
+                                         void* user_data) nogil:
     cdef dxf_configuration_t* config = <dxf_configuration_t*>data
     with gil:
         py_data = <dict>user_data
@@ -296,4 +309,3 @@ cdef void configuration_default_listener(int event_type, dxf_const_string_t symb
                                     unicode_from_dxf_const_string_t(config[i].object),
                                     ]
                                    )
-
