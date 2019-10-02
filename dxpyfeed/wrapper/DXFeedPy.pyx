@@ -341,3 +341,24 @@ def dxf_close_subscription(SubscriptionClass sc):
     if sc.subscription:
         clib.dxf_close_subscription(sc.subscription)
         sc.subscription = NULL
+
+def dxf_get_current_connection_status(ConnectionClass cc):
+    """
+    Returns one of four possible statuses
+
+    Parameters
+    ----------
+    cc: ConnectionClass
+        Variable with connection information
+
+    """
+    status_mapping = {
+        0: 'Not connected',
+        1: 'Connected',
+        2: 'Login required',
+        3: 'Connected and authorized'
+    }
+
+    cdef clib.dxf_connection_status_t status
+    clib.dxf_get_current_connection_status(cc.connection, &status)
+    print(status_mapping[status])

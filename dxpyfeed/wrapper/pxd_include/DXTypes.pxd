@@ -64,16 +64,16 @@ cdef extern from "DXTypes.h":
 cdef extern from "DXTypes.h":
     ctypedef dxf_uint_t dxf_event_flags_t
 
-    struct dxf_byte_array_t:
+    ctypedef struct dxf_byte_array_t:
         dxf_byte_t* elements,
         int size,
         int capacity,
 
-    struct dxf_property_item_t:
+    ctypedef struct dxf_property_item_t:
         dxf_string_t key,
         dxf_string_t value,
 
-    enum dxf_connection_status_t:
+    ctypedef enum dxf_connection_status_t:
         dxf_cs_not_connected = 0,
         dxf_cs_connected,
         dxf_cs_login_required,
