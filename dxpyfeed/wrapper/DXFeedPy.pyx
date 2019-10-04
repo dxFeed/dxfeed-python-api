@@ -383,3 +383,24 @@ def dxf_get_current_connected_address(ConnectionClass cc):
     cdef char * address
     clib.dxf_get_current_connected_address(cc.connection, &address)
     return (<bytes>address).decode('UTF-8')
+
+def dxf_initialize_logger(file_name: unicode, rewrite_file: bool, show_timezone_info: bool, verbose: bool):
+    """
+    Initializes the internal logger.
+    Various actions and events, including the errors, are being logged throughout the library. They may be stored
+    into the file.
+
+    Parameters
+    ----------
+    file_name: unicode
+        A full path to the file where the log is to be stored
+    rewrite_file: bool
+        A flag defining the file open mode if it's True then the log file will be rewritten
+    show_timezone_info: bool
+        A flag defining the time display option in the log file if it's True then the time will be displayed
+        with the timezone suffix
+    verbose: bool
+        A flag defining the logging mode if it's True then the verbose logging will be enabled
+
+    """
+    clib.dxf_initialize_logger(file_name.encode('UTF-8'), int(rewrite_file), int(show_timezone_info), int(verbose))
