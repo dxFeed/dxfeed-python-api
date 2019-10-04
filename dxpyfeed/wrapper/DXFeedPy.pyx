@@ -362,3 +362,24 @@ def dxf_get_current_connection_status(ConnectionClass cc):
     cdef clib.dxf_connection_status_t status
     clib.dxf_get_current_connection_status(cc.connection, &status)
     print(status_mapping[status])
+
+def dxf_get_current_connected_address(ConnectionClass cc):
+    """
+    Returns current connected address
+
+    Parameters
+    ----------
+    cc: ConnectionClass
+        Variable with connection information
+
+    Returns
+    -------
+    address: unicode
+        Current connected address
+    """
+    if not cc.connection:
+        raise ValueError('Connection is not valid')
+
+    cdef char * address
+    clib.dxf_get_current_connected_address(cc.connection, &address)
+    return (<bytes>address).decode('UTF-8')
