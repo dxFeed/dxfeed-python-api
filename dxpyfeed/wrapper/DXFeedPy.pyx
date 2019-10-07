@@ -445,3 +445,30 @@ def dxf_get_subscription_event_types(SubscriptionClass sc):
     clib.dxf_get_subscription_event_types (sc.subscription, &event_type)
 
     return et_mapping[event_type]
+
+def dxf_get_symbols(SubscriptionClass sc):
+    """
+    Retrieves the list of symbols currently added to the subscription.
+
+    Parameters
+    ----------
+    sc: SubscriptionClass
+        SubscriptionClass with information about subscription
+
+    Returns
+    -------
+
+    """
+    if not sc.subscription:
+        raise ValueError('Invalid subscription')
+
+    cdef dxf_const_string_t * symbols
+    symbols_list = list()
+    cdef int symbol_count
+    cdef int i
+
+    clib.dxf_get_symbols(sc.subscription, &symbols, &symbol_count)
+    for i in range(symbol_count):
+        symbols_list.append(unicode_from_dxf_const_string_t(symbols[i]))
+
+    return symbols_list
