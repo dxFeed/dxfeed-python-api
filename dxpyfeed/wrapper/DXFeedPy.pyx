@@ -404,3 +404,44 @@ def dxf_initialize_logger(file_name: unicode, rewrite_file: bool, show_timezone_
 
     """
     clib.dxf_initialize_logger(file_name.encode('UTF-8'), int(rewrite_file), int(show_timezone_info), int(verbose))
+
+def dxf_get_subscription_event_types(SubscriptionClass sc):
+    """
+    Gets subscription event type
+
+    Parameters
+    ----------
+    sc: SubscriptionClass
+        SubscriptionClass with information about subscription
+
+    Returns
+    -------
+    unicode
+        Subscription type
+    """
+    if not sc.subscription:
+        raise ValueError('Invalid subscription')
+
+    cdef int event_type
+
+    et_mapping = {
+        1: 'Trade',
+        2: 'Quote',
+        4: 'Summary',
+        8: 'Profile',
+        16: 'Order',
+        32: 'TimeAndSale',
+        64: 'Candle',
+        128: 'TradeETH',
+        256: 'SpreadOrder',
+        512: 'Greeks',
+        1024: 'TheoPrice',
+        2048: 'Underlying',
+        4096: 'Series',
+        8192: 'Configuration',
+        -16384: ''
+    }
+
+    clib.dxf_get_subscription_event_types (sc.subscription, &event_type)
+
+    return et_mapping[event_type]
