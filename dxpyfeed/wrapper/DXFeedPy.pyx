@@ -490,3 +490,17 @@ def dxf_remove_symbols(SubscriptionClass sc, symbols: List[unicode]):
 
     for symbol in symbols:
         clib.dxf_remove_symbol(sc.subscription, dxf_const_string_t_from_unicode(symbol))
+
+def dxf_clear_symbols(SubscriptionClass sc):
+    """
+    Removes all symbols from the subscription
+
+    Parameters
+    ----------
+    sc: SubscriptionClass
+        SubscriptionClass with information about subscription
+    """
+    if not sc.subscription:
+        raise ValueError('Invalid subscription')
+
+    clib.dxf_clear_symbols(sc.subscription)
