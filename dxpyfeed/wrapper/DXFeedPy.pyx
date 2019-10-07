@@ -9,7 +9,7 @@ cimport dxpyfeed.wrapper.listeners.listener as lis
 from collections import deque
 from datetime import datetime
 import pandas as pd
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 # for importing variables
 import dxpyfeed.wrapper.listeners.listener as lis
@@ -457,7 +457,8 @@ def dxf_get_symbols(SubscriptionClass sc):
 
     Returns
     -------
-
+    list
+        List of unicode strings of subscription symbols
     """
     if not sc.subscription:
         raise ValueError('Invalid subscription')
@@ -472,3 +473,20 @@ def dxf_get_symbols(SubscriptionClass sc):
         symbols_list.append(unicode_from_dxf_const_string_t(symbols[i]))
 
     return symbols_list
+
+def dxf_remove_symbols(SubscriptionClass sc, symbols: List[unicode]):
+    """
+    Removes several symbols from the subscription
+
+    Parameters
+    ----------
+    sc: SubscriptionClass
+        SubscriptionClass with information about subscription
+    symbols: list
+        List of symbols to remove
+    """
+    if not sc.subscription:
+        raise ValueError('Invalid subscription')
+
+    for symbol in symbols:
+        clib.dxf_remove_symbol(sc.subscription, dxf_const_string_t_from_unicode(symbol))
