@@ -405,7 +405,7 @@ def dxf_initialize_logger(file_name: unicode, rewrite_file: bool, show_timezone_
     """
     clib.dxf_initialize_logger(file_name.encode('UTF-8'), int(rewrite_file), int(show_timezone_info), int(verbose))
 
-def dxf_get_subscription_event_types(SubscriptionClass sc):
+def dxf_get_subscription_event_types(SubscriptionClass sc, return_str: bool=True):
     """
     Gets subscription event type
 
@@ -413,10 +413,12 @@ def dxf_get_subscription_event_types(SubscriptionClass sc):
     ----------
     sc: SubscriptionClass
         SubscriptionClass with information about subscription
+    return_str: bool
+        When True returns event type in string format, otherwise internal c representation as integer
 
     Returns
     -------
-    unicode
+    unicode or int
         Subscription type
     """
     if not sc.subscription:
@@ -443,8 +445,12 @@ def dxf_get_subscription_event_types(SubscriptionClass sc):
     }
 
     clib.dxf_get_subscription_event_types (sc.subscription, &event_type)
+    if return_str:
+        result = et_mapping[event_type]
+    else:
+        result = event_type
 
-    return et_mapping[event_type]
+    return result
 
 def dxf_get_symbols(SubscriptionClass sc):
     """
