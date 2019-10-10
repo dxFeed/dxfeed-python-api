@@ -342,7 +342,7 @@ def dxf_close_subscription(SubscriptionClass sc):
         clib.dxf_close_subscription(sc.subscription)
         sc.subscription = NULL
 
-def dxf_get_current_connection_status(ConnectionClass cc):
+def dxf_get_current_connection_status(ConnectionClass cc, return_str: bool=True):
     """
     Returns one of four possible statuses
 
@@ -350,6 +350,9 @@ def dxf_get_current_connection_status(ConnectionClass cc):
     ----------
     cc: ConnectionClass
         Variable with connection information
+    return_str: bool
+        When True returns connection status in string format, otherwise internal c representation as integer
+
 
     """
     status_mapping = {
@@ -361,7 +364,11 @@ def dxf_get_current_connection_status(ConnectionClass cc):
 
     cdef clib.dxf_connection_status_t status
     clib.dxf_get_current_connection_status(cc.connection, &status)
-    print(status_mapping[status])
+    result = status
+    if return_str:
+        result = status_mapping[status]
+
+    return result
 
 def dxf_get_current_connected_address(ConnectionClass cc):
     """
@@ -445,11 +452,10 @@ def dxf_get_subscription_event_types(SubscriptionClass sc, return_str: bool=True
     }
 
     clib.dxf_get_subscription_event_types (sc.subscription, &event_type)
+    result = event_type
     if return_str:
         result = et_mapping[event_type]
-    else:
-        result = event_type
-
+    
     return result
 
 def dxf_get_symbols(SubscriptionClass sc):
