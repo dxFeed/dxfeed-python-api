@@ -374,7 +374,7 @@ def dxf_get_current_connected_address(ConnectionClass cc):
 
     Returns
     -------
-    address: unicode
+    address: str
         Current connected address
     """
     if not cc.connection:
@@ -384,7 +384,7 @@ def dxf_get_current_connected_address(ConnectionClass cc):
     clib.dxf_get_current_connected_address(cc.connection, &address)
     return (<bytes>address).decode('UTF-8')
 
-def dxf_initialize_logger(file_name: unicode, rewrite_file: bool, show_timezone_info: bool, verbose: bool):
+def dxf_initialize_logger(file_name: str, rewrite_file: bool, show_timezone_info: bool, verbose: bool):
     """
     Initializes the internal logger.
     Various actions and events, including the errors, are being logged throughout the library. They may be stored
@@ -392,7 +392,7 @@ def dxf_initialize_logger(file_name: unicode, rewrite_file: bool, show_timezone_
 
     Parameters
     ----------
-    file_name: unicode
+    file_name: str
         A full path to the file where the log is to be stored
     rewrite_file: bool
         A flag defining the file open mode if it's True then the log file will be rewritten
@@ -418,7 +418,7 @@ def dxf_get_subscription_event_types(SubscriptionClass sc, return_str: bool=True
 
     Returns
     -------
-    unicode or int
+    str or int
         Subscription type
     """
     if not sc.subscription:
@@ -480,7 +480,7 @@ def dxf_get_symbols(SubscriptionClass sc):
 
     return symbols_list
 
-def dxf_remove_symbols(SubscriptionClass sc, symbols: List[unicode]):
+def dxf_remove_symbols(SubscriptionClass sc, symbols: List[str]):
     """
     Removes several symbols from the subscription
 
