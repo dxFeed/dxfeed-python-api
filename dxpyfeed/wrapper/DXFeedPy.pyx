@@ -9,7 +9,7 @@ cimport dxpyfeed.wrapper.listeners.listener as lis
 from collections import deque
 from datetime import datetime
 import pandas as pd
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 # for importing variables
 import dxpyfeed.wrapper.listeners.listener as lis
@@ -341,3 +341,178 @@ def dxf_close_subscription(SubscriptionClass sc):
     if sc.subscription:
         clib.dxf_close_subscription(sc.subscription)
         sc.subscription = NULL
+
+def dxf_get_current_connection_status(ConnectionClass cc, return_str: bool=True):
+    """
+    Returns one of four possible statuses
+
+    Parameters
+    ----------
+    cc: ConnectionClass
+        Variable with connection information
+    return_str: bool
+        When True returns connection status in string format, otherwise internal c representation as integer
+
+
+    """
+    status_mapping = {
+        0: 'Not connected',
+        1: 'Connected',
+        2: 'Login required',
+        3: 'Connected and authorized'
+    }
+
+    cdef clib.dxf_connection_status_t status
+    clib.dxf_get_current_connection_status(cc.connection, &status)
+    result = status
+    if return_str:
+        result = status_mapping[status]
+
+    return result
+
+def dxf_get_current_connected_address(ConnectionClass cc):
+    """
+    Returns current connected address
+
+    Parameters
+    ----------
+    cc: ConnectionClass
+        Variable with connection information
+
+    Returns
+    -------
+    address: str
+        Current connected address
+    """
+    if not cc.connection:
+        raise ValueError('Connection is not valid')
+
+    cdef char * address
+    clib.dxf_get_current_connected_address(cc.connection, &address)
+    return (<bytes>address).decode('UTF-8')
+
+def dxf_initialize_logger(file_name: str, rewrite_file: bool, show_timezone_info: bool, verbose: bool):
+    """
+    Initializes the internal logger.
+    Various actions and events, including the errors, are being logged throughout the library. They may be stored
+    into the file.
+
+    Parameters
+    ----------
+    file_name: str
+        A full path to the file where the log is to be stored
+    rewrite_file: bool
+        A flag defining the file open mode if it's True then the log file will be rewritten
+    show_timezone_info: bool
+        A flag defining the time display option in the log file if it's True then the time will be displayed
+        with the timezone suffix
+    verbose: bool
+        A flag defining the logging mode if it's True then the verbose logging will be enabled
+
+    """
+    clib.dxf_initialize_logger(file_name.encode('UTF-8'), int(rewrite_file), int(show_timezone_info), int(verbose))
+
+def dxf_get_subscription_event_types(SubscriptionClass sc, return_str: bool=True):
+    """
+    Gets subscription event type
+
+    Parameters
+    ----------
+    sc: SubscriptionClass
+        SubscriptionClass with information about subscription
+    return_str: bool
+        When True returns event type in string format, otherwise internal c representation as integer
+
+    Returns
+    -------
+    str or int
+        Subscription type
+    """
+    if not sc.subscription:
+        raise ValueError('Invalid subscription')
+
+    cdef int event_type
+
+    et_mapping = {
+        1: 'Trade',
+        2: 'Quote',
+        4: 'Summary',
+        8: 'Profile',
+        16: 'Order',
+        32: 'TimeAndSale',
+        64: 'Candle',
+        128: 'TradeETH',
+        256: 'SpreadOrder',
+        512: 'Greeks',
+        1024: 'TheoPrice',
+        2048: 'Underlying',
+        4096: 'Series',
+        8192: 'Configuration',
+        -16384: ''
+    }
+
+    clib.dxf_get_subscription_event_types (sc.subscription, &event_type)
+    result = event_type
+    if return_str:
+        result = et_mapping[event_type]
+    
+    return result
+
+def dxf_get_symbols(SubscriptionClass sc):
+    """
+    Retrieves the list of symbols currently added to the subscription.
+
+    Parameters
+    ----------
+    sc: SubscriptionClass
+        SubscriptionClass with information about subscription
+
+    Returns
+    -------
+    list
+        List of unicode strings of subscription symbols
+    """
+    if not sc.subscription:
+        raise ValueError('Invalid subscription')
+
+    cdef dxf_const_string_t * symbols
+    symbols_list = list()
+    cdef int symbol_count
+    cdef int i
+
+    clib.dxf_get_symbols(sc.subscription, &symbols, &symbol_count)
+    for i in range(symbol_count):
+        symbols_list.append(unicode_from_dxf_const_string_t(symbols[i]))
+
+    return symbols_list
+
+def dxf_remove_symbols(SubscriptionClass sc, symbols: List[str]):
+    """
+    Removes several symbols from the subscription
+
+    Parameters
+    ----------
+    sc: SubscriptionClass
+        SubscriptionClass with information about subscription
+    symbols: list
+        List of symbols to remove
+    """
+    if not sc.subscription:
+        raise ValueError('Invalid subscription')
+
+    for symbol in symbols:
+        clib.dxf_remove_symbol(sc.subscription, dxf_const_string_t_from_unicode(symbol))
+
+def dxf_clear_symbols(SubscriptionClass sc):
+    """
+    Removes all symbols from the subscription
+
+    Parameters
+    ----------
+    sc: SubscriptionClass
+        SubscriptionClass with information about subscription
+    """
+    if not sc.subscription:
+        raise ValueError('Invalid subscription')
+
+    clib.dxf_clear_symbols(sc.subscription)
