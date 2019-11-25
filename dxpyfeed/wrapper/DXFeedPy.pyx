@@ -154,7 +154,7 @@ def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str] = None, data_len: int = 0):
+def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str] = None, data_len: int = 100):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass
     Parameters
