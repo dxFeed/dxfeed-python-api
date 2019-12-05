@@ -36,6 +36,28 @@ cdef void trade_default_listener(int event_type,
 QUOTE_COLUMNS = ['Symbol', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime', 'AskExchangeCode',
                  'AskPrice', 'AskSize', 'Scope'
                  ]
+# cdef void quote_default_listener(int event_type,
+#                                  dxf_const_string_t symbol_name,
+# 			                     const dxf_event_data_t* data,
+#                                  int data_count,
+#                                  void* user_data) nogil:
+#     cdef dxf_quote_t* quotes = <dxf_quote_t*>data
+#     with gil:
+#         py_data = <dict>user_data
+#
+#         for i in range(data_count):
+#             py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
+#                                     quotes[i].bid_time,
+#                                     quotes[i].bid_exchange_code,
+#                                     quotes[i].bid_price,
+#                                     quotes[i].bid_size,
+#                                     quotes[i].ask_time,
+#                                     quotes[i].ask_exchange_code,
+#                                     quotes[i].ask_price,
+#                                     quotes[i].ask_size,
+#                                     <int>quotes[i].scope
+#                                     ]
+#                                    )
 cdef void quote_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
 			                     const dxf_event_data_t* data,
@@ -46,7 +68,7 @@ cdef void quote_default_listener(int event_type,
         py_data = <dict>user_data
 
         for i in range(data_count):
-            py_data['data'].append([unicode_from_dxf_const_string_t(symbol_name),
+            py_data['data'].safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                     quotes[i].bid_time,
                                     quotes[i].bid_exchange_code,
                                     quotes[i].bid_price,
@@ -58,6 +80,7 @@ cdef void quote_default_listener(int event_type,
                                     <int>quotes[i].scope
                                     ]
                                    )
+
 
 SUMMARY_COLUMNS = ['Symbol', 'DayId', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice', 'PrevDayId', 'PrevDayClosePrice',
                    'PrevDayVolume', 'OpenInterest'

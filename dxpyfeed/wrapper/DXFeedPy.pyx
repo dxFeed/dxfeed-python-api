@@ -6,7 +6,8 @@ from dxpyfeed.wrapper.utils.helpers import *
 cimport dxpyfeed.wrapper.pxd_include.DXFeed as clib
 cimport dxpyfeed.wrapper.pxd_include.DXErrorCodes as dxec
 cimport dxpyfeed.wrapper.listeners.listener as lis
-from collections import deque
+# from collections import deque
+from dxpyfeed.wrapper.utils.data_class import DequeWithLock as deque
 from datetime import datetime
 import pandas as pd
 from typing import Optional, Union, List
@@ -108,6 +109,9 @@ cdef class SubscriptionClass:
             # self.subscription = NULL
             # mark subscription as closed in list of pointers to subscriptions
             self.con_sub_list_ptr[0][self.subscription_order] = NULL
+
+    def get_data(self, sleep=1):
+        return self.data['data'].get_all_test(sleep)
 
     @property
     def data(self):
