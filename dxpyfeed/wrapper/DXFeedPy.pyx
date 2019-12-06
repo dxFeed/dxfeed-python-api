@@ -99,7 +99,7 @@ cdef class SubscriptionClass:
         if data_len > 0:
             self.data.update({'data': deque(maxlen=data_len)})
         else:
-            self.data.update({'data': []})
+            self.data.update({'data': deque()})
         self.u_data = <void *> self.data
         self.listener = NULL
 
@@ -111,7 +111,8 @@ cdef class SubscriptionClass:
             self.con_sub_list_ptr[0][self.subscription_order] = NULL
 
     def get_data(self, sleep=1):
-        return self.data['data'].get_all_test(sleep)
+        # return self.data['data'].get_all_test(sleep)
+        return self.data['data'].safe_get()
 
     @property
     def data(self):
