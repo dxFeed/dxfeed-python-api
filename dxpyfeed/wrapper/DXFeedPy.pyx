@@ -90,18 +90,16 @@ cdef class SubscriptionClass:
     cdef cppdq[clib.dxf_subscription_t *] *con_sub_list_ptr  # pointer to list of subscription pointers
     cdef dxf_event_listener_t listener
     cdef object event_type_str
-    cdef list columns
-    cdef dict data
+    cdef object data
     cdef void *u_data
 
     def __init__(self, data_len):
         self.subscription = NULL
-        self.columns = list()
-        self.data = {'columns': []}
-        if data_len > 0:
-            self.data.update({'data': deque(maxlen=data_len)})
-        else:
-            self.data.update({'data': deque()})
+        self.data = deque()
+        # if data_len > 0:
+        #     self.data.update({'data': deque(maxlen=data_len)})
+        # else:
+        #     self.data.update({'data': deque()})
         self.u_data = <void *> self.data
         self.listener = NULL
 
@@ -111,14 +109,6 @@ cdef class SubscriptionClass:
             # self.subscription = NULL
             # mark subscription as closed in list of pointers to subscriptions
             self.con_sub_list_ptr[0][self.subscription_order] = NULL
-
-    def get_data(self, sleep=1):
-        # return self.data['data'].get_all_test(sleep)
-        return self.data['data'].safe_get()
-
-    @property
-    def columns(self):
-        return self.columns
 
     @property
     def data(self):
@@ -165,7 +155,8 @@ def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str] = None, data_len: int = 0):
+def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str] = None,
+                            data_len: int = 100000):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass
     Parameters
@@ -235,46 +226,46 @@ def dxf_attach_listener(SubscriptionClass sc):
     if not sc.subscription:
         raise ValueError('Subscription is not valid')
     if sc.event_type_str == 'Trade':
-        sc.columns = lis.TRADE_COLUMNS
+        # sc.data['columns'] = lis.TRADE_COLUMNS
         sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'Quote':
-        sc.columns = lis.QUOTE_COLUMNS
+        # sc.data['columns'] = lis.QUOTE_COLUMNS
         sc.listener = lis.quote_default_listener
     elif sc.event_type_str == 'Summary':
-        sc.columns = lis.SUMMARY_COLUMNS
+        # sc.data['columns'] = lis.SUMMARY_COLUMNS
         sc.listener = lis.summary_default_listener
     elif sc.event_type_str == 'Profile':
-        sc.columns = lis.PROFILE_COLUMNS
+        # sc.data['columns'] = lis.PROFILE_COLUMNS
         sc.listener = lis.profile_default_listener
     elif sc.event_type_str == 'TimeAndSale':
-        sc.columns = lis.TIME_AND_SALE_COLUMNS
+        # sc.data['columns'] = lis.TIME_AND_SALE_COLUMNS
         sc.listener = lis.time_and_sale_default_listener
     elif sc.event_type_str == 'Candle':
-        sc.columns = lis.CANDLE_COLUMNS
+        # sc.data['columns'] = lis.CANDLE_COLUMNS
         sc.listener = lis.candle_default_listener
     elif sc.event_type_str == 'Order':
-        sc.columns = lis.ORDER_COLUMNS
+        # sc.data['columns'] = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
     elif sc.event_type_str == 'TradeETH':
-        sc.columns = lis.TRADE_COLUMNS
+        # sc.data['columns'] = lis.TRADE_COLUMNS
         sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'SpreadOrder':
-        sc.columns = lis.ORDER_COLUMNS
+        # sc.data['columns'] = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
     elif sc.event_type_str == 'Greeks':
-        sc.columns = lis.GREEKS_COLUMNS
+        # sc.data['columns'] = lis.GREEKS_COLUMNS
         sc.listener = lis.greeks_default_listener
     elif sc.event_type_str == 'TheoPrice':
-        sc.columns = lis.THEO_PRICE_COLUMNS
+        # sc.data['columns'] = lis.THEO_PRICE_COLUMNS
         sc.listener = lis.theo_price_default_listener
     elif sc.event_type_str == 'Underlying':
-        sc.columns = lis.UNDERLYING_COLUMNS
+        # sc.data['columns'] = lis.UNDERLYING_COLUMNS
         sc.listener = lis.underlying_default_listener
     elif sc.event_type_str == 'Series':
-        sc.columns = lis.SERIES_COLUMNS
+        # sc.data['columns'] = lis.SERIES_COLUMNS
         sc.listener = lis.series_default_listener
     elif sc.event_type_str == 'Configuration':
-        sc.columns = lis.CONFIGURATION_COLUMNS
+        # sc.data['columns'] = lis.CONFIGURATION_COLUMNS
         sc.listener = lis.configuration_default_listener
     else:
         raise Exception(f'No default listener for {sc.event_type_str} event type')
@@ -300,7 +291,7 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
         raise ValueError('Subscription is not valid')
     if data:
         sc.data = data
-    sc.columns = columns
+    # sc.data['columns'] = columns
     sc.listener = fw.func
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
