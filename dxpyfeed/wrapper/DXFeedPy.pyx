@@ -90,11 +90,13 @@ cdef class SubscriptionClass:
     cdef cppdq[clib.dxf_subscription_t *] *con_sub_list_ptr  # pointer to list of subscription pointers
     cdef dxf_event_listener_t listener
     cdef object event_type_str
+    cdef list columns
     cdef object data
     cdef void *u_data
 
     def __init__(self, data_len):
         self.subscription = NULL
+        self.columns = list()
         self.data = deque()
         # if data_len > 0:
         #     self.data.update({'data': deque(maxlen=data_len)})
@@ -114,9 +116,9 @@ cdef class SubscriptionClass:
     def data(self):
         return self.data
 
-    @data.setter
-    def data(self, new_val: dict):
-        self.data = new_val
+    # @data.setter
+    # def data(self, new_val):
+    #     self.data = new_val
 
     def to_dataframe(self):
         """
@@ -226,46 +228,46 @@ def dxf_attach_listener(SubscriptionClass sc):
     if not sc.subscription:
         raise ValueError('Subscription is not valid')
     if sc.event_type_str == 'Trade':
-        # sc.data['columns'] = lis.TRADE_COLUMNS
+        sc.columns = lis.TRADE_COLUMNS
         sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'Quote':
-        # sc.data['columns'] = lis.QUOTE_COLUMNS
+        sc.columns = lis.QUOTE_COLUMNS
         sc.listener = lis.quote_default_listener
     elif sc.event_type_str == 'Summary':
-        # sc.data['columns'] = lis.SUMMARY_COLUMNS
+        sc.columns = lis.SUMMARY_COLUMNS
         sc.listener = lis.summary_default_listener
     elif sc.event_type_str == 'Profile':
-        # sc.data['columns'] = lis.PROFILE_COLUMNS
+        sc.columns = lis.PROFILE_COLUMNS
         sc.listener = lis.profile_default_listener
     elif sc.event_type_str == 'TimeAndSale':
-        # sc.data['columns'] = lis.TIME_AND_SALE_COLUMNS
+        sc.columns = lis.TIME_AND_SALE_COLUMNS
         sc.listener = lis.time_and_sale_default_listener
     elif sc.event_type_str == 'Candle':
-        # sc.data['columns'] = lis.CANDLE_COLUMNS
+        sc.columns = lis.CANDLE_COLUMNS
         sc.listener = lis.candle_default_listener
     elif sc.event_type_str == 'Order':
-        # sc.data['columns'] = lis.ORDER_COLUMNS
+        sc.columns = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
     elif sc.event_type_str == 'TradeETH':
-        # sc.data['columns'] = lis.TRADE_COLUMNS
+        sc.columns = lis.TRADE_COLUMNS
         sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'SpreadOrder':
-        # sc.data['columns'] = lis.ORDER_COLUMNS
+        sc.columns = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
     elif sc.event_type_str == 'Greeks':
-        # sc.data['columns'] = lis.GREEKS_COLUMNS
+        sc.columns = lis.GREEKS_COLUMNS
         sc.listener = lis.greeks_default_listener
     elif sc.event_type_str == 'TheoPrice':
-        # sc.data['columns'] = lis.THEO_PRICE_COLUMNS
+        sc.columns = lis.THEO_PRICE_COLUMNS
         sc.listener = lis.theo_price_default_listener
     elif sc.event_type_str == 'Underlying':
-        # sc.data['columns'] = lis.UNDERLYING_COLUMNS
+        sc.columns = lis.UNDERLYING_COLUMNS
         sc.listener = lis.underlying_default_listener
     elif sc.event_type_str == 'Series':
-        # sc.data['columns'] = lis.SERIES_COLUMNS
+        sc.columns = lis.SERIES_COLUMNS
         sc.listener = lis.series_default_listener
     elif sc.event_type_str == 'Configuration':
-        # sc.data['columns'] = lis.CONFIGURATION_COLUMNS
+        sc.columns = lis.CONFIGURATION_COLUMNS
         sc.listener = lis.configuration_default_listener
     else:
         raise Exception(f'No default listener for {sc.event_type_str} event type')
@@ -291,7 +293,7 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
         raise ValueError('Subscription is not valid')
     if data:
         sc.data = data
-    # sc.data['columns'] = columns
+    sc.columns = columns
     sc.listener = fw.func
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
