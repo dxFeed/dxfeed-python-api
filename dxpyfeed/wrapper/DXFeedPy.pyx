@@ -98,7 +98,7 @@ cdef class SubscriptionClass:
         if data_len > 0:
             self.data.update({'data': deque(maxlen=data_len)})
         else:
-            self.data.update({'data': []})
+            self.data.update({'data': deque()})
         self.u_data = <void *> self.data
         self.listener = NULL
 
