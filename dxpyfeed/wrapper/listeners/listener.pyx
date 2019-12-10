@@ -43,7 +43,7 @@ cdef void quote_default_listener(int event_type,
                                  void* user_data) nogil:
     cdef dxf_quote_t* quotes = <dxf_quote_t*>data
     with gil:
-        py_data = <object>user_data
+        py_data = (<object *>user_data)[0]
 
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
@@ -67,7 +67,7 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
     cdef dxf_summary_t* summary = <dxf_summary_t*>data
 
     with gil:
-        py_data = <dict>user_data
+        py_data = <object>user_data
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                     summary[i].day_id,
@@ -91,7 +91,7 @@ cdef void profile_default_listener(int event_type,
                                    void* user_data)  nogil:
     cdef dxf_profile_t* p = <dxf_profile_t*>data
     with gil:
-        py_data = <dict>user_data
+        py_data = <object>user_data
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                     p[i].beta,
@@ -119,7 +119,7 @@ cdef void time_and_sale_default_listener(int event_type,
                                          void* user_data) nogil:
     cdef dxf_time_and_sale_t* tns = <dxf_time_and_sale_t*>data
     with gil:
-        py_data = <dict>user_data
+        py_data = <object>user_data
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                     tns[i].event_flags,
@@ -153,7 +153,7 @@ cdef void candle_default_listener(int event_type,
                                   void* user_data) nogil:
     cdef dxf_candle_t* candle = <dxf_candle_t*>data
     with gil:
-        py_data = <dict>user_data
+        py_data = <object>user_data
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                     candle[i].index,
@@ -183,7 +183,7 @@ cdef void order_default_listener(int event_type,
                                  void* user_data) nogil:
     cdef dxf_order_t* order = <dxf_order_t*>data
     with gil:
-        py_data = <dict>user_data
+        py_data = <object>user_data
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                     order[i].event_flags,
@@ -212,7 +212,7 @@ cdef void greeks_default_listener(int event_type,
                                   void* user_data) nogil:
     cdef dxf_greeks_t* greeks = <dxf_greeks_t*>data
     with gil:
-        py_data = <dict>user_data
+        py_data = <object>user_data
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                     greeks[i].event_flags,
@@ -236,7 +236,7 @@ cdef void theo_price_default_listener(int event_type,
                                       void* user_data) nogil:
     cdef dxf_theo_price_t* theo_price = <dxf_theo_price_t*>data
     with gil:
-        py_data = <dict>user_data
+        py_data = <object>user_data
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                     theo_price[i].time,
@@ -257,7 +257,7 @@ cdef void underlying_default_listener(int event_type,
                                       void* user_data) nogil:
     cdef dxf_underlying_t* underlying = <dxf_underlying_t*>data
     with gil:
-        py_data = <dict>user_data
+        py_data = <object>user_data
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                     underlying[i].volatility,
@@ -277,7 +277,7 @@ cdef void series_default_listener(int event_type,
                                   void* user_data) nogil:
     cdef dxf_series_t* series = <dxf_series_t*>data
     with gil:
-        py_data = <dict>user_data
+        py_data = <object>user_data
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                     series[i].event_flags,
@@ -302,7 +302,7 @@ cdef void configuration_default_listener(int event_type,
                                          void* user_data) nogil:
     cdef dxf_configuration_t* config = <dxf_configuration_t*>data
     with gil:
-        py_data = <dict>user_data
+        py_data = <object>user_data
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                     config[i].version,
