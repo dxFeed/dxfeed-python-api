@@ -43,7 +43,7 @@ cdef void quote_default_listener(int event_type,
                                  void* user_data) nogil:
     cdef dxf_quote_t* quotes = <dxf_quote_t*>data
     with gil:
-        py_data = (<object *>user_data)[0]
+        py_data = <object>user_data
 
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
