@@ -90,46 +90,47 @@ cdef class SubscriptionClass:
     cdef cppdq[clib.dxf_subscription_t *] *con_sub_list_ptr  # pointer to list of subscription pointers
     cdef dxf_event_listener_t listener
     cdef object event_type_str
-    cdef list columns
+    cdef public list columns
     cdef object data
     cdef void *u_data
 
     def __init__(self, data_len):
         self.subscription = NULL
         self.columns = list()
-        self.data = deque()
-        # if data_len > 0:
-        #     self.data.update({'data': deque(maxlen=data_len)})
-        # else:
-        #     self.data.update({'data': deque()})
+        if data_len > 0:
+            self.data = deque(maxlen=data_len)
+        else:
+            self.data = deque()
         self.u_data = <void *> self.data
         self.listener = NULL
 
     def __dealloc__(self):
         if self.subscription:  # if connection is not closed
             clib.dxf_close_subscription(self.subscription)
-            # self.subscription = NULL
-            # mark subscription as closed in list of pointers to subscriptions
             self.con_sub_list_ptr[0][self.subscription_order] = NULL
 
-    @property
-    def data(self):
-        return self.data
+    def get_data(self):
+        return self.data.safe_get()
 
-    # @data.setter
-    # def data(self, new_val):
-    #     self.data = new_val
-
-    def to_dataframe(self):
+    def to_dataframe(self, keep: bool=True):
         """
-        Method converts dict of data to the Pandas DataFrame
+        Method converts data to the Pandas DataFrame
+
+        Parameters
+        ----------
+        keep: bool
+            When True copies data to dataframe, otherwise pops. Default True
 
         Returns
         -------
         df: pandas DataFrame
         """
-        arr_len = len(self.data['data'])
-        df = pd.DataFrame(list(self.data['data'])[:arr_len], columns=self.data['columns'])
+        if keep:
+            df_data = self.data.safe_copy()
+        else:
+            df_data = self.data.safe_get()
+
+        df = pd.DataFrame(df_data, columns=self.columns)
         time_columns = df.columns[df.columns.str.contains('Time')]
         for column in time_columns:
             df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
