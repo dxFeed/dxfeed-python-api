@@ -98,7 +98,7 @@ cdef class SubscriptionClass:
         if data_len > 0:
             self.data.update({'data': deque(maxlen=data_len)})
         else:
-            self.data.update({'data': []})
+            self.data.update({'data': deque()})
         self.u_data = <void *> self.data
         self.listener = NULL
 
@@ -154,7 +154,8 @@ def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str] = None, data_len: int = 0):
+def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str] = None,
+                            data_len: int = 100000):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass
     Parameters
