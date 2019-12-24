@@ -6,7 +6,6 @@ from dxpyfeed.wrapper.utils.helpers import *
 cimport dxpyfeed.wrapper.pxd_include.DXFeed as clib
 cimport dxpyfeed.wrapper.pxd_include.DXErrorCodes as dxec
 cimport dxpyfeed.wrapper.listeners.listener as lis
-# from collections import deque
 from dxpyfeed.wrapper.utils.data_class import DequeWithLock as deque
 from datetime import datetime
 import pandas as pd
