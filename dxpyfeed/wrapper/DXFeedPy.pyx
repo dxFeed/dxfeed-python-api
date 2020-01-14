@@ -6,7 +6,7 @@ from dxpyfeed.wrapper.utils.helpers import *
 cimport dxpyfeed.wrapper.pxd_include.DXFeed as clib
 cimport dxpyfeed.wrapper.pxd_include.DXErrorCodes as dxec
 cimport dxpyfeed.wrapper.listeners.listener as lis
-from dxpyfeed.wrapper.utils.data_class import DequeWithLock as deque
+from dxpyfeed.wrapper.utils.data_class import DequeWithLock as deque_wl
 from datetime import datetime
 import pandas as pd
 from typing import Optional, Union, List
@@ -89,7 +89,7 @@ cdef class SubscriptionClass:
     cdef cppdq[clib.dxf_subscription_t *] *con_sub_list_ptr  # pointer to list of subscription pointers
     cdef dxf_event_listener_t listener
     cdef object event_type_str
-    cdef public list columns
+    cdef list columns
     cdef object data
     cdef void *u_data
 
@@ -97,9 +97,9 @@ cdef class SubscriptionClass:
         self.subscription = NULL
         self.columns = list()
         if data_len > 0:
-            self.data = deque(maxlen=data_len)
+            self.data = deque_wl(maxlen=data_len)
         else:
-            self.data = deque()
+            self.data = deque_wl()
         self.u_data = <void *> self.data
         self.listener = NULL
 
