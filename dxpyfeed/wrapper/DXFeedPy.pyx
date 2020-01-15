@@ -125,7 +125,7 @@ cdef class SubscriptionClass:
         df: pandas DataFrame
         """
         if keep:
-            df_data = self.data.safe_copy()
+            df_data = self.data.copy()
         else:
             df_data = self.data.safe_get()
 
