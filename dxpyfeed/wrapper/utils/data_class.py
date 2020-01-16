@@ -32,8 +32,8 @@ class DequeWithLock(deque):
 
         Returns
         -------
-        list_to_return: DequeWithLock
-            Instance of current class, filled with data
+        list_to_return: list
+            List filled with data
         """
         list_to_return = list()
         try:
