@@ -6,7 +6,7 @@ from dxpyfeed.wrapper.utils.helpers import *
 cimport dxpyfeed.wrapper.pxd_include.DXFeed as clib
 cimport dxpyfeed.wrapper.pxd_include.DXErrorCodes as dxec
 cimport dxpyfeed.wrapper.listeners.listener as lis
-from collections import deque
+from dxpyfeed.wrapper.utils.data_class import DequeWithLock as deque_wl
 from datetime import datetime
 import pandas as pd
 from typing import Optional, Union, List
@@ -89,44 +89,47 @@ cdef class SubscriptionClass:
     cdef cppdq[clib.dxf_subscription_t *] *con_sub_list_ptr  # pointer to list of subscription pointers
     cdef dxf_event_listener_t listener
     cdef object event_type_str
-    cdef dict data
+    cdef list columns
+    cdef object data
     cdef void *u_data
 
     def __init__(self, data_len):
         self.subscription = NULL
-        self.data = {'columns': []}
+        self.columns = list()
         if data_len > 0:
-            self.data.update({'data': deque(maxlen=data_len)})
+            self.data = deque_wl(maxlen=data_len)
         else:
-            self.data.update({'data': deque()})
+            self.data = deque_wl()
         self.u_data = <void *> self.data
         self.listener = NULL
 
     def __dealloc__(self):
         if self.subscription:  # if connection is not closed
             clib.dxf_close_subscription(self.subscription)
-            # self.subscription = NULL
-            # mark subscription as closed in list of pointers to subscriptions
             self.con_sub_list_ptr[0][self.subscription_order] = NULL
 
-    @property
-    def data(self):
-        return self.data
+    def get_data(self):
+        return self.data.safe_get()
 
-    @data.setter
-    def data(self, new_val: dict):
-        self.data = new_val
-
-    def to_dataframe(self):
+    def to_dataframe(self, keep: bool=True):
         """
-        Method converts dict of data to the Pandas DataFrame
+        Method converts data to the Pandas DataFrame
+
+        Parameters
+        ----------
+        keep: bool
+            When True copies data to dataframe, otherwise pops. Default True
 
         Returns
         -------
         df: pandas DataFrame
         """
-        arr_len = len(self.data['data'])
-        df = pd.DataFrame(list(self.data['data'])[:arr_len], columns=self.data['columns'])
+        if keep:
+            df_data = self.data.copy()
+        else:
+            df_data = self.data.safe_get()
+
+        df = pd.DataFrame(df_data, columns=self.columns)
         time_columns = df.columns[df.columns.str.contains('Time')]
         for column in time_columns:
             df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
@@ -225,46 +228,46 @@ def dxf_attach_listener(SubscriptionClass sc):
     if not sc.subscription:
         raise ValueError('Subscription is not valid')
     if sc.event_type_str == 'Trade':
-        sc.data['columns'] = lis.TRADE_COLUMNS
+        sc.columns = lis.TRADE_COLUMNS
         sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'Quote':
-        sc.data['columns'] = lis.QUOTE_COLUMNS
+        sc.columns = lis.QUOTE_COLUMNS
         sc.listener = lis.quote_default_listener
     elif sc.event_type_str == 'Summary':
-        sc.data['columns'] = lis.SUMMARY_COLUMNS
+        sc.columns = lis.SUMMARY_COLUMNS
         sc.listener = lis.summary_default_listener
     elif sc.event_type_str == 'Profile':
-        sc.data['columns'] = lis.PROFILE_COLUMNS
+        sc.columns = lis.PROFILE_COLUMNS
         sc.listener = lis.profile_default_listener
     elif sc.event_type_str == 'TimeAndSale':
-        sc.data['columns'] = lis.TIME_AND_SALE_COLUMNS
+        sc.columns = lis.TIME_AND_SALE_COLUMNS
         sc.listener = lis.time_and_sale_default_listener
     elif sc.event_type_str == 'Candle':
-        sc.data['columns'] = lis.CANDLE_COLUMNS
+        sc.columns = lis.CANDLE_COLUMNS
         sc.listener = lis.candle_default_listener
     elif sc.event_type_str == 'Order':
-        sc.data['columns'] = lis.ORDER_COLUMNS
+        sc.columns = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
     elif sc.event_type_str == 'TradeETH':
-        sc.data['columns'] = lis.TRADE_COLUMNS
+        sc.columns = lis.TRADE_COLUMNS
         sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'SpreadOrder':
-        sc.data['columns'] = lis.ORDER_COLUMNS
+        sc.columns = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
     elif sc.event_type_str == 'Greeks':
-        sc.data['columns'] = lis.GREEKS_COLUMNS
+        sc.columns = lis.GREEKS_COLUMNS
         sc.listener = lis.greeks_default_listener
     elif sc.event_type_str == 'TheoPrice':
-        sc.data['columns'] = lis.THEO_PRICE_COLUMNS
+        sc.columns = lis.THEO_PRICE_COLUMNS
         sc.listener = lis.theo_price_default_listener
     elif sc.event_type_str == 'Underlying':
-        sc.data['columns'] = lis.UNDERLYING_COLUMNS
+        sc.columns = lis.UNDERLYING_COLUMNS
         sc.listener = lis.underlying_default_listener
     elif sc.event_type_str == 'Series':
-        sc.data['columns'] = lis.SERIES_COLUMNS
+        sc.columns = lis.SERIES_COLUMNS
         sc.listener = lis.series_default_listener
     elif sc.event_type_str == 'Configuration':
-        sc.data['columns'] = lis.CONFIGURATION_COLUMNS
+        sc.columns = lis.CONFIGURATION_COLUMNS
         sc.listener = lis.configuration_default_listener
     else:
         raise Exception(f'No default listener for {sc.event_type_str} event type')
@@ -290,7 +293,7 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
         raise ValueError('Subscription is not valid')
     if data:
         sc.data = data
-    sc.data['columns'] = columns
+    sc.columns = columns
     sc.listener = fw.func
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
