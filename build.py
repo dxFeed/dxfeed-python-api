@@ -19,32 +19,23 @@ SRC_DIR = 'dxpyfeed'
 PACKAGES = [SRC_DIR]
 
 dxfeed = ('dxfeed', {'sources': source_files_paths,
-                     'libraries': libs,
-                     })
-
+                     'libraries': libs})
 
 ext_lis = Extension(name=SRC_DIR + '.wrapper.listeners.listener',
                     sources=[SRC_DIR + '/wrapper/listeners/listener.pyx'],
-                    libraries=libs,
-                    )
-
+                    libraries=libs)
 
 ext_helpers = Extension(name=SRC_DIR + '.wrapper.utils.helpers',
                         sources=[SRC_DIR + '/wrapper/utils/helpers.pyx'],
-                        libraries=libs,
-                        )
-
+                        libraries=libs)
 
 ext_dxfeed = Extension(name=SRC_DIR + '.wrapper.DXFeedPy',
-                       sources=[SRC_DIR + '/wrapper/DXFeedPy.pyx'],
-                       libraries=libs,
-                       )
+                       sources=[SRC_DIR + '/wrapper/DXFeedPy.pyx'] + package_c_files_paths,
+                       libraries=libs)
 
-EXTENSIONS = [
-    ext_lis,
-    ext_helpers,
-    ext_dxfeed,
-]
+EXTENSIONS = [ext_lis,
+              ext_helpers,
+              ext_dxfeed]
 
 
 def build(setup_kwargs):
