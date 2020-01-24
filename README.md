@@ -95,3 +95,13 @@ poetry build
 ```
 
 The built package is in `dist/` folder. 
+
+## Generating html documentation with Sphinx
+
+Additional requirements: sphinx, sphinx_rtd_theme
+
+```bash
+gen_docs.sh
+```
+
+Documentation can be found in `./docs/_build` folder.
