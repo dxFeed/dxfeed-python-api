@@ -16,6 +16,7 @@ python = "^3.6"
 cython = "^0.29.13"
 pandas = "^0.25.1"
 sphinx = "^2.2"
+sphinx_rtd_theme = "^0.4.3"
 m2r = "^0.2.1"
 
 [build-system]
