@@ -19,7 +19,7 @@ from dxpyfeed.wrapper.pxd_include.EventData cimport *
 # from libc.stdint cimport uintptr_t
 
 
-cpdef int process_last_error(verbose: bool = True):
+cpdef int process_last_error(verbose: bool=True):
     """
     Function retrieves last error
 
@@ -49,6 +49,7 @@ cpdef int process_last_error(verbose: bool = True):
 
     return error_code
 
+
 cdef class ConnectionClass:
     """
     Data structure that contains connection
@@ -74,14 +75,10 @@ cdef class ConnectionClass:
         out.con_sub_list_ptr = &self.sub_ptr_list  # reverse pointer to pointers list
         return out
 
+
 cdef class SubscriptionClass:
     """
     Data structure that contains subscription and related fields
-
-    Parameters
-    ----------
-    data_len: int
-        Sets maximum amount of events, that are kept in Subscription class
     """
     cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
@@ -94,6 +91,13 @@ cdef class SubscriptionClass:
     cdef void *u_data
 
     def __init__(self, data_len):
+        """
+        Parameters
+        ----------
+        data_len: int
+            Sets maximum amount of events, that are kept in Subscription class
+        """
+        self.data = {'columns': []}
         self.subscription = NULL
         self.columns = list()
         if data_len > 0:
@@ -161,13 +165,14 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
                             data_len: int = 100000):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass
+
     Parameters
     ----------
     cc: ConnectionClass
         Variable with connection information
     event_type: str
-        Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
-                    'Greeks', 'THEO_PRICE', 'Underlying', 'Series', 'Configuration' or ''
+        Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+        'SpreadOrder', 'Greeks', 'THEO_PRICE', 'Underlying', 'Series', 'Configuration' or ''
     candle_time: str
         String of %Y-%m-%d %H:%M:%S datetime format for retrieving candles. By default set to now
     data_len: int
@@ -204,6 +209,7 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
 def dxf_add_symbols(SubscriptionClass sc, symbols: list):
     """
     Adds symbols to subscription
+
     Parameters
     ----------
     sc: SubscriptionClass
@@ -220,6 +226,7 @@ def dxf_add_symbols(SubscriptionClass sc, symbols: list):
 def dxf_attach_listener(SubscriptionClass sc):
     """
     Function attaches default listener according to subscription type
+
     Parameters
     ----------
     sc: SubscriptionClass
@@ -278,6 +285,7 @@ def dxf_attach_listener(SubscriptionClass sc):
 def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns: list, data: dict = None):
     """
     Attaches custom listener
+
     Parameters
     ----------
     sc: SubscriptionClass
@@ -301,6 +309,7 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
 def dxf_detach_listener(SubscriptionClass sc):
     """
     Detaches any listener
+
     Parameters
     ----------
     sc: SubscriptionClass
@@ -314,6 +323,7 @@ def dxf_detach_listener(SubscriptionClass sc):
 def dxf_close_connection(ConnectionClass cc):
     """
     Closes connection
+
 
     Parameters
     ----------
@@ -459,7 +469,7 @@ def dxf_get_subscription_event_types(SubscriptionClass sc, return_str: bool=True
     result = event_type
     if return_str:
         result = et_mapping[event_type]
-    
+
     return result
 
 def dxf_get_symbols(SubscriptionClass sc):

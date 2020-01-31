@@ -4,7 +4,7 @@ This library provides Python API to dxfeed via C API. The code is written in Pyt
 
 ## Installation
 
-Requirements: python >3.6, cython, pandas
+**Requirements:** python >3.6, cython, pandas
 
 ```python
 pip3 install cython pandas
@@ -88,10 +88,23 @@ git submodule update
 
 ## Building the package
 
-Additional requirements: poetry(https://github.com/sdispater/poetry)
+**Additional requirements:** poetry(https://github.com/sdispater/poetry)
 
 ```bash
 poetry build
 ```
 
 The built package is in `dist/` folder. 
+
+## Generating html documentation with Sphinx
+
+**Additional requirements:** sphinx, sphinx_rtd_theme
+
+| WARNING: There should be executable make command on your computer, which is not alias |
+| --- |
+
+```bash
+gen_docs.sh
+```
+
+Documentation can be found in `./docs/_build` folder.

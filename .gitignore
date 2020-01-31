@@ -21,3 +21,6 @@ build/*
 Pipfile*
 poetry.lock
 dist*
+
+# Documentation
+_build*

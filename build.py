@@ -35,8 +35,7 @@ ext_dxfeed = Extension(name=SRC_DIR + '.wrapper.DXFeedPy',
 
 EXTENSIONS = [ext_lis,
               ext_helpers,
-              ext_dxfeed,
-              ]
+              ext_dxfeed]
 
 
 def build(setup_kwargs):
