@@ -1,4 +1,5 @@
-from setuptools import Extension, find_packages
+from setuptools import Extension, dist
+dist.Distribution().fetch_build_eggs(['cython'])
 from Cython.Build import cythonize
 from pathlib import Path
 import platform
