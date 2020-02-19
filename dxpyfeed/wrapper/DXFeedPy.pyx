@@ -161,6 +161,33 @@ def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return cc
 
+def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
+                                     token: Union[str, unicode, bytes]):
+    """
+    Function creates connection to dxfeed given url address and token
+
+    Parameters
+    ----------
+    address: str
+        dxfeed url address
+    token: str
+        dxfeed login
+
+    Returns
+    -------
+    cc: ConnectionClass
+        Cython ConnectionClass with information about connection
+    """
+    cc = ConnectionClass()
+    address = address.encode('utf-8')
+    token = token.encode('utf-8')
+    clib.dxf_create_connection_auth_bearer(address, token,
+                                          NULL, NULL, NULL, NULL, NULL, &cc.connection)
+    error_code = process_last_error(verbose=False)
+    if error_code:
+        raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
+    return cc
+
 def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str] = None,
                             data_len: int = 100000):
     """
