@@ -171,7 +171,7 @@ def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
     address: str
         dxfeed url address
     token: str
-        dxfeed login
+        dxfeed token
 
     Returns
     -------
