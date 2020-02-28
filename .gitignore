@@ -7,8 +7,6 @@ build/*
 
 *.c
 *.cpp
-!lib/wrapper/pxd_include/*.c
-!lib/wrapper/linked_list/LinkedList.c
 
 *__pycache__
 
@@ -19,8 +17,4 @@ build/*
 *.ipynb_checkpoints*
 
 Pipfile*
-poetry.lock
 dist*
-
-# Documentation
-_build*
