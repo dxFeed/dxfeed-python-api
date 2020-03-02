@@ -8,7 +8,7 @@ build = "build.py"
 license = "MPL-2.0"
 readme = "README.md"
 
-include = ["LICENSE"]
+include = ["LICENSE", "dxfeed/**/*.c"]
 exclude = ["dxfeed/dxfeed-c-api/wrappers*",
            "dxfeed/dxfeed-c-api/tests*",
            "dxfeed/dxfeed-c-api/scripts*",
@@ -21,6 +21,12 @@ repository = "https://github.com/dxFeed/dxfeed-python-api"
 python = "^3.6"
 cython = "^0.29.13"
 pandas = "^0.25.1"
+
+[tool.poetry.dev-dependencies]
+taskipy = "^1.1.3"
+
+[tool.taskipy.tasks]
+sdist = "python build.py && poetry build -f sdist"
 
 [build-system]
 requires = ["poetry>=0.12", "cython"]
