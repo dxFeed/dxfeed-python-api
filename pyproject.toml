@@ -30,7 +30,7 @@ pytest = "^5.3.5"
 [tool.taskipy.tasks]
 clear = "find dxfeed/core/* -type f ( -name '*.c*' -or -name '*.pyd' ) -delete"
 sdist = "python build.py && poetry build -f sdist && task clear"
-test =  "pytest dxfeed/core/tests/test_dxfeedpy.py && task clear"
+test =  "pytest tests/test_dxfeedpy.py && task clear"
 
 [build-system]
 requires = ["poetry>=0.12", "cython"]
