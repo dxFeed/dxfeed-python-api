@@ -10,6 +10,7 @@ from dxfeed.core.utils.data_class import DequeWithLock as deque_wl
 from datetime import datetime
 import pandas as pd
 from typing import Optional, Union, List
+from cython cimport always_allow_keywords
 
 # for importing variables
 import dxfeed.core.listeners.listener as lis
@@ -495,6 +496,7 @@ def dxf_get_subscription_event_types(SubscriptionClass sc, return_str: bool=True
 
     return result
 
+@always_allow_keywords(True)
 def dxf_get_symbols(SubscriptionClass sc):
     """
     Retrieves the list of symbols currently added to the subscription.
