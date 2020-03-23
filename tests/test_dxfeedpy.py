@@ -4,8 +4,6 @@ import pytest
 
 class ValueStorage(object):  # config
     demo_address = 'demo.dxfeed.com:7300'
-    subscription_types = ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
-                          'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration']
 
 
 @pytest.fixture
@@ -34,14 +32,14 @@ def test_fail_create_subscription_with_no_connection():
     dx.dxf_create_subscription()
 
 
-def test_subscription_on_correct_types(connection):
-
-    actual_types = list()
-    for sub_type in ValueStorage.subscription_types:
-        sub = dx.dxf_create_subscription(cc=connection, event_type=sub_type)
-        actual_types.append(dx.dxf_get_subscription_event_types(sc=sub))
-        dx.dxf_close_subscription(sub)
-    assert ValueStorage.subscription_types == actual_types
+@pytest.mark.parametrize('sub_type', ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle',
+                                      'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series',
+                                      'Configuration', ])
+def test_subscription_on_correct_types(connection, sub_type):
+    sub = dx.dxf_create_subscription(cc=connection, event_type=sub_type)
+    act_sub_type = dx.dxf_get_subscription_event_types(sc=sub)
+    dx.dxf_close_subscription(sub)
+    assert act_sub_type == sub_type
 
 
 def test_symbol_addition(connection):

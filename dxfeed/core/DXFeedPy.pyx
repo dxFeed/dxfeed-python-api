@@ -196,7 +196,7 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
         Variable with connection information
     event_type: str
         Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
-        'SpreadOrder', 'Greeks', 'THEO_PRICE', 'Underlying', 'Series', 'Configuration' or ''
+        'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
     candle_time: str
         String of %Y-%m-%d %H:%M:%S datetime format for retrieving candles. By default set to now
     data_len: int
