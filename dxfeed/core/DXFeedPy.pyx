@@ -209,6 +209,9 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
     """
     if not cc.connection:
         raise ValueError('Connection is not valid')
+    if event_type not in ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+                          'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
+        raise ValueError('Incorrect event type!')
 
     sc = cc.make_new_subscription(data_len=data_len)
     sc.event_type_str = event_type

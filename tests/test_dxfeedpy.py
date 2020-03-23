@@ -42,6 +42,11 @@ def test_subscription_on_correct_types(connection, sub_type):
     assert act_sub_type == sub_type
 
 
+@pytest.mark.xfail()
+def test_subscription_on_incorrect_type(connection):
+    dx.dxf_create_subscription(cc=connection, event_type='TradeQuote')
+
+
 def test_symbol_addition(connection):
     symbols = ['AAPL', 'GOOG']
     sub = dx.dxf_create_subscription(cc=connection, event_type='Trade')
