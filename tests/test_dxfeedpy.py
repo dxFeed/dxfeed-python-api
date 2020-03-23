@@ -4,6 +4,8 @@ import pytest
 
 class ValueStorage(object):  # config
     demo_address = 'demo.dxfeed.com:7300'
+    event_types = ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
+                   'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration']
 
 
 @pytest.fixture
@@ -32,9 +34,7 @@ def test_fail_create_subscription_with_no_connection():
     dx.dxf_create_subscription()
 
 
-@pytest.mark.parametrize('sub_type', ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle',
-                                      'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series',
-                                      'Configuration', ])
+@pytest.mark.parametrize('sub_type', ValueStorage.event_types)
 def test_subscription_on_correct_types(connection, sub_type):
     sub = dx.dxf_create_subscription(cc=connection, event_type=sub_type)
     act_sub_type = dx.dxf_get_subscription_event_types(sc=sub)
