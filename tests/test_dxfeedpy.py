@@ -64,3 +64,20 @@ def test_symbol_deletion(connection):
     actual_symbols = dx.dxf_get_symbols(sc=sub)
     dx.dxf_close_subscription(sub)
     assert ['GOOG'] == actual_symbols
+
+
+@pytest.mark.parametrize('sub_type', ValueStorage.event_types)
+def test_default_listeners(sub_type):
+    # fixture usage causes errors with, probably, threads
+    connection = dx.dxf_create_connection(ValueStorage.demo_address)
+    con_err_status = dx.process_last_error(verbose=False)
+    sub = dx.dxf_create_subscription(connection, sub_type)
+    sub_err_status = dx.process_last_error(verbose=False)
+    dx.dxf_attach_listener(sub)
+    add_lis_err_status = dx.process_last_error(verbose=False)
+    dx.dxf_detach_listener(sub)
+    drop_lis_err_status = dx.process_last_error(verbose=False)
+    dx.dxf_close_subscription(sub)
+    dx.dxf_close_connection(connection)
+    assert (con_err_status, sub_err_status, add_lis_err_status, drop_lis_err_status) == (0, 0, 0, 0)
+
