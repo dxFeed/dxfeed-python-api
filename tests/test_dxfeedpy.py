@@ -71,6 +71,16 @@ def test_symbol_deletion(connection):
     assert ['GOOG'] == actual_symbols
 
 
+@pytest.mark.filterwarnings('ignore::UserWarning')
+def test_wrong_symbol_types_ignored(connection):
+    symbols = ['AAPL', 'GOOG']
+    sub = dx.dxf_create_subscription(cc=connection, event_type='Trade')
+    dx.dxf_add_symbols(sc=sub, symbols=symbols + [1, 5.0, [], True, {}, ()] )
+    actual_symbols = dx.dxf_get_symbols(sc=sub)
+    dx.dxf_close_subscription(sub)
+    assert symbols == actual_symbols
+
+
 def test_symbol_clearing(connection):
     symbols = ['AAPL', 'GOOG']
     sub = dx.dxf_create_subscription(cc=connection, event_type='Trade')

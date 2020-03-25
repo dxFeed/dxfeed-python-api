@@ -1,4 +1,5 @@
 # distutils: language = c++
+# cython: always_allow_keywords=True
 from libcpp.deque cimport deque as cppdq
 
 from dxfeed.core.utils.helpers cimport *
@@ -10,7 +11,7 @@ from dxfeed.core.utils.data_class import DequeWithLock as deque_wl
 from datetime import datetime
 import pandas as pd
 from typing import Optional, Union, List
-from cython cimport always_allow_keywords
+from warnings import warn
 
 # for importing variables
 import dxfeed.core.listeners.listener as lis
@@ -247,6 +248,9 @@ def dxf_add_symbols(SubscriptionClass sc, symbols: list):
     if not sc.subscription:
         raise ValueError('Subscription is not valid')
     for idx, sym in enumerate(symbols):
+        if not isinstance(sym, str):
+            warn(f'{sym} has type different from string')
+            continue
         if not clib.dxf_add_symbol(sc.subscription, dxf_const_string_t_from_unicode(sym)):
             process_last_error()
 
@@ -499,7 +503,6 @@ def dxf_get_subscription_event_types(SubscriptionClass sc, return_str: bool=True
 
     return result
 
-@always_allow_keywords(True)
 def dxf_get_symbols(SubscriptionClass sc):
     """
     Retrieves the list of symbols currently added to the subscription.
