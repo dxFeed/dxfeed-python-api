@@ -39,6 +39,14 @@ def test_fail_create_subscription_with_no_connection():
     dx.dxf_create_subscription()
 
 
+@pytest.mark.xfail()
+def test_fail_to_use_subscription_without_connection():
+    connection = dx.dxf_create_connection(ValueStorage.demo_address)
+    sub = dx.dxf_create_subscription(cc=connection, event_type='Trade')
+    dx.dxf_close_connection(connection)
+    dx.dxf_add_symbols(sc=sub, symbols=['AAPL'])
+
+
 @pytest.mark.parametrize('sub_type', ValueStorage.event_types)
 def test_subscription_on_correct_types(connection, sub_type):
     sub = dx.dxf_create_subscription(cc=connection, event_type=sub_type)
