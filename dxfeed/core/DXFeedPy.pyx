@@ -10,7 +10,7 @@ cimport dxfeed.core.listeners.listener as lis
 from dxfeed.core.utils.data_class import DequeWithLock as deque_wl
 from datetime import datetime
 import pandas as pd
-from typing import Optional, Union, List
+from typing import Optional, Union, Iterable
 from warnings import warn
 
 # for importing variables
@@ -64,7 +64,7 @@ cdef class ConnectionClass:
     def __dealloc__(self):
         dxf_close_connection(self)
 
-    cpdef SubscriptionClass make_new_subscription(self, data_len):
+    cpdef SubscriptionClass make_new_subscription(self, data_len: int):
         cdef SubscriptionClass out = SubscriptionClass(data_len)
         out.connection = self.connection
         self.sub_ptr_list.push_back(&out.subscription)  # append pointer to new subscription
@@ -88,7 +88,7 @@ cdef class SubscriptionClass:
     cdef object data
     cdef void *u_data
 
-    def __init__(self, data_len):
+    def __init__(self, data_len: int):
         """
         Parameters
         ----------
@@ -234,7 +234,7 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return sc
 
-def dxf_add_symbols(SubscriptionClass sc, symbols: list):
+def dxf_add_symbols(SubscriptionClass sc, symbols: Iterable[str]):
     """
     Adds symbols to subscription
 
@@ -313,7 +313,7 @@ def dxf_attach_listener(SubscriptionClass sc):
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
 
-def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns: list, data: dict = None):
+def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns: Iterable[str], data: Iterable = None):
     """
     Attaches custom listener
 
@@ -531,7 +531,7 @@ def dxf_get_symbols(SubscriptionClass sc):
 
     return symbols_list
 
-def dxf_remove_symbols(SubscriptionClass sc, symbols: List[str]):
+def dxf_remove_symbols(SubscriptionClass sc, symbols: Iterable[str]):
     """
     Removes several symbols from the subscription
 
