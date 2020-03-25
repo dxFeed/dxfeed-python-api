@@ -30,6 +30,11 @@ def test_connection_address(connection):
 
 
 @pytest.mark.xfail()
+def test_fail_connection_to_wrong_address():
+    dx.dxf_create_connection(address='8.8.8.8')
+
+
+@pytest.mark.xfail()
 def test_fail_create_subscription_with_no_connection():
     dx.dxf_create_subscription()
 
@@ -64,6 +69,16 @@ def test_symbol_deletion(connection):
     actual_symbols = dx.dxf_get_symbols(sc=sub)
     dx.dxf_close_subscription(sub)
     assert ['GOOG'] == actual_symbols
+
+
+def test_symbol_clearing(connection):
+    symbols = ['AAPL', 'GOOG']
+    sub = dx.dxf_create_subscription(cc=connection, event_type='Trade')
+    dx.dxf_add_symbols(sc=sub, symbols=symbols)
+    dx.dxf_clear_symbols(sc=sub)
+    actual_symbols = dx.dxf_get_symbols(sc=sub)
+    dx.dxf_close_subscription(sub)
+    assert actual_symbols == []
 
 
 @pytest.mark.parametrize('sub_type', ValueStorage.event_types)
