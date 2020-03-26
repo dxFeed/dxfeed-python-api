@@ -57,4 +57,4 @@ Documentation
     task html_docs
 
 The upper command starts sphinx documentation building. The files can be found in
-`docs/_build/html` folder
+`docs/_build/html` folder. Automatically zip archive is created in ``docs/_build/` folder.
