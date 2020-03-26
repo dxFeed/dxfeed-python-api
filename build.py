@@ -1,4 +1,5 @@
 from setuptools import setup, Extension, find_packages
+from setuptools.dist import Distribution
 from pathlib import Path
 import platform
 
@@ -44,4 +45,18 @@ def build(setup_kwargs):
                          'dxfeed/dxfeed-c-api/src'],
     })
 
-
+def build_extensions():
+    """
+    Function for building extensions inplace for docs and tests
+    :return:
+    """
+    build_params = {}
+    build(build_params)
+    dist = Distribution(attrs=build_params)
+    build_clib_cmd = dist.get_command_obj('build_clib')
+    build_clib_cmd.ensure_finalized()
+    build_clib_cmd.run()
+    build_ext_cmd = dist.get_command_obj('build_ext')
+    build_ext_cmd.ensure_finalized()
+    build_ext_cmd.inplace = 1
+    build_ext_cmd.run()

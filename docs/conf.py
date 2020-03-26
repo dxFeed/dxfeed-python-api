@@ -1,28 +1,28 @@
 # -*- coding: utf-8 -*-
 
-import os
 import sys
 import toml
+from pathlib import Path
 
-#pyproject = toml.load()
+
+pyproject = toml.load(Path(__file__).parents[1].joinpath('pyproject.toml'))
 # -- Path setup --------------------------------------------------------------
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 
-sys.path.insert(0, os.path.abspath('..'))
-
+sys.path.insert(0, Path(__file__).parents[1])
 # -- Project information -----------------------------------------------------
 
-project = 'dxfeed'
+project = pyproject['tool']['poetry']['name']
 copyright = '2019, dxfeed'
 author = 'dxfeed'
 
 # The short X.Y version
-version = '0.0.1'
+version = pyproject['tool']['poetry']['version']
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = pyproject['tool']['poetry']['version']
 
 
 # -- General configuration ---------------------------------------------------
@@ -74,7 +74,7 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme =  'sphinxdoc'  # 'sphinx_rtd_theme'
+html_theme = 'haiku'  # 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
