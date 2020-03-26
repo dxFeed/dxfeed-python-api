@@ -27,6 +27,9 @@ additional packages:
 * sphinx - for automatic documentation generation
 * pytest - for testing purposes
 
+.. note::
+    All further commands should be execute from the root directory of the project
+
 Build package
 -------------
 
