@@ -12,7 +12,7 @@ pyproject = toml.load(Path(__file__).parents[1].joinpath('pyproject.toml'))
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 
-sys.path.insert(0, Path(__file__).parents[1])
+sys.path.append(Path(__file__).parents[1])
 # -- Project information -----------------------------------------------------
 
 project = pyproject['tool']['poetry']['name']

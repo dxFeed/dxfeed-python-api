@@ -7,3 +7,4 @@ This library provides Python API to dxfeed via C API. The code is written in Pyt
    :maxdepth: 1
 
    self
+   api.rst
