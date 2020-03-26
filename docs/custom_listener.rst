@@ -34,7 +34,7 @@ package**
 Here we will write listener for Trade event type that will store only
 price and ticker
 
-.. code:: ipython3
+.. code:: cython
 
     %%writefile cust.pyx
     from dxfeed.core.listeners.listener cimport *
@@ -77,7 +77,7 @@ price and ticker
 
 **Create setup.py to build the binary file**
 
-.. code:: ipython3
+.. code:: cython
 
     %%writefile setup.py
     from Cython.Build import cythonize
