@@ -3,7 +3,7 @@
 import sys
 import toml
 from pathlib import Path
-import sphinx_rtd_theme
+import corlab_theme
 from pygments.lexers.python import CythonLexer
 from sphinx.highlighting import lexers
 
@@ -51,7 +51,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'corlab_theme'
+html_theme_path = [corlab_theme.get_theme_dir()]
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
