@@ -3,7 +3,6 @@
 import sys
 import toml
 from pathlib import Path
-import corlab_theme
 from pygments.lexers.python import CythonLexer
 from sphinx.highlighting import lexers
 
@@ -51,8 +50,15 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.
-html_theme = 'corlab_theme'
-html_theme_path = [corlab_theme.get_theme_dir()]
+html_theme = 'classic'
+html_theme_options = {
+    'relbarbgcolor': '#967ef7',
+    'body_max_width': '80%',
+    'bgcolor': 'white',
+    'sidebarbgcolor': '#ebe1e1',
+    'sidebartextcolor': 'black',
+    'sidebarlinkcolor': '201f24'
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
