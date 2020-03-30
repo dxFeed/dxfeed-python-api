@@ -12,7 +12,7 @@ pyproject = toml.load(Path(__file__).parents[1].joinpath('pyproject.toml'))
 sys.path.append(Path(__file__).parents[1])
 # -- Project information -----------------------------------------------------
 
-project = pyproject['tool']['poetry']['name']
+project = pyproject['tool']['poetry']['name'] + '-package'
 copyright = '2019, dxfeed'
 author = 'dxfeed'
 
@@ -52,14 +52,14 @@ html_static_path = ['_static']
 html_css_files = ['custom.css']
 
 # The theme to use for HTML and HTML Help pages.
-html_theme = 'classic'
+html_theme = 'alabaster'
 html_theme_options = {
-    'relbarbgcolor': '#967ef7',
+#     'relbarbgcolor': '#967ef7',
     'body_max_width': '80%',
-    'bgcolor': 'white',
-    'sidebarbgcolor': '#ebe1e1',
-    'sidebartextcolor': 'black',
-    'sidebarlinkcolor': '201f24'
+#     'bgcolor': 'white',
+#     'sidebarbgcolor': '#ebe1e1',
+#     'sidebartextcolor': 'black',
+#     'sidebarlinkcolor': '201f24'
 }
 
 # -- Options for HTMLHelp output ---------------------------------------------

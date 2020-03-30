@@ -17,9 +17,11 @@ write his own custom listener in Cython, the instructions could be found here: :
 At this web-site you will find information about basic functionality of the library,
 how to write your custom listener, documentation to all available functions and information for developers.
 
+Table of contents:
+------------------
+
 .. toctree::
    :maxdepth: 1
-   :caption: Table of Contents
 
    self
    installation.rst
