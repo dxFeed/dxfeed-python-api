@@ -55,6 +55,7 @@ html_css_files = ['custom.css']
 html_theme = 'alabaster'
 html_theme_options = {
     'body_max_width': '80%',
+    'show_powered_by': False
 }
 
 # -- Options for HTMLHelp output ---------------------------------------------
