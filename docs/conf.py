@@ -54,12 +54,7 @@ html_css_files = ['custom.css']
 # The theme to use for HTML and HTML Help pages.
 html_theme = 'alabaster'
 html_theme_options = {
-#     'relbarbgcolor': '#967ef7',
     'body_max_width': '80%',
-#     'bgcolor': 'white',
-#     'sidebarbgcolor': '#ebe1e1',
-#     'sidebartextcolor': 'black',
-#     'sidebarlinkcolor': '201f24'
 }
 
 # -- Options for HTMLHelp output ---------------------------------------------
