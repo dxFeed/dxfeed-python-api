@@ -7,7 +7,7 @@ Home
 
 This package provides access to `dxFeed <https://www.dxfeed.com/>`_ streaming data.
 The library is build as a thin wrapper over `dxFeed C-API library <https://github.com/dxFeed/dxfeed-c-api>`_.
-We use `Cython <https://github.com/cython/cython>`_ in this project as it combines flexibility, reliability and
+We use `Cython <https://cython.org/>`_ in this project as it combines flexibility, reliability and
 usability in writing C extensions.
 
 This package already contains basic C-API functions related to creating connections, subscriptions etc.
