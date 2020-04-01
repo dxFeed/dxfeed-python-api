@@ -1,4 +1,5 @@
 # distutils: language = c++
+# cython: always_allow_keywords=True
 from libcpp.deque cimport deque as cppdq
 
 from dxfeed.core.utils.helpers cimport *
@@ -10,6 +11,7 @@ from dxfeed.core.utils.data_class import DequeWithLock as deque_wl
 from datetime import datetime
 import pandas as pd
 from typing import Optional, Union, Iterable
+from warnings import warn
 
 # for importing variables
 import dxfeed.core.listeners.listener as lis
@@ -195,7 +197,7 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
         Variable with connection information
     event_type: str
         Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
-        'SpreadOrder', 'Greeks', 'THEO_PRICE', 'Underlying', 'Series', 'Configuration' or ''
+        'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
     candle_time: str
         String of %Y-%m-%d %H:%M:%S datetime format for retrieving candles. By default set to now
     data_len: int
@@ -208,6 +210,9 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
     """
     if not cc.connection:
         raise ValueError('Connection is not valid')
+    if event_type not in ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+                          'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
+        raise ValueError('Incorrect event type!')
 
     sc = cc.make_new_subscription(data_len=data_len)
     sc.event_type_str = event_type
@@ -243,6 +248,9 @@ def dxf_add_symbols(SubscriptionClass sc, symbols: Iterable[str]):
     if not sc.subscription:
         raise ValueError('Subscription is not valid')
     for idx, sym in enumerate(symbols):
+        if not isinstance(sym, str):
+            warn(f'{sym} has type different from string')
+            continue
         if not clib.dxf_add_symbol(sc.subscription, dxf_const_string_t_from_unicode(sym)):
             process_last_error()
 

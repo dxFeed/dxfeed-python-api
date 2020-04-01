@@ -5,6 +5,7 @@
 build/*
 *.pyd
 
+_build*
 
 *__pycache__
 
