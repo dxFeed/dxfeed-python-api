@@ -50,6 +50,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 html_static_path = ['_static']
 html_css_files = ['custom.css']
+html_js_files = ['custom.js']
 
 # The theme to use for HTML and HTML Help pages.
 html_theme = 'alabaster'
