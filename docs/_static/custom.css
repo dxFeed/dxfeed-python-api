@@ -7,3 +7,6 @@
 .section > dl > dt {
     background-color: #DDE7F7;
 }
+.current.reference.internal {
+    font-weight: bold;
+}
