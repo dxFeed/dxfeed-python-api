@@ -8,9 +8,11 @@ This is the tutorial, how to write custom listener
 Pipeline
 --------
 
-1. Create cython package
-2. Build
-3. Import
+1. :ref:`cython-pack`
+2. :ref:`Build <build>`
+3. :ref:`Import <import>`
+
+.. _cython-pack:
 
 Create cython package
 ---------------------
@@ -96,7 +98,10 @@ price and ticker
 -  Line 4 imports dxfeed to get access to ``get_include`` function,
    which provide paths to .pxd and .h header files
 
-**Build the binary file**
+.. _build:
+
+Build the binary file
+---------------------
 
 .. code:: ipython3
 
@@ -105,6 +110,8 @@ price and ticker
 .. code:: ipython3
 
     !ls
+
+.. _import:
 
 Import
 ------
