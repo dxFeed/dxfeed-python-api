@@ -56,7 +56,8 @@ html_js_files = ['custom.js']
 html_theme = 'alabaster'
 html_theme_options = {
     'body_max_width': '80%',
-    'show_powered_by': False
+    'show_powered_by': False,
+    'sidebar_collapse': True
 }
 
 # -- Options for HTMLHelp output ---------------------------------------------
