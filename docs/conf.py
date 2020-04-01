@@ -12,7 +12,7 @@ pyproject = toml.load(Path(__file__).parents[1].joinpath('pyproject.toml'))
 sys.path.append(Path(__file__).parents[1])
 # -- Project information -----------------------------------------------------
 
-project = pyproject['tool']['poetry']['name'] + '-package'
+project = pyproject['tool']['poetry']['name']
 copyright = '2019, dxfeed'
 author = 'dxfeed'
 
