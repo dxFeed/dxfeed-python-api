@@ -111,7 +111,7 @@ cdef class SubscriptionClass:
 
     def get_data(self):
         """
-        Method returns list with data, specified in event listener
+        Method returns list with data, specified in event listener and returned data will be removed from object buffer
 
         Returns
         -------
