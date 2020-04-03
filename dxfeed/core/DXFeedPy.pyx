@@ -95,7 +95,6 @@ cdef class SubscriptionClass:
         data_len: int
             Sets maximum amount of events, that are kept in Subscription class
         """
-        self.data = {'columns': []}
         self.subscription = NULL
         self.columns = list()
         if data_len > 0:
@@ -111,6 +110,14 @@ cdef class SubscriptionClass:
             self.con_sub_list_ptr[0][self.subscription_order] = NULL
 
     def get_data(self):
+        """
+        Method returns list with data, specified in event listener and returned data will be removed from object buffer
+
+        Returns
+        -------
+        list
+            List with data
+        """
         return self.data.safe_get()
 
     def to_dataframe(self, keep: bool=True):
