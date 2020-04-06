@@ -1,4 +1,4 @@
 [submodule "dxfeed/dxfeed-c-api"]
-	path = dxfeed/dxfeed-c-api
-	url = https://github.com/dxFeed/dxfeed-c-api.git
+    path = dxfeed/dxfeed-c-api
+    url = https://github.com/dxFeed/dxfeed-c-api.git
     branch = master
