@@ -7,6 +7,14 @@ authors = ["Ivan Mishalkin <ivan.mishalkin@devexperts.com>",
 build = "build.py"
 license = "MPL-2.0"
 readme = "README.md"
+classifiers = ["Development Status :: 4 - Beta",
+               "Operating System :: Microsoft :: Windows",
+               "Operating System :: POSIX :: Linux",
+               "Programming Language :: Cython",
+               "Programming Language :: Python :: 3 :: Only",
+               "Topic :: Office/Business :: Financial",
+               "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+               "Natural Language :: English"]
 
 include = ["LICENSE", "dxfeed/**/*.c"]
 exclude = ["dxfeed/dxfeed-c-api/wrappers*",
@@ -15,7 +23,11 @@ exclude = ["dxfeed/dxfeed-c-api/wrappers*",
            "dxfeed/dxfeed-c-api/lib*",
            "dxfeed/dxfeed-c-api/docs*",
            "dxfeed/dxfeed-c-api/.github*"]
-repository = "https://github.com/dxFeed/dxfeed-python-api"
+
+
+[tool.poetry.urls]
+"repository" = "https://github.com/dxFeed/dxfeed-python-api"
+
 
 [tool.poetry.dependencies]
 python = "^3.6"
