@@ -20,19 +20,18 @@ libs = list()
 include_dirs = [str(source_files_directory.parent.joinpath('include')),
                 str(source_files_directory)]
 ### Build dxfeed c library
-# http://svn.python.org/projects/python/branches/pep-0384/Lib/distutils/command/build_clib.py
-dxfeed_c_lib_args = dict()  # args in build_libraries function by link above
+dxfeed_c_lib_args = dict()
 if platform.system() == 'Windows':
     source_files_paths.remove(str(source_files_directory.joinpath('Linux.c')))
     libs.append('ws2_32')
 else:
     source_files_paths.remove(str(source_files_directory.joinpath('Win32.c')))
-dxfeed_c_lib_args.update({'sources': source_files_paths})
+dxfeed_c_lib_args.update({'sources': source_files_paths,
+                          'include_dirs': include_dirs})
 
 if platform.system() == 'Darwin':
-    dxfeed_c_lib_args.update({'macros': [('MACOSX', 'TRUE')],
-                              'include_dirs': include_dirs})
-# Separate dxfeed c api library
+    dxfeed_c_lib_args.update({'macros': [('MACOSX', 'TRUE')]})
+
 dxfeed_c = ('dxfeed_c', dxfeed_c_lib_args)
 
 extensions = [Extension('dxfeed.core.utils.helpers', ['dxfeed/core/utils/helpers.' + ext],
