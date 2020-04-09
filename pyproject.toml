@@ -9,6 +9,7 @@ readme = "README.md"
 classifiers = ["Development Status :: 4 - Beta",
                "Operating System :: Microsoft :: Windows",
                "Operating System :: POSIX :: Linux",
+               "Operating System :: MacOS",
                "Programming Language :: Cython",
                "Programming Language :: Python :: 3 :: Only",
                "Topic :: Office/Business :: Financial",
