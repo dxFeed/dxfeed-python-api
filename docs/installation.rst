@@ -10,11 +10,15 @@ Installation
 
         pip3 install pandas
 
-The easiest way to install dxpyfeed is to use pip
+Install package itself with PyPI
 
 .. code-block:: bash
 
-    pip3 install dxpyfeed-x.x.x.tar.gz
+    pip3 install dxfeed
 
-.. warning::
-    Package is not available on MacOS for now
+or with tar.gz artifact
+
+.. code-block:: bash
+
+    pip3 install dxfeed-x.x.x.tar.gz
+
