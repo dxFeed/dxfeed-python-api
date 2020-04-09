@@ -1,6 +1,13 @@
 # dxfeed package
 
-This library provides Python API to dxfeed via C API. The code is written in Python and Cython.
+This package provides access to [dxFeed](https://www.dxfeed.com/) streaming data.
+The library is build as a thin wrapper over [dxFeed C-API library](https://github.com/dxFeed/dxfeed-c-api).
+We use [Cython](https://cython.org/) in this project as it combines flexibility, reliability and
+usability in writing C extensions.
+
+This package already contains basic C-API functions related to creating connections, subscriptions etc.
+Moreover default listeners (functions responsible for event processing) are ready to use. The user is also able to
+write his own custom listener in Cython
 
 ## Installation
 
@@ -10,10 +17,16 @@ This library provides Python API to dxfeed via C API. The code is written in Pyt
 pip3 install cython pandas
 ```
 
-Install package itself
+Install package itself with PyPI
 
 ```python
-pip3 install dxpyfeed-x.x.x.tar.gz
+pip3 install dxfeed
+```
+
+or with tar.gz artifact
+
+```python
+pip3 install dxfeed-x.x.x.tar.gz
 ``` 
 
 ## Basic usage
