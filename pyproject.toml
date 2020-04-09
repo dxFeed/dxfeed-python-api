@@ -31,7 +31,7 @@ sphinx_rtd_theme = "^0.4.3"
 
 
 [tool.taskipy.tasks]
-clear = "find dxfeed/core/* -type f ( -name '*.c*' -or -name '*.pyd' ) -delete"
+clear = "find dxfeed/core -type f \\( -iname \\*.c -o -iname \\*.cpp -o -iname \\*.pyd -o -iname \\*.so \\) -delete"
 build = "python build.py && poetry build"
 html_docs = "make html -C docs"
 test =  "pytest tests"
