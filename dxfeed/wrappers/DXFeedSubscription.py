@@ -1,4 +1,5 @@
 from dxfeed.core.DXFeedPy import *
+from typing import Iterable
 
 
 class DXFeedSubscription(object):
@@ -7,8 +8,23 @@ class DXFeedSubscription(object):
                                              event_type=event_type,
                                              data_len=data_len)
 
+    @property
+    def event_type(self):
+        return dxf_get_subscription_event_types(self.__sub, return_str=True)
+
+    @property
+    def symbols(self):
+        return dxf_get_symbols(self.__sub)
+
     def add_symbols(self, symbols: Iterable[str]):
         dxf_add_symbols(sc=self.__sub, symbols=symbols)
+        return self
+
+    def remove_symbols(self, symbols: Iterable[str] = [''], remove_all: bool = False):
+        if remove_all:
+            dxf_clear_symbols(self.__sub)
+        else:
+            dxf_remove_symbols(self.__sub, symbols=symbols)
         return self
 
     def close_subscription(self):
@@ -25,8 +41,20 @@ class DXFeedSubscription(object):
     def get_data(self):
         return self.__sub.get_data()
 
-    def to_dataframe(self):
-        return self.__sub.to_dataframe()
+    def to_dataframe(self, keep: bool=True):
+        """
+        Method converts data to the Pandas DataFrame
+
+        Parameters
+        ----------
+        keep: bool
+            When True copies data to dataframe, otherwise pops. Default True
+
+        Returns
+        -------
+        df: pandas DataFrame
+        """
+        return self.__sub.to_dataframe(keep)
 
     def __del__(self):
         self.close_subscription()

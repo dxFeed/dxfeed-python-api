@@ -7,6 +7,14 @@ class DXFeed(object):
         self.__con_address = connection_address
         self.__connection = ConnectionClass()
 
+    @property
+    def connection_status(self):
+        dxf_get_current_connection_status(self.__connection, return_str=True)
+
+    @property
+    def address(self):
+        return dxf_get_current_connected_address(self.__connection)
+
     def connect(self):
         if dxf_get_current_connection_status(self.__connection, return_str=False):
             dxf_close_connection(self.__connection)
