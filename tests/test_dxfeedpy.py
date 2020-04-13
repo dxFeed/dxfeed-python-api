@@ -1,4 +1,4 @@
-import dxfeed as dx
+import dxfeed.core.DXFeedPy as dx
 import pytest
 
 
