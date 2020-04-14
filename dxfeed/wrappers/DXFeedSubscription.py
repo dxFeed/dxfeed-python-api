@@ -28,7 +28,7 @@ class DXFeedSubscription(object):
         return self
 
     def close_subscription(self):
-        dxf_close_connection(sc=self.__sub)
+        dxf_close_subscription(sc=self.__sub)
 
     def attach_listener(self):
         dxf_attach_listener(self.__sub)

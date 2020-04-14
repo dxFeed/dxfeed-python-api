@@ -9,7 +9,7 @@ class DXFeed(object):
 
     @property
     def connection_status(self):
-        dxf_get_current_connection_status(self.__connection, return_str=True)
+        return dxf_get_current_connection_status(self.__connection, return_str=True)
 
     @property
     def address(self):
