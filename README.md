@@ -41,16 +41,16 @@ sub2 = dx.dxf_create_subscription(con, 'Quote')
 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' event types are supported.
 
-**Add tickers you want to get data for**:
-```python
-dx.dxf_add_symbols(sub1, ['AAPL', 'MSFT'])
-dx.dxf_add_symbols(sub2, ['AAPL', 'C'])
-```
-
 **Attach listeners**:
 ```python
 dx.dxf_attach_listener(sub1)
 dx.dxf_attach_listener(sub2)
+```
+
+**Add tickers you want to get data for**:
+```python
+dx.dxf_add_symbols(sub1, ['AAPL', 'MSFT'])
+dx.dxf_add_symbols(sub2, ['AAPL', 'C'])
 ```
 
 `dxfeed` has default listeners for each event type, but you are able to write 
