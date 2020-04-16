@@ -23,29 +23,28 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install package # check correct installation on default machine
+    - name: Install package artifact
+      uses: abatilo/actions-poetry@v1.5.0 # https://github.com/marketplace?type=actions&query=poetry
+        with: install --no-root --no-dev --extras "taskipy"
       run: |
-        python -m pip install --upgrade pip
-        pip install dxfeed
+        task build -f sdist
+        pip install dist/dxfeed*
         pip uninstall dxfeed
     # Run developer tasks
     - uses: actions/checkout@v2
       with:
         submodules: true
-    - uses: abatilo/actions-poetry@v1.5.0 # https://github.com/marketplace?type=actions&query=poetry
-#    - name: Install dependencies
-
+    - name: Install dependencies
+      uses: abatilo/actions-poetry@v1.5.0 # https://github.com/marketplace?type=actions&query=poetry
+        with: install --no-root
+    - name: Run tests
+      run: |
+        task test
+    - name: Generate doc
+      run: |
+        task html_docs
+#       send zip after generation
+#    - name: Publish to PyPI
 #      run: |
-#        python -m pip install --upgrade pip
-#        pip install -r requirements.txt
-#    - name: Lint with flake8
-#      run: |
-#        pip install flake8
-#        # stop the build if there are Python syntax errors or undefined names
-#        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-#        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-#        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-#    - name: Test with pytest
-#      run: |
-#        pip install pytest
-#        pytest
+#        task build
+#        poetry publish -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }}
