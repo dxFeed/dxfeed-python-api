@@ -43,6 +43,7 @@ jobs:
     - name: Generate doc
       run: |
         task html_docs
+      if: matrix.os == 'ubuntu-latest'
 #       send zip after generation
 #    - name: Publish to PyPI
 #      run: |
