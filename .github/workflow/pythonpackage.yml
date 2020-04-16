@@ -19,6 +19,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+    - uses: actions/checkout@v2
+        with:
+          submodules: true
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
@@ -31,9 +34,6 @@ jobs:
         pip install dist/dxfeed*
         pip uninstall dxfeed
     # Run developer tasks
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
     - name: Install dependencies
       uses: abatilo/actions-poetry@v1.5.0 # https://github.com/marketplace?type=actions&query=poetry
         with: install --no-root
