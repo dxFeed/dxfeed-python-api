@@ -10,29 +10,46 @@ on:
     - '*'
 
 jobs:
+  installation:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.5, 3.6, 3.7, 3.8]
+
+      runs-on: ${{ matrix.os }}
+
+      steps:
+        - uses: actions/checkout@v2
+            with:
+              submodules: true
+        - name: Set up Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v1
+          with:
+            python-version: ${{ matrix.python-version }}
+        - name: Install package artifact
+          uses: abatilo/actions-poetry@v1.5.0 # https://github.com/marketplace?type=actions&query=poetry
+            with: install --no-root --no-dev --extras "taskipy"
+          run: |
+            task build -f sdist
+            pip install dist/dxfeed*
+            pip uninstall dxfeed
+
   build:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: [3.5, 3.6, 3.7, 3.8]
 
-    runs-on: ${{ matrix.os }}
+      runs-on: ${{ matrix.os }}
 
-    steps:
-    - uses: actions/checkout@v2
-        with:
-          submodules: true
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install package artifact
-      uses: abatilo/actions-poetry@v1.5.0 # https://github.com/marketplace?type=actions&query=poetry
-        with: install --no-root --no-dev --extras "taskipy"
-      run: |
-        task build -f sdist
-        pip install dist/dxfeed*
-        pip uninstall dxfeed
+      steps:
+        - uses: actions/checkout@v2
+            with:
+              submodules: true
+        - name: Set up Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v1
+          with:
+            python-version: ${{ matrix.python-version }}
     # Run developer tasks
     - name: Install dependencies
       uses: abatilo/actions-poetry@v1.5.0 # https://github.com/marketplace?type=actions&query=poetry
@@ -45,7 +62,28 @@ jobs:
         task html_docs
       if: matrix.os == 'ubuntu-latest'
 #       send zip after generation
-#    - name: Publish to PyPI
-#      run: |
-#        task build
-#        poetry publish -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }}
+
+  publishing:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.7]
+
+      runs-on: ${{ matrix.os }}
+
+      steps:
+        - uses: actions/checkout@v2
+            with:
+              submodules: true
+        - name: Set up Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v1
+          with:
+            python-version: ${{ matrix.python-version }}
+        # Run developer tasks
+        - name: Install dependencies
+          uses: abatilo/actions-poetry@v1.5.0 # https://github.com/marketplace?type=actions&query=poetry
+            with: install --no-root
+        - name: Publish to PyPI
+          run: |
+            task build
+            poetry publish -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }}
