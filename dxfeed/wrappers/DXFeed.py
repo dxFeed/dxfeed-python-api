@@ -6,6 +6,7 @@ class DXFeed(object):
     def __init__(self, connection_address: str = 'demo.dxfeed.com:7300'):
         self.__con_address = connection_address
         self.__connection = ConnectionClass()
+        self.connect()
 
     @property
     def connection_status(self):
@@ -21,12 +22,13 @@ class DXFeed(object):
         self.__connection = dxf_create_connection(self.__con_address)
         return self
 
-    def create_subscription(self, event_type: str, data_len: int = 100000):
+    def create_subscription(self, event_type: str, data_len: int = 100000, date_time: Union[str, datetime] = None):
         con_status = dxf_get_current_connection_status(self.__connection, return_str=False)
         if con_status == 0 or con_status == 2:
             raise ValueError('Connection is not established')
         subscription = DXFeedSubscription(connection=self.__connection,
                                           event_type=event_type,
+                                          date_time=date_time,
                                           data_len=data_len)
         return subscription
 

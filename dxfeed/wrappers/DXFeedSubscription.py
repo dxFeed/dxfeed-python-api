@@ -1,12 +1,32 @@
 from dxfeed.core.DXFeedPy import *
-from typing import Iterable
+from typing import Iterable, Union
+from datetime import datetime
+import pandas as pd
+from warnings import warn
 
 
 class DXFeedSubscription(object):
-    def __init__(self, connection, event_type: str, data_len: int = 100000):
-        self.__sub = dxf_create_subscription(cc=connection,
-                                             event_type=event_type,
-                                             data_len=data_len)
+    def __init__(self, connection, event_type: str, date_time: Union[str, datetime], data_len: int = 100000):
+        if date_time is not None:
+            if isinstance(date_time, str):
+                try:
+                    date_time = datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S.%f')
+                except ValueError:
+                    try:
+                        date_time = pd.to_datetime(date_time, format='%Y-%m-%d %H:%M:%S.%f', infer_datetime_format=True)
+                        warn('date_time argument does not exactly match %Y-%m-%d %H:%M:%S.%f format,' +
+                             ' date was parsed automatically')
+                    except ValueError:
+                        raise ValueError('date_time should use %Y-%m-%d %H:%M:%S.%f format!')
+            timestamp = int(date_time.timestamp() * 1000)
+            self.__sub = dxf_create_subscription_timed(cc=connection,
+                                                       event_type=event_type,
+                                                       time=timestamp,
+                                                       data_len=data_len)
+        else:
+            self.__sub = dxf_create_subscription(cc=connection,
+                                                 event_type=event_type,
+                                                 data_len=data_len)
 
     @property
     def event_type(self):
