@@ -233,6 +233,10 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
     """
     Creates a timed subscription with the specified parameters.
 
+    Notes
+    -----
+    Default limit for 'Candle' event type is 8000 records. The other event types have default limit of 1000 records.
+
     Parameters
     ----------
     cc: ConnectionClass
@@ -256,6 +260,8 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
     if event_type not in ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
                           'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
         raise ValueError('Incorrect event type!')
+    if time < 0 or not isinstance(time, int):
+        raise ValueError('time argument should be non-negative integer!')
 
     sc = cc.make_new_subscription(data_len=data_len)
     sc.event_type_str = event_type

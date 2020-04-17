@@ -55,9 +55,33 @@ def test_subscription_on_correct_types(connection, sub_type):
     assert act_sub_type == sub_type
 
 
+@pytest.mark.parametrize('sub_type', ValueStorage.event_types)
+def test_subscription_timed_on_correct_types(connection, sub_type):
+    sub = dx.dxf_create_subscription_timed(cc=connection, event_type=sub_type, time=0)
+    act_sub_type = dx.dxf_get_subscription_event_types(sc=sub)
+    dx.dxf_close_subscription(sub)
+    assert act_sub_type == sub_type
+
+
 @pytest.mark.xfail()
-def test_subscription_on_incorrect_type(connection):
+def test_subscription_fail_on_incorrect_time_type(connection):
+    dx.dxf_create_subscription_timed(cc=connection, event_type='Trade', time=5.2)
+
+
+@pytest.mark.xfail()
+def test_subscription_fail_on_incorrect_time_value(connection):
+    dx.dxf_create_subscription_timed(cc=connection, event_type='Trade', time=-7)
+
+
+@pytest.mark.xfail()
+def test_subscription_fail_on_incorrect_type(connection):
     dx.dxf_create_subscription(cc=connection, event_type='TradeQuote')
+
+
+@pytest.mark.xfail()
+def test_subscription_fail_on_incorrect_type(connection):
+    dx.dxf_create_subscription_timed(cc=connection, event_type='TradeQuote', time=0)
+
 
 
 def test_symbol_addition(connection):
