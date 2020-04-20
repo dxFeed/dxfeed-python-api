@@ -276,3 +276,26 @@ cdef void configuration_default_listener(int event_type,
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                  config[i].version,
                                  unicode_from_dxf_const_string_t(config[i].object)])
+
+BOOK_COLUMNS = ['Symbol', 'Ask', 'Size', 'Time', 'Bid', 'Size', 'Time']
+cdef void book_default_listener(const dxf_price_level_book_data_ptr_t book_data,
+                                void* user_data) nogil:
+    cdef int counts = max(book_data[0].asks_count, book_data[0].bids_count)
+    cdef int i
+    with gil:
+        py_data = <object> user_data
+        for i in range(counts):
+            if i < book_data[0].asks_count:
+                py_data.safe_append([unicode_from_dxf_const_string_t(book_data[0].symbol),
+                                     book_data[0].asks[i].price,
+                                     book_data[0].asks[i].size,
+                                     book_data[0].asks[i].time,
+                                     None, None, None])
+            if i < book_data[0].bids_count:
+                py_data.safe_append([unicode_from_dxf_const_string_t(book_data[0].symbol),
+                                     None, None, None,
+                                     book_data[0].bids[i].price,
+                                     book_data[0].bids[i].size,
+                                     book_data[0].bids[i].time,
+                                     ])
+
