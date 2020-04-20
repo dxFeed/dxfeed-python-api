@@ -1,6 +1,7 @@
 # distutils: language = c++
 # cython: always_allow_keywords=True
 from libcpp.map cimport map as cppmap
+from libc.stdlib cimport free
 
 from dxfeed.core.utils.helpers cimport *
 from dxfeed.core.utils.helpers import *
@@ -68,6 +69,15 @@ cdef class ConnectionClass:
         out.connection = self.connection
         self.con_users_map[self.con_users] = &out.subscription # append pointer to new subscription
         out.subscription_order = self.con_users  # assign each subscription an index
+        self.con_users += 1
+        out.con_users_map_ptr = &self.con_users_map  # reverse pointer to pointers list
+        return out
+
+    cpdef PriceLevelBookClass make_new_price_level_book(self, data_len: int):
+        cdef PriceLevelBookClass out = PriceLevelBookClass(data_len)
+        out.connection = self.connection
+        self.con_users_map[self.con_users] = &out.book
+        out.book_order_id = self.con_users
         self.con_users += 1
         out.con_users_map_ptr = &self.con_users_map  # reverse pointer to pointers list
         return out
@@ -142,6 +152,32 @@ cdef class SubscriptionClass:
         for column in time_columns:
             df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
         return df
+
+cdef class PriceLevelBookClass:
+    cdef clib.dxf_connection_t connection
+    cdef clib.dxf_price_level_book_t book
+    cdef int book_order_id  # index in list of subscription pointers
+    cdef cppmap[int, void **] *con_users_map_ptr
+    cdef clib.dxf_price_level_book_listener_t book_listener
+    cdef list columns
+    cdef object data
+    cdef void *u_data
+
+    def __init__(self, data_len: int):
+        self.book = NULL
+        self.columns = list()
+        if data_len > 0:
+            self.data = deque_wl(maxlen=data_len)
+        else:
+            self.data = deque_wl()
+        self.u_data = <void *> self.data
+        self.book_listener = NULL
+
+    def __dealloc__(self):
+        if self.book:
+            clib.dxf_close_price_level_book(self.book)
+            self.con_users_map_ptr[0][self.book_order_id] = NULL
+
 
 def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com:7300'):
     """
@@ -273,6 +309,30 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return sc
 
+from libc.stdlib cimport malloc, free
+
+cdef extern from "Python.h":
+    char* PyUnicode_AsUTF8(object unicode)
+
+def dxf_create_price_level_book(ConnectionClass connection, symbol: str, sources: Iterable[str], data_len: int = 100000):
+    if not connection.connection:
+        raise ValueError('Connection is not valid')
+
+    pl_book = connection.make_new_price_level_book(data_len)
+    base_symbol = dxf_const_string_t_from_unicode(symbol)
+
+
+    cdef const char ** base_sources =  <const char **>malloc((len(sources)+1) * sizeof(const char *))
+    for i in range(len(sources)):
+        base_sources[i] = PyUnicode_AsUTF8(sources[i])
+    base_sources[len(sources)+1] = NULL
+    clib.dxf_create_price_level_book(pl_book.connection, base_symbol, base_sources, &pl_book.book)
+    free(base_sources)
+
+    error_code = process_last_error(verbose=False)
+    if error_code:
+        raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
+    return pl_book
 
 def dxf_add_symbols(SubscriptionClass sc, symbols: Iterable[str]):
     """
