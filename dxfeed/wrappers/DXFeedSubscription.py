@@ -14,8 +14,10 @@ class DXFeedSubscription(object):
                 except ValueError:
                     try:
                         date_time = pd.to_datetime(date_time, format='%Y-%m-%d %H:%M:%S.%f', infer_datetime_format=True)
-                        warn('date_time argument does not exactly match %Y-%m-%d %H:%M:%S.%f format,' +
-                             ' date was parsed automatically')
+                        warn_message = 'date_time argument does not exactly match %Y-%m-%d %H:%M:%S.%f format,' + \
+                                       ' date was parsed automatically as ' + \
+                                       date_time.strftime(format="%Y-%m-%d %H:%M:%S.%f")
+                        warn(warn_message)
                     except ValueError:
                         raise ValueError('date_time should use %Y-%m-%d %H:%M:%S.%f format!')
             timestamp = int(date_time.timestamp() * 1000)
