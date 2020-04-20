@@ -1,7 +1,7 @@
 # distutils: language = c++
 # cython: always_allow_keywords=True
 from libcpp.map cimport map as cppmap
-from libc.stdlib cimport free
+from libc.stdlib cimport malloc, free
 
 from dxfeed.core.utils.helpers cimport *
 from dxfeed.core.utils.helpers import *
@@ -17,6 +17,9 @@ from warnings import warn
 # for importing variables
 import dxfeed.core.listeners.listener as lis
 from dxfeed.core.pxd_include.EventData cimport *
+
+cdef extern from "Python.h":
+    char* PyUnicode_AsUTF8(object unicode)
 
 cpdef int process_last_error(verbose: bool=True):
     """
@@ -178,6 +181,41 @@ cdef class PriceLevelBookClass:
             clib.dxf_close_price_level_book(self.book)
             self.con_users_map_ptr[0][self.book_order_id] = NULL
 
+    def get_data(self):
+        """
+        Method returns list with data, specified in event listener and returned data will be removed from object buffer
+
+        Returns
+        -------
+        list
+            List with data
+        """
+        return self.data.safe_get()
+
+    def to_dataframe(self, keep: bool=True):
+        """
+        Method converts data to the Pandas DataFrame
+
+        Parameters
+        ----------
+        keep: bool
+            When True copies data to dataframe, otherwise pops. Default True
+
+        Returns
+        -------
+        df: pandas DataFrame
+        """
+        if keep:
+            df_data = self.data.copy()
+        else:
+            df_data = self.data.safe_get()
+
+        df = pd.DataFrame(df_data, columns=self.columns)
+        time_columns = df.columns[df.columns.str.contains('Time')]
+        for column in time_columns:
+            df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
+        return df
+
 
 def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com:7300'):
     """
@@ -309,11 +347,6 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return sc
 
-from libc.stdlib cimport malloc, free
-
-cdef extern from "Python.h":
-    char* PyUnicode_AsUTF8(object unicode)
-
 def dxf_create_price_level_book(ConnectionClass connection, symbol: str, sources: Iterable[str], data_len: int = 100000):
     if not connection.connection:
         raise ValueError('Connection is not valid')
@@ -353,6 +386,24 @@ def dxf_add_symbols(SubscriptionClass sc, symbols: Iterable[str]):
             continue
         if not clib.dxf_add_symbol(sc.subscription, dxf_const_string_t_from_unicode(sym)):
             process_last_error()
+
+def dxf_attach_price_level_book_listener(PriceLevelBookClass price_level_book):
+    if not price_level_book.book:
+        raise ValueError('Subscription is not valid')
+    price_level_book.book_listener = lis.book_default_listener
+    price_level_book.columns = lis.BOOK_COLUMNS
+
+    if not clib.dxf_attach_price_level_book_listener(price_level_book.book,
+                                                     price_level_book.book_listener,
+                                                     price_level_book.u_data):
+        process_last_error()
+
+def dxf_detach_price_level_book_listener(PriceLevelBookClass price_level_book):
+    if not price_level_book.book:
+        raise ValueError('Subscription is not valid')
+    if not clib.dxf_detach_price_level_book_listener(price_level_book.book,
+                                                     price_level_book.book_listener):
+        process_last_error()
 
 def dxf_attach_listener(SubscriptionClass sc):
     """
