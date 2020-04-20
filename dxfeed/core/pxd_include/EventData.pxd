@@ -456,7 +456,7 @@ cdef extern from "EventData.h":
 #  */
 # /* -------------------------------------------------------------------------- */
 
-    enum dx_subscription_type_t:
+    ctypedef enum dx_subscription_type_t:
         dx_st_begin = 0,
 
         dx_st_ticker = dx_st_begin,
@@ -468,12 +468,12 @@ cdef extern from "EventData.h":
         dx_st_count
 
 
-    struct dx_event_subscription_param_t:
+    ctypedef struct dx_event_subscription_param_t:
         dx_record_id_t record_id,
         dx_subscription_type_t subscription_type
 
 
-    struct dx_event_subscription_param_list_t:
+    ctypedef struct dx_event_subscription_param_list_t:
         dx_event_subscription_param_t* elements,
         size_t size,
         size_t capacity
@@ -493,7 +493,7 @@ cdef extern from "EventData.h":
 # */
 # /* -------------------------------------------------------------------------- */
     #Not sure if it will go
-    struct dxf_snapshot_data_t:
+    ctypedef struct dxf_snapshot_data_t:
         int event_type,
         dxf_string_t symbol,
 
@@ -536,14 +536,14 @@ cdef extern from "EventData.h":
 # *  Price Level data structs
 # */
 # /* -------------------------------------------------------------------------- */
-    struct dxf_price_level_element_t:
+    ctypedef struct dxf_price_level_element_t:
         dxf_double_t price
         dxf_long_t size
         dxf_long_t time
 
 
 
-    struct dxf_price_level_book_data_t:
+    ctypedef struct dxf_price_level_book_data_t:
         dxf_const_string_t symbol
 
         size_t bids_count
