@@ -1,6 +1,5 @@
 # distutils: language = c++
 # cython: always_allow_keywords=True
-from libcpp.deque cimport deque as cppdq
 from libcpp.map cimport map as cppmap
 
 from dxfeed.core.utils.helpers cimport *
@@ -54,14 +53,12 @@ cdef class ConnectionClass:
     Data structure that contains connection
     """
     cdef clib.dxf_connection_t connection
-    # sub_ptr_list contains pointers to all subscriptions related to current connection
-    # cdef cppdq[clib.dxf_subscription_t *] sub_ptr_list
-    cdef cppmap[int, void **] con_users_map
-    # each subscription has its own index in a list
-    cdef int subs_order
+    cdef cppmap[int, void **] con_users_map # contains pointers to all connection users
+    # each user has its own index in a list
+    cdef int con_users
 
     def __init__(self):
-        self.subs_order = 0
+        self.con_users = 0
 
     def __dealloc__(self):
         dxf_close_connection(self)
@@ -69,10 +66,9 @@ cdef class ConnectionClass:
     cpdef SubscriptionClass make_new_subscription(self, data_len: int):
         cdef SubscriptionClass out = SubscriptionClass(data_len)
         out.connection = self.connection
-        # self.sub_ptr_list.push_back(&out.subscription)  # append pointer to new subscription
-        self.con_users_map[self.subs_order] = &out.subscription
-        out.subscription_order = self.subs_order  # assign each subscription an index
-        self.subs_order += 1
+        self.con_users_map[self.con_users] = &out.subscription # append pointer to new subscription
+        out.subscription_order = self.con_users  # assign each subscription an index
+        self.con_users += 1
         out.con_users_map_ptr = &self.con_users_map  # reverse pointer to pointers list
         return out
 
@@ -84,8 +80,7 @@ cdef class SubscriptionClass:
     cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
     cdef int subscription_order  # index in list of subscription pointers
-    # cdef cppdq[clib.dxf_subscription_t *] *con_sub_list_ptr  # pointer to list of subscription pointers
-    cdef cppmap[int, void **] *con_users_map_ptr
+    cdef cppmap[int, void **] *con_users_map_ptr   # pointer to map of connection users' pointers
     cdef dxf_event_listener_t listener
     cdef object event_type_str
     cdef list columns
@@ -147,12 +142,6 @@ cdef class SubscriptionClass:
         for column in time_columns:
             df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
         return df
-
-# cdef class PriceLevelBookClass:
-#     cdef clib.dxf_connection_t connection
-#     cdef int subscription_order  # index in list of subscription pointers
-#     cdef cppdq[clib.dxf_subscription_t *] *con_sub_list_ptr
-
 
 def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com:7300'):
     """
