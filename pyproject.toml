@@ -1,9 +1,8 @@
 [tool.poetry]
 name = "dxfeed"
-version = "0.1.0"
+version = "0.1.1"
 description = "DXFeed Python API via C API"
-authors = ["Ivan Mishalkin <ivan.mishalkin@devexperts.com>",
-           "DxCurrent Team <dxcurrent@devexperts.com>"]
+authors = ["Index Management Team <im@dxfeed.com>"]
 build = "build.py"
 license = "MPL-2.0"
 readme = "README.md"
