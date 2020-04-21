@@ -86,12 +86,23 @@ cdef class ConnectionClass:
         return out
 
 cdef class ConnectionUserClass:
+    """
+    C-level class, that contains common for dxf_connection_t users C-level fields, e.g. connection, data field pointer,
+    etc
+    """
     cdef clib.dxf_connection_t connection
+    cdef cppmap[int, void **] *con_users_map_ptr   # pointer to map of connection users' pointers
     cdef list columns
     cdef object data
     cdef void *u_data
 
     def __init__(self, data_len: int):
+        """
+        Parameters
+        ----------
+        data_len: int
+            Sets maximum amount of events, that are kept in Subscription class
+        """
         self.columns = list()
         if data_len > 0:
             self.data = deque_wl(maxlen=data_len)
@@ -140,17 +151,10 @@ cdef class SubscriptionClass(ConnectionUserClass):
     """
     cdef clib.dxf_subscription_t subscription
     cdef int subscription_order  # index in list of subscription pointers
-    cdef cppmap[int, void **] *con_users_map_ptr   # pointer to map of connection users' pointers
     cdef dxf_event_listener_t listener
     cdef object event_type_str
 
     def __init__(self, data_len: int):
-        """
-        Parameters
-        ----------
-        data_len: int
-            Sets maximum amount of events, that are kept in Subscription class
-        """
         super().__init__(data_len)
         self.subscription = NULL
         self.listener = NULL
@@ -161,9 +165,11 @@ cdef class SubscriptionClass(ConnectionUserClass):
             self.con_users_map_ptr[0][self.subscription_order] = NULL
 
 cdef class PriceLevelBookClass(ConnectionUserClass):
+    """
+    Class responsible for price level book. Contains related fields
+    """
     cdef clib.dxf_price_level_book_t book
     cdef int book_order_id  # index in list of subscription pointers
-    cdef cppmap[int, void **] *con_users_map_ptr
     cdef clib.dxf_price_level_book_listener_t book_listener
 
 
@@ -308,7 +314,27 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return sc
 
-def dxf_create_price_level_book(ConnectionClass connection, symbol: str, sources: Iterable[str], data_len: int = 100000):
+def dxf_create_price_level_book(ConnectionClass connection, symbol: str,
+                                sources: Iterable[str], data_len: int = 100000):
+    """
+    Creates Price Level book with the specified parameters.
+
+    Parameters
+    ----------
+    connection: ConnectionClass
+        ConnectionClass with initialized connection
+    symbol: str
+        Base symbol to use
+    sources: list
+        Order sources for Order. Each element can be one of following: "BYX", "BZX", "DEA", "DEX", "ISE", "IST", "NTV".
+    data_len: int
+        Amount of events that will be stored in returned object's field as deque
+
+    Returns
+    -------
+    pl_book: PriceLevelBookClass
+        Object with all needed fields initialized
+    """
     if not connection.connection:
         raise ValueError('Connection is not valid')
 
@@ -349,6 +375,14 @@ def dxf_add_symbols(SubscriptionClass sc, symbols: Iterable[str]):
             process_last_error()
 
 def dxf_attach_price_level_book_listener(PriceLevelBookClass price_level_book):
+    """
+    Function attaches default listener.
+
+    Parameters
+    ----------
+    price_level_book: PriceLevelBookClass
+        PriceLevelBookClass initialized with dxf_create_price_level_book
+    """
     if not price_level_book.book:
         raise ValueError('Subscription is not valid')
     price_level_book.book_listener = lis.book_default_listener
@@ -360,8 +394,16 @@ def dxf_attach_price_level_book_listener(PriceLevelBookClass price_level_book):
         process_last_error()
 
 def dxf_detach_price_level_book_listener(PriceLevelBookClass price_level_book):
+    """
+    Function detaches listener.
+
+    Parameters
+    ----------
+    price_level_book: PriceLevelBookClass
+        PriceLevelBookClass with attached listener
+    """
     if not price_level_book.book:
-        raise ValueError('Subscription is not valid')
+        raise ValueError('PriceLevelBookClass is not valid')
     if not clib.dxf_detach_price_level_book_listener(price_level_book.book,
                                                      price_level_book.book_listener):
         process_last_error()
