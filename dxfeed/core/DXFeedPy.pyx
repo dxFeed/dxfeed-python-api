@@ -85,20 +85,64 @@ cdef class ConnectionClass:
         out.con_users_map_ptr = &self.con_users_map  # reverse pointer to pointers list
         return out
 
+cdef class ConnectionUserClass:
+    cdef clib.dxf_connection_t connection
+    cdef list columns
+    cdef object data
+    cdef void *u_data
 
-cdef class SubscriptionClass:
+    def __init__(self, data_len: int):
+        self.columns = list()
+        if data_len > 0:
+            self.data = deque_wl(maxlen=data_len)
+        else:
+            self.data = deque_wl()
+        self.u_data = <void *> self.data
+
+    def get_data(self):
+        """
+        Method returns list with data, specified in event listener and returned data will be removed from object buffer
+
+        Returns
+        -------
+        list
+            List with data
+        """
+        return self.data.safe_get()
+
+    def to_dataframe(self, keep: bool=True):
+        """
+        Method converts data to the Pandas DataFrame
+
+        Parameters
+        ----------
+        keep: bool
+            When True copies data to dataframe, otherwise pops. Default True
+
+        Returns
+        -------
+        df: pandas DataFrame
+        """
+        if keep:
+            df_data = self.data.copy()
+        else:
+            df_data = self.data.safe_get()
+
+        df = pd.DataFrame(df_data, columns=self.columns)
+        time_columns = df.columns[df.columns.str.contains('Time')]
+        for column in time_columns:
+            df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
+        return df
+
+cdef class SubscriptionClass(ConnectionUserClass):
     """
     Data structure that contains subscription and related fields
     """
-    cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
     cdef int subscription_order  # index in list of subscription pointers
     cdef cppmap[int, void **] *con_users_map_ptr   # pointer to map of connection users' pointers
     cdef dxf_event_listener_t listener
     cdef object event_type_str
-    cdef list columns
-    cdef object data
-    cdef void *u_data
 
     def __init__(self, data_len: int):
         """
@@ -107,13 +151,8 @@ cdef class SubscriptionClass:
         data_len: int
             Sets maximum amount of events, that are kept in Subscription class
         """
+        super().__init__(data_len)
         self.subscription = NULL
-        self.columns = list()
-        if data_len > 0:
-            self.data = deque_wl(maxlen=data_len)
-        else:
-            self.data = deque_wl()
-        self.u_data = <void *> self.data
         self.listener = NULL
 
     def __dealloc__(self):
@@ -121,100 +160,22 @@ cdef class SubscriptionClass:
             clib.dxf_close_subscription(self.subscription)
             self.con_users_map_ptr[0][self.subscription_order] = NULL
 
-    def get_data(self):
-        """
-        Method returns list with data, specified in event listener and returned data will be removed from object buffer
-
-        Returns
-        -------
-        list
-            List with data
-        """
-        return self.data.safe_get()
-
-    def to_dataframe(self, keep: bool=True):
-        """
-        Method converts data to the Pandas DataFrame
-
-        Parameters
-        ----------
-        keep: bool
-            When True copies data to dataframe, otherwise pops. Default True
-
-        Returns
-        -------
-        df: pandas DataFrame
-        """
-        if keep:
-            df_data = self.data.copy()
-        else:
-            df_data = self.data.safe_get()
-
-        df = pd.DataFrame(df_data, columns=self.columns)
-        time_columns = df.columns[df.columns.str.contains('Time')]
-        for column in time_columns:
-            df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
-        return df
-
-cdef class PriceLevelBookClass:
-    cdef clib.dxf_connection_t connection
+cdef class PriceLevelBookClass(ConnectionUserClass):
     cdef clib.dxf_price_level_book_t book
     cdef int book_order_id  # index in list of subscription pointers
     cdef cppmap[int, void **] *con_users_map_ptr
     cdef clib.dxf_price_level_book_listener_t book_listener
-    cdef list columns
-    cdef object data
-    cdef void *u_data
+
 
     def __init__(self, data_len: int):
+        super().__init__(data_len)
         self.book = NULL
-        self.columns = list()
-        if data_len > 0:
-            self.data = deque_wl(maxlen=data_len)
-        else:
-            self.data = deque_wl()
-        self.u_data = <void *> self.data
         self.book_listener = NULL
 
     def __dealloc__(self):
         if self.book:
             clib.dxf_close_price_level_book(self.book)
             self.con_users_map_ptr[0][self.book_order_id] = NULL
-
-    def get_data(self):
-        """
-        Method returns list with data, specified in event listener and returned data will be removed from object buffer
-
-        Returns
-        -------
-        list
-            List with data
-        """
-        return self.data.safe_get()
-
-    def to_dataframe(self, keep: bool=True):
-        """
-        Method converts data to the Pandas DataFrame
-
-        Parameters
-        ----------
-        keep: bool
-            When True copies data to dataframe, otherwise pops. Default True
-
-        Returns
-        -------
-        df: pandas DataFrame
-        """
-        if keep:
-            df_data = self.data.copy()
-        else:
-            df_data = self.data.safe_get()
-
-        df = pd.DataFrame(df_data, columns=self.columns)
-        time_columns = df.columns[df.columns.str.contains('Time')]
-        for column in time_columns:
-            df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
-        return df
 
 
 def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com:7300'):
