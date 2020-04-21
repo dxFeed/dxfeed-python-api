@@ -4,16 +4,16 @@ This library provides Python API to dxfeed via C API. The code is written in Pyt
 
 ## Installation
 
-**Requirements:** python >3.6, cython, pandas
+**Requirements:** python >3.6, pandas
 
 ```python
-pip3 install cython pandas
+pip3 install pandas
 ```
 
-Install package itself
+Install package via PyPI
 
 ```python
-pip3 install dxpyfeed-x.x.x.tar.gz
+pip3 install dxfeed
 ``` 
 
 ## Basic usage
