@@ -9,7 +9,7 @@ from sphinx.highlighting import lexers
 pyproject = toml.load(Path(__file__).parents[1].joinpath('pyproject.toml'))
 # -- Path setup --------------------------------------------------------------
 
-sys.path.append(Path(__file__).parents[1])
+sys.path.append(str(Path(__file__).parents[1]))
 # -- Project information -----------------------------------------------------
 
 project = pyproject['tool']['poetry']['name']
