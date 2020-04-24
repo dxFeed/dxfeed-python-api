@@ -14,7 +14,8 @@ else:
     ext = ext_pp = 'pyx'
 
 # Get all dxfeed c api c files to be compiled into separate lib
-source_files_directory = Path(__file__).resolve().parent.joinpath('dxfeed', 'dxfeed-c-api', 'src')
+root_path = Path(__file__).resolve().parent
+source_files_directory = root_path.joinpath('dxfeed', 'dxfeed-c-api', 'src')
 source_files_paths = [str(path) for path in source_files_directory.glob('*.c')]
 libs = list()
 if platform.system() == 'Windows':
@@ -27,9 +28,12 @@ else:
 dxfeed_c = ('dxfeed_c', {'sources': source_files_paths,
                          'libraries': libs})
 
-extensions = [Extension('dxfeed.core.utils.helpers', ['dxfeed/core/utils/helpers.' + ext]),
-              Extension('dxfeed.core.listeners.listener', ['dxfeed/core/listeners/listener.' + ext]),
-              Extension('dxfeed.core.DXFeedPy', ['dxfeed/core/DXFeedPy.' + ext_pp], libraries=libs)]
+extensions = [Extension('dxfeed.core.utils.helpers',
+                        [str(root_path.joinpath('dxfeed', 'core', 'utils', f'helpers.{ext}'))]),
+              Extension('dxfeed.core.listeners.listener',
+                        [str(root_path.joinpath('dxfeed', 'core', 'listeners', f'listener.{ext}'))]),
+              Extension('dxfeed.core.DXFeedPy',
+                        [str(root_path.joinpath('dxfeed', 'core', f'DXFeedPy.{ext_pp}'))], libraries=libs)]
 
 if use_cython:
     extensions = cythonize(extensions, language_level=3)
@@ -41,8 +45,8 @@ def build(setup_kwargs):
         'zip_safe': False,
         'libraries': [dxfeed_c],
         'packages': find_packages(),
-        'include_dirs': ['dxfeed/dxfeed-c-api/include',
-                         'dxfeed/dxfeed-c-api/src'],
+        'include_dirs': [str(root_path.joinpath('dxfeed', 'dxfeed-c-api', 'include')),
+                         str(source_files_directory)],
     })
 
 def build_extensions():

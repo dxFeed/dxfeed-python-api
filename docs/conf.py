@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 import toml
 from pathlib import Path
 from pygments.lexers.python import CythonLexer
@@ -10,6 +11,7 @@ pyproject = toml.load(Path(__file__).parents[1].joinpath('pyproject.toml'))
 # -- Path setup --------------------------------------------------------------
 
 sys.path.append(str(Path(__file__).parents[1]))
+os.system('cd ..; python -c "from build import *; build_extensions()"')
 # -- Project information -----------------------------------------------------
 
 project = pyproject['tool']['poetry']['name']
