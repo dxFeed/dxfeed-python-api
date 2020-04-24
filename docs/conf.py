@@ -11,7 +11,22 @@ pyproject = toml.load(Path(__file__).parents[1].joinpath('pyproject.toml'))
 # -- Path setup --------------------------------------------------------------
 
 sys.path.append(str(Path(__file__).parents[1]))
-os.system('cd ..; python -c "from build import *; build_extensions()"')
+# -- Create setup.py for readthedocs
+setup_file_contents = """
+from distutils.core import setup
+from build import *
+
+global setup_kwargs
+
+setup_kwargs = {}
+
+build(setup_kwargs)
+setup(**setup_kwargs)
+"""
+setup_file_path = str(Path(__file__).parents[1].joinpath('setup.py'))
+with open(setup_file_path, 'w') as f:
+    f.write(setup_file_contents)
+# os.system('cd ..; python -c "from build import *; build_extensions()"')
 # -- Project information -----------------------------------------------------
 
 project = pyproject['tool']['poetry']['name']
