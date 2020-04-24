@@ -1,4 +1,4 @@
-from setuptools import setup, Extension, find_packages
+from setuptools import Extension, find_packages
 from setuptools.dist import Distribution
 from pathlib import Path
 import platform
