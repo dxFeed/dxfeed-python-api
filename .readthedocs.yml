@@ -14,9 +14,9 @@ python:
   install:
     - requirements: docs/requirements.txt
     - method: pip
-        path: .
-        extra_requirements:
-          - docs
+      path: .
+      extra_requirements:
+        - docs
 
 submodules:
   include: all
