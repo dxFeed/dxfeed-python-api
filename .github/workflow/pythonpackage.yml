@@ -40,7 +40,7 @@ jobs:
       shell: bash
     - name: Install package artifact
       run: |
-        pip install dist/cyrtd*
+        pip install dist/dxfeed*
         pip uninstall dxfeed
       shell: bash
   build:
