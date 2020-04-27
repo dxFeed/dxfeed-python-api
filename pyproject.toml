@@ -9,6 +9,7 @@ readme = "README.md"
 classifiers = ["Development Status :: 4 - Beta",
                "Operating System :: Microsoft :: Windows",
                "Operating System :: POSIX :: Linux",
+               "Operating System :: MacOS",
                "Programming Language :: Cython",
                "Programming Language :: Python :: 3 :: Only",
                "Topic :: Office/Business :: Financial",
@@ -24,7 +25,7 @@ exclude = ["dxfeed/dxfeed-c-api/wrappers*",
            "dxfeed/dxfeed-c-api/.github*"]
 
 [tool.poetry.urls]
-"Repository" = "https://github.com/dxFeed/dxfeed-python-api"
+"Source code" = "https://github.com/dxFeed/dxfeed-python-api"
 "Documentation" = "https://docs.dxfeed.com/python/index.html"
 
 [tool.poetry.dependencies]
@@ -41,7 +42,7 @@ sphinx_rtd_theme = "^0.4.3"
 
 
 [tool.taskipy.tasks]
-clear = "find dxfeed/core/* -type f ( -name '*.c*' -or -name '*.pyd' ) -delete"
+clear = "find dxfeed/core -type f \\( -iname \\*.c -o -iname \\*.cpp -o -iname \\*.pyd -o -iname \\*.so \\) -delete"
 build = "python build.py && poetry build"
 html_docs = "make html -C docs"
 test =  "pytest tests"
