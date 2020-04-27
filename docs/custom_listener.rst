@@ -127,19 +127,19 @@ You can either import extension built on previous step or install your extension
 
     con = dx.dxf_create_connection()
     sub = dx.dxf_create_subscription(con, 'Trade')
-    dx.dxf_add_symbols(sub, ['AAPL', 'MSFT'])
 
 Attach custom listener, specifying the columns
 
 .. code:: ipython3
 
     dx.dxf_attach_custom_listener(sub, cust.tc, ['Symbol', 'Price'])
+    dx.dxf_add_symbols(sub, ['AAPL', 'MSFT'])
 
 After some time you will get the data.
 
 .. code:: ipython3
 
-    sub.gat_data()
+    sub.get_data()
 
 .. code:: ipython3
 

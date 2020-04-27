@@ -11,22 +11,16 @@ write his own custom listener in Cython
 
 ## Installation
 
-**Requirements:** python >3.6, cython, pandas
+**Requirements:** python >3.6, pandas
 
 ```python
-pip3 install cython pandas
+pip3 install pandas
 ```
 
-Install package itself with PyPI
+Install package via PyPI
 
 ```python
 pip3 install dxfeed
-```
-
-or with tar.gz artifact
-
-```python
-pip3 install dxfeed-x.x.x.tar.gz
 ``` 
 
 ## Basic usage
@@ -54,16 +48,16 @@ sub2 = dx.dxf_create_subscription(con, 'Quote')
 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' event types are supported.
 
-**Add tickers you want to get data for**:
-```python
-dx.dxf_add_symbols(sub1, ['AAPL', 'MSFT'])
-dx.dxf_add_symbols(sub2, ['AAPL', 'C'])
-```
-
 **Attach listeners**:
 ```python
 dx.dxf_attach_listener(sub1)
 dx.dxf_attach_listener(sub2)
+```
+
+**Add tickers you want to get data for**:
+```python
+dx.dxf_add_symbols(sub1, ['AAPL', 'MSFT'])
+dx.dxf_add_symbols(sub2, ['AAPL', 'C'])
 ```
 
 `dxfeed` has default listeners for each event type, but you are able to write 

@@ -1,0 +1,80 @@
+# This workflow will check package installation and runs tests
+# On Ubuntu, Windows and MacOS
+# Triggered by push to master
+
+name: Test package
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  installation:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.6, 3.7, 3.8]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install poetry
+      run: |
+        pip install poetry
+      shell: bash
+    - name: Set poetry env
+      run: |
+        poetry config virtualenvs.create false
+        poetry install --no-root --no-dev
+        pip install taskipy cython
+        task build -f sdist
+        pip uninstall --yes taskipy cython
+      shell: bash
+    - name: Install package artifact
+      run: |
+        pip install dist/dxfeed*
+        pip uninstall dxfeed
+      shell: bash
+  build:
+    needs: installation
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.6, 3.7, 3.8]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install poetry
+      run: |
+        pip install poetry
+      shell: bash
+    - name: Set poetry env
+      run: |
+        poetry config virtualenvs.create false
+        poetry install --no-root
+      shell: bash
+    - name: Run tests
+      run: |
+        task test
+      shell: bash
+    - name: Generate doc
+      run: |
+        task html_docs
+      shell: bash
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.7
