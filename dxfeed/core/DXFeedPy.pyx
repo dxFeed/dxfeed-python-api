@@ -393,6 +393,7 @@ def dxf_close_subscription(SubscriptionClass sc):
     if sc.subscription:
         clib.dxf_close_subscription(sc.subscription)
         sc.subscription = NULL
+        sc.con_sub_list_ptr[0][sc.subscription_order] = NULL
 
 def dxf_get_current_connection_status(ConnectionClass cc, return_str: bool=True):
     """
