@@ -23,13 +23,6 @@ Install package via PyPI
 pip3 install dxfeed
 ``` 
 
----
-**NOTE**
-
-MacOS is not supported yet
-
----
-
 ## Basic usage
 
 All the functions in C API have similar ones in Python with the same name. Not all arguments are
