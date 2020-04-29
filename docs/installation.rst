@@ -16,9 +16,3 @@ Install package itself with PyPI
 
     pip3 install dxfeed
 
-or with tar.gz artifact
-
-.. code-block:: bash
-
-    pip3 install dxfeed-x.x.x.tar.gz
-

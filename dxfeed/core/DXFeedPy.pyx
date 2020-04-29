@@ -1,7 +1,6 @@
 # distutils: language = c++
 # cython: always_allow_keywords=True
-from libcpp.map cimport map as cppmap
-from libc.stdlib cimport malloc, free
+from libcpp.deque cimport deque as cppdq
 
 from dxfeed.core.utils.helpers cimport *
 from dxfeed.core.utils.helpers import *
@@ -17,9 +16,6 @@ from warnings import warn
 # for importing variables
 import dxfeed.core.listeners.listener as lis
 from dxfeed.core.pxd_include.EventData cimport *
-
-cdef extern from "Python.h":
-    char* PyUnicode_AsUTF8(object unicode)
 
 cpdef int process_last_error(verbose: bool=True):
     """
@@ -57,12 +53,13 @@ cdef class ConnectionClass:
     Data structure that contains connection
     """
     cdef clib.dxf_connection_t connection
-    cdef cppmap[int, void **] con_users_map # contains pointers to all connection users
-    # each user has its own index in a list
-    cdef int con_users
+    # sub_ptr_list contains pointers to all subscriptions related to current connection
+    cdef cppdq[clib.dxf_subscription_t *] sub_ptr_list
+    # each subscription has its own index in a list
+    cdef int subs_order
 
     def __init__(self):
-        self.con_users = 0
+        self.subs_order = 0
 
     def __dealloc__(self):
         dxf_close_connection(self)
@@ -70,28 +67,23 @@ cdef class ConnectionClass:
     cpdef SubscriptionClass make_new_subscription(self, data_len: int):
         cdef SubscriptionClass out = SubscriptionClass(data_len)
         out.connection = self.connection
-        self.con_users_map[self.con_users] = &out.subscription # append pointer to new subscription
-        out.subscription_order = self.con_users  # assign each subscription an index
-        self.con_users += 1
-        out.con_users_map_ptr = &self.con_users_map  # reverse pointer to pointers list
+        self.sub_ptr_list.push_back(&out.subscription)  # append pointer to new subscription
+        out.subscription_order = self.subs_order  # assign each subscription an index
+        self.subs_order += 1
+        out.con_sub_list_ptr = &self.sub_ptr_list  # reverse pointer to pointers list
         return out
 
-    cpdef PriceLevelBookClass make_new_price_level_book(self, data_len: int):
-        cdef PriceLevelBookClass out = PriceLevelBookClass(data_len)
-        out.connection = self.connection
-        self.con_users_map[self.con_users] = &out.book
-        out.book_order_id = self.con_users
-        self.con_users += 1
-        out.con_users_map_ptr = &self.con_users_map  # reverse pointer to pointers list
-        return out
 
-cdef class ConnectionUserClass:
+cdef class SubscriptionClass:
     """
-    C-level class, that contains common for dxf_connection_t users C-level fields, e.g. connection, data field pointer,
-    etc
+    Data structure that contains subscription and related fields
     """
     cdef clib.dxf_connection_t connection
-    cdef cppmap[int, void **] *con_users_map_ptr   # pointer to map of connection users' pointers
+    cdef clib.dxf_subscription_t subscription
+    cdef int subscription_order  # index in list of subscription pointers
+    cdef cppdq[clib.dxf_subscription_t *] *con_sub_list_ptr  # pointer to list of subscription pointers
+    cdef dxf_event_listener_t listener
+    cdef object event_type_str
     cdef list columns
     cdef object data
     cdef void *u_data
@@ -103,12 +95,19 @@ cdef class ConnectionUserClass:
         data_len: int
             Sets maximum amount of events, that are kept in Subscription class
         """
+        self.subscription = NULL
         self.columns = list()
         if data_len > 0:
             self.data = deque_wl(maxlen=data_len)
         else:
             self.data = deque_wl()
         self.u_data = <void *> self.data
+        self.listener = NULL
+
+    def __dealloc__(self):
+        if self.subscription:  # if connection is not closed
+            clib.dxf_close_subscription(self.subscription)
+            self.con_sub_list_ptr[0][self.subscription_order] = NULL
 
     def get_data(self):
         """
@@ -144,45 +143,6 @@ cdef class ConnectionUserClass:
         for column in time_columns:
             df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
         return df
-
-cdef class SubscriptionClass(ConnectionUserClass):
-    """
-    Data structure that contains subscription and related fields
-    """
-    cdef clib.dxf_subscription_t subscription
-    cdef int subscription_order  # index in list of subscription pointers
-    cdef dxf_event_listener_t listener
-    cdef object event_type_str
-
-    def __init__(self, data_len: int):
-        super().__init__(data_len)
-        self.subscription = NULL
-        self.listener = NULL
-
-    def __dealloc__(self):
-        if self.subscription:  # if connection is not closed
-            clib.dxf_close_subscription(self.subscription)
-            self.con_users_map_ptr[0][self.subscription_order] = NULL
-
-cdef class PriceLevelBookClass(ConnectionUserClass):
-    """
-    Class responsible for price level book. Contains related fields
-    """
-    cdef clib.dxf_price_level_book_t book
-    cdef int book_order_id  # index in list of subscription pointers
-    cdef clib.dxf_price_level_book_listener_t book_listener
-
-
-    def __init__(self, data_len: int):
-        super().__init__(data_len)
-        self.book = NULL
-        self.book_listener = NULL
-
-    def __dealloc__(self):
-        if self.book:
-            clib.dxf_close_price_level_book(self.book)
-            self.con_users_map_ptr[0][self.book_order_id] = NULL
-
 
 def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com:7300'):
     """
@@ -233,7 +193,8 @@ def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int = 100000):
+def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str] = None,
+                            data_len: int = 100000):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass
 
@@ -244,6 +205,8 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int =
     event_type: str
         Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
         'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
+    candle_time: str
+        String of %Y-%m-%d %H:%M:%S datetime format for retrieving candles. By default set to now
     data_len: int
         Sets maximum amount of events, that are kept in Subscription class
 
@@ -262,97 +225,21 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int =
     sc.event_type_str = event_type
     et_type_int = event_type_convert(event_type)
 
-    clib.dxf_create_subscription(sc.connection, et_type_int, &sc.subscription)
+    try:
+        candle_time = datetime.strptime(candle_time, '%Y-%m-%d %H:%M:%S') if candle_time else datetime.utcnow()
+        timestamp = int((candle_time - datetime(1970, 1, 1)).total_seconds()) * 1000 - 5000
+    except ValueError:
+        raise Exception("Inapropriate date format, should be %Y-%m-%d %H:%M:%S")
+
+    if event_type == 'Candle':
+        clib.dxf_create_subscription_timed(sc.connection, et_type_int, timestamp, &sc.subscription)
+    else:
+        clib.dxf_create_subscription(sc.connection, et_type_int, &sc.subscription)
 
     error_code = process_last_error(verbose=False)
     if error_code:
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return sc
-
-def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int,  data_len: int = 100000):
-    """
-    Creates a timed subscription with the specified parameters.
-
-    Notes
-    -----
-    Default limit for 'Candle' event type is 8000 records. The other event types have default limit of 1000 records.
-
-    Parameters
-    ----------
-    cc: ConnectionClass
-        Variable with connection information
-    event_type: str
-        Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
-        'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
-    time: int
-        UTC time in the past (unix time in milliseconds)
-    data_len: int
-        Sets maximum amount of events, that are kept in Subscription class
-
-
-    Returns
-    -------
-    sc: SubscriptionClass
-        Cython SubscriptionClass with information about subscription
-    """
-    if not cc.connection:
-        raise ValueError('Connection is not valid')
-    if event_type not in ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
-                          'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
-        raise ValueError('Incorrect event type!')
-    if time < 0 or not isinstance(time, int):
-        raise ValueError('time argument should be non-negative integer!')
-
-    sc = cc.make_new_subscription(data_len=data_len)
-    sc.event_type_str = event_type
-    et_type_int = event_type_convert(event_type)
-
-    clib.dxf_create_subscription_timed(sc.connection, et_type_int, time, &sc.subscription)
-
-    error_code = process_last_error(verbose=False)
-    if error_code:
-        raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
-    return sc
-
-def dxf_create_price_level_book(ConnectionClass connection, symbol: str,
-                                sources: Iterable[str], data_len: int = 100000):
-    """
-    Creates Price Level book with the specified parameters.
-
-    Parameters
-    ----------
-    connection: ConnectionClass
-        ConnectionClass with initialized connection
-    symbol: str
-        Base symbol to use
-    sources: list
-        Order sources for Order. Each element can be one of following: "BYX", "BZX", "DEA", "DEX", "ISE", "IST", "NTV".
-    data_len: int
-        Amount of events that will be stored in returned object's field as deque
-
-    Returns
-    -------
-    pl_book: PriceLevelBookClass
-        Object with all needed fields initialized
-    """
-    if not connection.connection:
-        raise ValueError('Connection is not valid')
-
-    pl_book = connection.make_new_price_level_book(data_len)
-    base_symbol = dxf_const_string_t_from_unicode(symbol)
-
-
-    cdef const char ** base_sources =  <const char **>malloc((len(sources)+1) * sizeof(const char *))
-    for i in range(len(sources)):
-        base_sources[i] = PyUnicode_AsUTF8(sources[i])
-    base_sources[len(sources)+1] = NULL
-    clib.dxf_create_price_level_book(pl_book.connection, base_symbol, base_sources, &pl_book.book)
-    free(base_sources)
-
-    error_code = process_last_error(verbose=False)
-    if error_code:
-        raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
-    return pl_book
 
 def dxf_add_symbols(SubscriptionClass sc, symbols: Iterable[str]):
     """
@@ -373,40 +260,6 @@ def dxf_add_symbols(SubscriptionClass sc, symbols: Iterable[str]):
             continue
         if not clib.dxf_add_symbol(sc.subscription, dxf_const_string_t_from_unicode(sym)):
             process_last_error()
-
-def dxf_attach_price_level_book_listener(PriceLevelBookClass price_level_book):
-    """
-    Function attaches default listener.
-
-    Parameters
-    ----------
-    price_level_book: PriceLevelBookClass
-        PriceLevelBookClass initialized with dxf_create_price_level_book
-    """
-    if not price_level_book.book:
-        raise ValueError('Subscription is not valid')
-    price_level_book.book_listener = lis.book_default_listener
-    price_level_book.columns = lis.BOOK_COLUMNS
-
-    if not clib.dxf_attach_price_level_book_listener(price_level_book.book,
-                                                     price_level_book.book_listener,
-                                                     price_level_book.u_data):
-        process_last_error()
-
-def dxf_detach_price_level_book_listener(PriceLevelBookClass price_level_book):
-    """
-    Function detaches listener.
-
-    Parameters
-    ----------
-    price_level_book: PriceLevelBookClass
-        PriceLevelBookClass with attached listener
-    """
-    if not price_level_book.book:
-        raise ValueError('PriceLevelBookClass is not valid')
-    if not clib.dxf_detach_price_level_book_listener(price_level_book.book,
-                                                     price_level_book.book_listener):
-        process_last_error()
 
 def dxf_attach_listener(SubscriptionClass sc):
     """
@@ -517,12 +370,12 @@ def dxf_close_connection(ConnectionClass cc):
     """
 
     # close all subscriptions before closing the connection
-    for i in range(cc.con_users_map.size()):
-        if cc.con_users_map[i]:  # subscription should not be closed previously
-            clib.dxf_close_subscription(cc.con_users_map[i][0])
-            cc.con_users_map[i][0] = NULL  # mark subscription as closed
+    for i in range(cc.sub_ptr_list.size()):
+        if cc.sub_ptr_list[i]:  # subscription should not be closed previously
+            clib.dxf_close_subscription(cc.sub_ptr_list[i][0])
+            cc.sub_ptr_list[i][0] = NULL  # mark subscription as closed
 
-    cc.con_users_map.clear()
+    cc.sub_ptr_list.clear()
 
     if cc.connection:
         clib.dxf_close_connection(cc.connection)
@@ -540,6 +393,7 @@ def dxf_close_subscription(SubscriptionClass sc):
     if sc.subscription:
         clib.dxf_close_subscription(sc.subscription)
         sc.subscription = NULL
+        sc.con_sub_list_ptr[0][sc.subscription_order] = NULL
 
 def dxf_get_current_connection_status(ConnectionClass cc, return_str: bool=True):
     """

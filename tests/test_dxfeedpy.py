@@ -1,14 +1,13 @@
 import dxfeed.core.DXFeedPy as dx
 import pytest
 
-
 class ValueStorage(object):  # config
     demo_address = 'demo.dxfeed.com:7300'
     event_types = ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
                    'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration']
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def connection():
     # Setup
     con = dx.dxf_create_connection(ValueStorage.demo_address)

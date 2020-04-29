@@ -31,13 +31,6 @@ create. One connection may have several subscriptions.
     'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
     'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' event types are supported.
 
-Each subscription should be provided with tickers to get events for:
-
-.. code-block:: python
-
-    dx.dxf_add_symbols(sub1, ['AAPL', 'MSFT'])
-    dx.dxf_add_symbols(sub2, ['AAPL', 'C'])
-
 Special function called listener should be attached to the subscription to start receiving
 events. There are default listeners already implemented in dxpyfeed, but you
 can write your own with cython: :ref:`custom_listener`. To attach
@@ -47,6 +40,13 @@ default listener just call `dxf_attach_listener`
 
     dx.dxf_attach_listener(sub1)
     dx.dxf_attach_listener(sub2)
+
+Each subscription should be provided with tickers to get events for:
+
+.. code-block:: python
+
+    dx.dxf_add_symbols(sub1, ['AAPL', 'MSFT'])
+    dx.dxf_add_symbols(sub2, ['AAPL', 'C'])
 
 The data can be extracted with `get_data()` method. It is stored as dict with list of columns and list
 of events. Note that `get_data` extracts the data and then clean the field. To look at data call this property:
