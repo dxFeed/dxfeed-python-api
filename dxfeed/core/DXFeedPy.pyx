@@ -167,7 +167,7 @@ def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com
     return cc
 
 def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
-                                     token: Union[str, unicode, bytes]):
+                                      token: Union[str, unicode, bytes]):
     """
     Function creates connection to dxfeed given url address and token
 
