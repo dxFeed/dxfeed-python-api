@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dxfeed"
-version = "0.1.1"
+version = "0.2.0"
 description = "DXFeed Python API via C API"
 authors = ["Index Management Team <im@dxfeed.com>"]
 build = "build.py"
