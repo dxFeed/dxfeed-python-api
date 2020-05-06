@@ -44,11 +44,11 @@ cdef void quote_default_listener(int event_type,
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                  quotes[i].bid_time,
-                                 quotes[i].bid_exchange_code,
+                                 unicode_from_dxf_const_string_t(&quotes[i].bid_exchange_code),
                                  quotes[i].bid_price,
                                  quotes[i].bid_size,
                                  quotes[i].ask_time,
-                                 quotes[i].ask_exchange_code,
+                                 unicode_from_dxf_const_string_t(&quotes[i].ask_exchange_code),
                                  quotes[i].ask_price,
                                  quotes[i].ask_size,
                                  <int> quotes[i].scope])
@@ -70,7 +70,8 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
                                  summary[i].prev_day_id,
                                  summary[i].prev_day_close_price,
                                  summary[i].prev_day_volume,
-                                 summary[i].open_interest])
+                                 summary[i].open_interest,
+                                 unicode_from_dxf_const_string_t(&summary[i].exchange_code)])
 
 PROFILE_COLUMNS = ['Symbol', 'Beta', 'EPS', 'DivFreq', 'ExdDivAmount', 'ExdDivDate', '52HighPrice', '52LowPrice',
                    'Shares', 'Description', 'RawFlags', 'StatusReason']
