@@ -178,7 +178,7 @@ cdef void order_default_listener(int event_type,
                                  order[i].count,
                                  order[i].scope,
                                  order[i].side,
-                                 order[i].exchange_code,
+                                 unicode_from_dxf_const_string_t(&order[i].exchange_code),
                                  unicode_from_dxf_const_string_t(order[i].market_maker),
                                  unicode_from_dxf_const_string_t(order[i].spread_symbol)])
 
