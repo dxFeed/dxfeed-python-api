@@ -151,7 +151,14 @@ def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com
     Parameters
     ----------
     address: str
-        dxfeed url address
+        One of possible connection addresses:
+
+            - the single address: `host:port` or just `host`
+            - address with credentials: `host:port[username=xxx,password=yyy]`
+            - multiple addresses: `(host1:port1)(host2)(host3:port3[username=xxx,password=yyy])`
+            - the data from file: `/path/to/file` on nix and `drive:\\path\\to\\file` on Windows
+
+        Default: demo.dxfeed.com:7300
 
     Returns
     -------

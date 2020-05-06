@@ -1,6 +1,6 @@
 .. meta::
    :description: DXFeed python api for getting stock exchange data
-   :keywords: python, api, dxfeed, stock exchange
+   :keywords: python, api, dxfeed, stock exchange, market data, marketdata, finance
 
 Home
 ====
