@@ -26,7 +26,7 @@ exclude = ["dxfeed/dxfeed-c-api/wrappers*",
 
 [tool.poetry.urls]
 "Source code" = "https://github.com/dxFeed/dxfeed-python-api"
-"Documentation" = "https://docs.dxfeed.com/python/index.html"
+"Documentation" = "https://dxfeed.readthedocs.io/en/latest/"
 
 [tool.poetry.dependencies]
 python = "^3.6"
