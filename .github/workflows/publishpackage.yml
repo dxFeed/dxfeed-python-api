@@ -1,0 +1,54 @@
+# This workflow publishes package to pypi via poetry
+
+name: Publish package
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  publishing:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.7]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install poetry
+        run: |
+          pip install poetry
+        shell: bash
+      - name: Set poetry env
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-root
+        shell: bash
+      - name: Create package artifacts
+        run: |
+          task build
+        shell: bash
+      - name: Remove redundant files
+        if: success()
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            find dist/ -type f -iname *.whl -delete
+          else
+            find dist/ -type f -iname *.tar.gz -delete
+          fi
+        shell: bash
+      - name: Publish to PyPI
+        if: success()
+        run: |
+          poetry config repositories.testpypi https://test.pypi.org/legacy/
+          poetry publish -r testpypi -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }}
+        shell: bash
