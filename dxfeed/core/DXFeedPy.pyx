@@ -105,9 +105,7 @@ cdef class SubscriptionClass:
         self.listener = NULL
 
     def __dealloc__(self):
-        if self.subscription:  # if connection is not closed
-            clib.dxf_close_subscription(self.subscription)
-            self.con_sub_list_ptr[0][self.subscription_order] = NULL
+        dxf_close_subscription(self)
 
     def get_data(self):
         """
