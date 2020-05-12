@@ -3,7 +3,7 @@ from build import *
 
 global setup_kwargs
 
-setup_kwargs = {'extras_require': {'docs': ['toml', 'cython']}}
+setup_kwargs = {}
 
 build(setup_kwargs)
 setup(**setup_kwargs)

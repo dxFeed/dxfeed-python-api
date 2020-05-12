@@ -28,6 +28,9 @@ exclude = ["dxfeed/dxfeed-c-api/wrappers*",
 "Source code" = "https://github.com/dxFeed/dxfeed-python-api"
 "Documentation" = "https://dxfeed.readthedocs.io/en/latest/"
 
+[tool.poetry.extras]
+docs = ['toml', 'cython']
+
 [tool.poetry.dependencies]
 python = "^3.6"
 pandas = "^0.25.1"
