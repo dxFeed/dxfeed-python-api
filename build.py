@@ -45,17 +45,13 @@ extensions = [Extension('dxfeed.core.utils.helpers', ['dxfeed/core/utils/helpers
 if use_cython:
     extensions = cythonize(extensions, language_level=3)
 
-#extras
-extras = {'docs': ['toml', 'cython']}
-
 def build(setup_kwargs):
     setup_kwargs.update({
         'ext_modules': extensions,
         'zip_safe': False,
         'libraries': [dxfeed_c],
         'packages': find_packages(),
-        'include_dirs': include_dirs,
-        'extras_require': extras
+        'include_dirs': include_dirs
     })
 
 def build_extensions():
