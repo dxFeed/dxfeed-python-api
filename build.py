@@ -15,18 +15,18 @@ else:
 
 # Get all dxfeed c api c files to be compiled into separate lib
 root_path = Path(__file__).resolve().parent
-source_files_directory = root_path.joinpath('dxfeed', 'dxfeed-c-api', 'src')
+source_files_directory = root_path / 'dxfeed' / 'dxfeed-c-api' / 'src'
 source_files_paths = [str(path) for path in source_files_directory.glob('*.c')]
 libs = list()
-include_dirs = [str(source_files_directory.parent.joinpath('include')),
+include_dirs = [str(source_files_directory.parent / 'include'),
                 str(source_files_directory)]
 # Build dxfeed c library
 dxfeed_c_lib_args = dict()
 if platform.system() == 'Windows':
-    source_files_paths.remove(str(source_files_directory.joinpath('Linux.c')))
+    source_files_paths.remove(str(source_files_directory / 'Linux.c'))
     libs.append('ws2_32')
 else:
-    source_files_paths.remove(str(source_files_directory.joinpath('Win32.c')))
+    source_files_paths.remove(str(source_files_directory / 'Win32.c'))
 dxfeed_c_lib_args.update({'sources': source_files_paths,
                           'include_dirs': include_dirs})
 
