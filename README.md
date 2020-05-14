@@ -1,5 +1,7 @@
 # dxfeed package
 
+[![Documentation Status](https://readthedocs.org/projects/dxfeed/badge/?version=latest)](https://dxfeed.readthedocs.io/en/latest/?badge=latest)
+
 This package provides access to [dxFeed](https://www.dxfeed.com/) streaming data.
 The library is build as a thin wrapper over [dxFeed C-API library](https://github.com/dxFeed/dxfeed-c-api).
 We use [Cython](https://cython.org/) in this project as it combines flexibility, reliability and
