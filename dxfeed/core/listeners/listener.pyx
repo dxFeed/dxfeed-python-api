@@ -54,7 +54,7 @@ cdef void quote_default_listener(int event_type,
                                  <int> quotes[i].scope])
 
 SUMMARY_COLUMNS = ['Symbol', 'DayId', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice', 'PrevDayId', 'PrevDayClosePrice',
-                   'PrevDayVolume', 'OpenInterest']
+                   'PrevDayVolume', 'OpenInterest', 'ExchangeCode']
 cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_name,
                                    const dxf_event_data_t*data, int data_count, void*user_data) nogil:
     cdef dxf_summary_t*summary = <dxf_summary_t*> data
