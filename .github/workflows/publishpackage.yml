@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.7]
+        python-version: [3.6, 3.7, 3.8]
 
     runs-on: ${{ matrix.os }}
 
@@ -33,18 +33,15 @@ jobs:
           poetry config virtualenvs.create false
           poetry install --no-root
         shell: bash
-      - name: Create package artifacts
+      - name: Create tarball
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.7
         run: |
-          task build
+          task build -f sdist
         shell: bash
-      - name: Remove redundant files
-        if: success()
+      - name: Create wheel
+        if: matrix.os == 'windows-latest' || matrix.os == 'macos-latest'
         run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            find dist/ -type f -iname *.whl -delete
-          else
-            find dist/ -type f -iname *.tar.gz -delete
-          fi
+          task build -f wheel
         shell: bash
       - name: Upload artifacts
         if: success()
