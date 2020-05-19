@@ -1,0 +1,80 @@
+# This workflow publishes package to pypi via poetry
+
+name: Publish package
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.6, 3.7, 3.8]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install poetry
+        run: |
+          pip install poetry
+        shell: bash
+      - name: Set poetry env
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-root
+        shell: bash
+      - name: Create tarball
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.7
+        run: |
+          task build -f sdist
+        shell: bash
+      - name: Create wheel
+        if: matrix.os == 'windows-latest' || matrix.os == 'macos-latest'
+        run: |
+          task build -f wheel
+        shell: bash
+      - name: Upload artifacts
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: dist/
+
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install poetry
+        run: |
+          pip install poetry
+        shell: bash
+      - name: Clear dist folder
+        run: |
+          rm -rf dist/
+      - name: Download
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts
+          path: dist/
+      - name: Publish to PyPI
+        if: success()
+        run: |
+          poetry config repositories.testpypi https://test.pypi.org/legacy/
+          poetry publish -r testpypi -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }}
+        shell: bash
