@@ -1,6 +1,5 @@
 # distutils: language = c++
 # cython: always_allow_keywords=True
-from libcpp.deque cimport deque as cppdq
 
 from dxfeed.core.utils.helpers cimport *
 from dxfeed.core.utils.helpers import *
@@ -12,6 +11,7 @@ from datetime import datetime
 import pandas as pd
 from typing import Optional, Union, Iterable
 from warnings import warn
+from weakref import WeakSet
 
 # for importing variables
 import dxfeed.core.listeners.listener as lis
@@ -53,24 +53,30 @@ cdef class ConnectionClass:
     Data structure that contains connection
     """
     cdef clib.dxf_connection_t connection
-    # sub_ptr_list contains pointers to all subscriptions related to current connection
-    cdef cppdq[clib.dxf_subscription_t *] sub_ptr_list
-    # each subscription has its own index in a list
-    cdef int subs_order
+    cdef object __sub_refs
 
     def __init__(self):
-        self.subs_order = 0
+        self.__sub_refs = WeakSet()
 
     def __dealloc__(self):
         dxf_close_connection(self)
 
+    def get_sub_refs(self):
+        """
+        Method to get list of references to all subscriptions related to current connection
+
+        Returns
+        -------
+        :list
+            List of weakref objects. Empty list if no refs
+        """
+        refs = list(self.__sub_refs) if self.__sub_refs else list()
+        return refs
+
     cpdef SubscriptionClass make_new_subscription(self, data_len: int):
         cdef SubscriptionClass out = SubscriptionClass(data_len)
         out.connection = self.connection
-        self.sub_ptr_list.push_back(&out.subscription)  # append pointer to new subscription
-        out.subscription_order = self.subs_order  # assign each subscription an index
-        self.subs_order += 1
-        out.con_sub_list_ptr = &self.sub_ptr_list  # reverse pointer to pointers list
+        self.__sub_refs.add(out)
         return out
 
 
@@ -80,9 +86,8 @@ cdef class SubscriptionClass:
     """
     cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
-    cdef int subscription_order  # index in list of subscription pointers
-    cdef cppdq[clib.dxf_subscription_t *] *con_sub_list_ptr  # pointer to list of subscription pointers
     cdef dxf_event_listener_t listener
+    cdef object __weakref__  # Weak referencing enabling
     cdef object event_type_str
     cdef list columns
     cdef object data
@@ -185,7 +190,7 @@ def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
     address = address.encode('utf-8')
     token = token.encode('utf-8')
     clib.dxf_create_connection_auth_bearer(address, token,
-                                          NULL, NULL, NULL, NULL, NULL, &cc.connection)
+                                           NULL, NULL, NULL, NULL, NULL, &cc.connection)
     error_code = process_last_error(verbose=False)
     if error_code:
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
@@ -366,14 +371,9 @@ def dxf_close_connection(ConnectionClass cc):
     cc: ConnectionClass
         Variable with connection information
     """
-
-    # close all subscriptions before closing the connection
-    for i in range(cc.sub_ptr_list.size()):
-        if cc.sub_ptr_list[i]:  # subscription should not be closed previously
-            clib.dxf_close_subscription(cc.sub_ptr_list[i][0])
-            cc.sub_ptr_list[i][0] = NULL  # mark subscription as closed
-
-    cc.sub_ptr_list.clear()
+    related_subs = cc.get_sub_refs()
+    for sub in related_subs:
+        dxf_close_subscription(sub)
 
     if cc.connection:
         clib.dxf_close_connection(cc.connection)
@@ -391,7 +391,6 @@ def dxf_close_subscription(SubscriptionClass sc):
     if sc.subscription:
         clib.dxf_close_subscription(sc.subscription)
         sc.subscription = NULL
-        sc.con_sub_list_ptr[0][sc.subscription_order] = NULL
 
 def dxf_get_current_connection_status(ConnectionClass cc, return_str: bool=True):
     """
