@@ -1,5 +1,6 @@
 # dxfeed package
 
+![PyPI](https://img.shields.io/pypi/v/dxfeed)
 [![Documentation Status](https://readthedocs.org/projects/dxfeed/badge/?version=latest)](https://dxfeed.readthedocs.io/en/latest/?badge=latest)
 
 This package provides access to [dxFeed](https://www.dxfeed.com/) streaming data.

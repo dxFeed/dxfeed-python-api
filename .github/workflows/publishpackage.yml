@@ -75,6 +75,5 @@ jobs:
       - name: Publish to PyPI
         if: success()
         run: |
-          poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry publish -r testpypi -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }}
+          poetry publish -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }}
         shell: bash
