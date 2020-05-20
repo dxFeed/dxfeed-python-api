@@ -70,8 +70,7 @@ cdef class ConnectionClass:
         :list
             List of weakref objects. Empty list if no refs
         """
-        refs = list(self.__sub_refs) if self.__sub_refs else list()
-        return refs
+        return list(self.__sub_refs)
 
     cpdef SubscriptionClass make_new_subscription(self, data_len: int):
         cdef SubscriptionClass out = SubscriptionClass(data_len)
