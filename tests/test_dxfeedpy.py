@@ -1,6 +1,7 @@
 import dxfeed as dx
 import pytest
 
+
 class ValueStorage(object):  # config
     demo_address = 'demo.dxfeed.com:7300'
     event_types = ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
@@ -39,8 +40,7 @@ def test_fail_create_subscription_with_no_connection():
 
 
 @pytest.mark.xfail()
-def test_fail_to_use_subscription_without_connection():
-    connection = dx.dxf_create_connection(ValueStorage.demo_address)
+def test_fail_to_use_subscription_without_connection(connection):
     sub = dx.dxf_create_subscription(cc=connection, event_type='Trade')
     dx.dxf_close_connection(connection)
     dx.dxf_add_symbols(sc=sub, symbols=['AAPL'])
@@ -99,9 +99,7 @@ def test_symbol_clearing(connection):
 
 
 @pytest.mark.parametrize('sub_type', ValueStorage.event_types)
-def test_default_listeners(sub_type):
-    # fixture usage causes errors with, probably, threads
-    connection = dx.dxf_create_connection(ValueStorage.demo_address)
+def test_default_listeners(connection, sub_type):
     con_err_status = dx.process_last_error(verbose=False)
     sub = dx.dxf_create_subscription(connection, sub_type)
     sub_err_status = dx.process_last_error(verbose=False)
@@ -110,6 +108,5 @@ def test_default_listeners(sub_type):
     dx.dxf_detach_listener(sub)
     drop_lis_err_status = dx.process_last_error(verbose=False)
     dx.dxf_close_subscription(sub)
-    dx.dxf_close_connection(connection)
     assert (con_err_status, sub_err_status, add_lis_err_status, drop_lis_err_status) == (0, 0, 0, 0)
 
