@@ -3,6 +3,7 @@ from typing import Iterable, Union
 from datetime import datetime
 import pandas as pd
 from warnings import warn
+import dxfeed.wrappers.class_utils as cu
 
 
 class Subscription(object):
@@ -39,8 +40,8 @@ class Subscription(object):
     def symbols(self):
         return dxf_get_symbols(self.__sub)
 
-    def add_symbols(self, symbols: Iterable[str]):
-        dxf_add_symbols(sc=self.__sub, symbols=symbols)
+    def add_symbols(self, symbols: Union[str, Iterable[str]]):
+        dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable_of_strings(symbols))
         return self
 
     def remove_symbols(self, symbols: Iterable[str] = [''], remove_all: bool = False):
