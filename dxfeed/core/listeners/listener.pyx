@@ -15,14 +15,14 @@ cdef void trade_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
                                  int data_count, void*user_data) nogil:
-    cdef dxf_trade_t*trades = <dxf_trade_t*> data
+    cdef dxf_trade_t* trades = <dxf_trade_t*> data
     with gil:
         py_data = <object> user_data
 
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                  trades[i].price,
-                                 trades[i].exchange_code,
+                                 unicode_from_dxf_const_string_t(&trades[i].exchange_code),
                                  trades[i].size,
                                  trades[i].tick,
                                  trades[i].change,
@@ -44,17 +44,17 @@ cdef void quote_default_listener(int event_type,
         for i in range(data_count):
             py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
                                  quotes[i].bid_time,
-                                 quotes[i].bid_exchange_code,
+                                 unicode_from_dxf_const_string_t(&quotes[i].bid_exchange_code),
                                  quotes[i].bid_price,
                                  quotes[i].bid_size,
                                  quotes[i].ask_time,
-                                 quotes[i].ask_exchange_code,
+                                 unicode_from_dxf_const_string_t(&quotes[i].ask_exchange_code),
                                  quotes[i].ask_price,
                                  quotes[i].ask_size,
                                  <int> quotes[i].scope])
 
 SUMMARY_COLUMNS = ['Symbol', 'DayId', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice', 'PrevDayId', 'PrevDayClosePrice',
-                   'PrevDayVolume', 'OpenInterest']
+                   'PrevDayVolume', 'OpenInterest', 'ExchangeCode']
 cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_name,
                                    const dxf_event_data_t*data, int data_count, void*user_data) nogil:
     cdef dxf_summary_t*summary = <dxf_summary_t*> data
@@ -70,7 +70,8 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
                                  summary[i].prev_day_id,
                                  summary[i].prev_day_close_price,
                                  summary[i].prev_day_volume,
-                                 summary[i].open_interest])
+                                 summary[i].open_interest,
+                                 unicode_from_dxf_const_string_t(&summary[i].exchange_code)])
 
 PROFILE_COLUMNS = ['Symbol', 'Beta', 'EPS', 'DivFreq', 'ExdDivAmount', 'ExdDivDate', '52HighPrice', '52LowPrice',
                    'Shares', 'Description', 'RawFlags', 'StatusReason']
@@ -112,7 +113,7 @@ cdef void time_and_sale_default_listener(int event_type,
                                  tns[i].event_flags,
                                  tns[i].index,
                                  tns[i].time,
-                                 tns[i].exchange_code,
+                                 unicode_from_dxf_const_string_t(&tns[i].exchange_code),
                                  tns[i].price,
                                  tns[i].size,
                                  tns[i].bid_price,
@@ -177,7 +178,7 @@ cdef void order_default_listener(int event_type,
                                  order[i].count,
                                  order[i].scope,
                                  order[i].side,
-                                 order[i].exchange_code,
+                                 unicode_from_dxf_const_string_t(&order[i].exchange_code),
                                  unicode_from_dxf_const_string_t(order[i].market_maker),
                                  unicode_from_dxf_const_string_t(order[i].spread_symbol)])
 

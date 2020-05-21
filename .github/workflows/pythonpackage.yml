@@ -43,7 +43,7 @@ jobs:
         pip install dist/dxfeed*
         pip uninstall --yes dxfeed
       shell: bash
-  build:
+  tests:
     needs: installation
     strategy:
       matrix:
