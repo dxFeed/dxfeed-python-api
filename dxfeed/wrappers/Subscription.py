@@ -7,6 +7,7 @@ from warnings import warn
 
 class Subscription(object):
     def __init__(self, connection, event_type: str, date_time: Union[str, datetime], data_len: int = 100000):
+        self.__event_type = event_type
         if date_time is not None:
             if isinstance(date_time, str):
                 try:
@@ -32,7 +33,7 @@ class Subscription(object):
 
     @property
     def event_type(self):
-        return dxf_get_subscription_event_types(self.__sub, return_str=True)
+        return self.__event_type
 
     @property
     def symbols(self):
