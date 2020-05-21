@@ -2,7 +2,7 @@ from dxfeed.core.DXFeedPy import *
 from dxfeed.wrappers.Subscription import Subscription
 
 
-class DXFeed(object):
+class Endpoint(object):
     """
     Class for connection management. After successful creation Instance will be connected to server
     with provided credentials

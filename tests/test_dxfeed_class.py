@@ -8,7 +8,7 @@ class ValueStorage(object):  # config
 
 @pytest.fixture(scope='function')
 def dxfeed():
-    dxf = dx.DXFeed(connection_address=ValueStorage.demo_address)
+    dxf = dx.Endpoint(connection_address=ValueStorage.demo_address)
     yield dxf
     dxf.close_connection()
 
@@ -30,4 +30,4 @@ def test_closing_connection(dxfeed):
 
 @pytest.mark.xfail()
 def test_connection_fail_on_incorrect_address():
-    dxfeed = dx.DXFeed(connection_address='8.8.8.8')
+    dxfeed = dx.Endpoint(connection_address='8.8.8.8')

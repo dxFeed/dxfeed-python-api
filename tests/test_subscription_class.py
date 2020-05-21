@@ -13,7 +13,7 @@ class ValueStorage(object):  # config
 
 @pytest.fixture(scope='function')
 def dxfeed():
-    dxf = dx.DXFeed(connection_address=ValueStorage.demo_address)
+    dxf = dx.Endpoint(connection_address=ValueStorage.demo_address)
     yield dxf
     dxf.close_connection()
 

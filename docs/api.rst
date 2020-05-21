@@ -6,7 +6,7 @@ API Reference
 High-level functionality
 ------------------------
 
-.. automodule:: dxfeed.wrappers.DXFeed
+.. automodule:: dxfeed.wrappers.Endpoint
 	:members:
 	:inherited-members:
 
