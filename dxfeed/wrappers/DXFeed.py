@@ -1,5 +1,5 @@
 from dxfeed.core.DXFeedPy import *
-from dxfeed.wrappers.DXFeedSubscription import DXFeedSubscription
+from dxfeed.wrappers.Subscription import Subscription
 
 
 class DXFeed(object):
@@ -41,10 +41,10 @@ class DXFeed(object):
         con_status = dxf_get_current_connection_status(self.__connection, return_str=False)
         if con_status == 0 or con_status == 2:
             raise ValueError('Connection is not established')
-        subscription = DXFeedSubscription(connection=self.__connection,
-                                          event_type=event_type,
-                                          date_time=date_time,
-                                          data_len=data_len)
+        subscription = Subscription(connection=self.__connection,
+                                    event_type=event_type,
+                                    date_time=date_time,
+                                    data_len=data_len)
         return subscription
 
     def close_connection(self):

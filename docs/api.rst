@@ -10,7 +10,7 @@ High-level functionality
 	:members:
 	:inherited-members:
 
-.. automodule:: dxfeed.wrappers.DXFeedSubscription
+.. automodule:: dxfeed.wrappers.Subscription
 	:members:
 	:inherited-members:
 

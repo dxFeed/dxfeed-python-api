@@ -5,7 +5,7 @@ import pandas as pd
 from warnings import warn
 
 
-class DXFeedSubscription(object):
+class Subscription(object):
     def __init__(self, connection, event_type: str, date_time: Union[str, datetime], data_len: int = 100000):
         if date_time is not None:
             if isinstance(date_time, str):
