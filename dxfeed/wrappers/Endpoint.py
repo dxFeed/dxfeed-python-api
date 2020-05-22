@@ -32,7 +32,7 @@ class Endpoint(object):
 
     @property
     def address(self):
-        return dxf_get_current_connected_address(self.__connection)
+        return self.__con_address
 
     def connect(self):
         """
@@ -44,7 +44,7 @@ class Endpoint(object):
         """
         if dxf_get_current_connection_status(self.__connection, return_str=False):
             dxf_close_connection(self.__connection)
-        self.__connection = dxf_create_connection(self.__con_address)
+        self.__connection = dxf_create_connection(self.address)
         return self
 
     def create_subscription(self, event_type: str, data_len: int = 100000, date_time: Union[str, datetime] = None):
