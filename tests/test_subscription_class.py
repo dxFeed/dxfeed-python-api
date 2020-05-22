@@ -64,11 +64,11 @@ def test_remove_symbol_timed(subscription_timed):
 
 def test_remove_all_symbols(subscription):
     subscription = subscription.add_symbols(ValueStorage.symbols) \
-                               .remove_symbols(remove_all=True)
+                               .remove_symbols()
     assert subscription.symbols == []
 
 
 def test_remove_all_symbols_timed(subscription_timed):
     subscription_timed = subscription_timed.add_symbols(ValueStorage.symbols) \
-                                           .remove_symbols(remove_all=True)
+                                           .remove_symbols()
     assert subscription_timed.symbols == []
