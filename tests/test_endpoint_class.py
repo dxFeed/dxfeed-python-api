@@ -18,6 +18,12 @@ def test_connection_status_property(dxfeed):
     assert expected_status == dxfeed.connection_status
 
 
+def test_create_endpoint_without_connection():
+    expected_status = 'Not connected'
+    dxf = dx.Endpoint(connect=False)
+    assert expected_status == dxf.connection_status
+
+
 def test_address_property(dxfeed):
     assert dxfeed.address == ValueStorage.demo_address
 
