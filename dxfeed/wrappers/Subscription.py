@@ -44,11 +44,23 @@ class Subscription(object):
         dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable_of_strings(symbols))
         return self
 
-    def remove_symbols(self, symbols: Iterable[str] = [''], remove_all: bool = False):
-        if remove_all:
-            dxf_clear_symbols(self.__sub)
+    def remove_symbols(self, symbols: Union[str, Iterable[str]] = None):
+        """
+        Method removes symbols from subscription. If no symbols provided removes all symbols
+
+        Parameters
+        ----------
+        symbols: str, iterable
+            One ticker or list of tickers to remove from subscription
+
+        Returns
+        -------
+        self: Subscription
+        """
+        if symbols:
+            dxf_remove_symbols(self.__sub, symbols=cu.to_iterable_of_strings(symbols))
         else:
-            dxf_remove_symbols(self.__sub, symbols=symbols)
+            dxf_clear_symbols(self.__sub)
         return self
 
     def close_subscription(self):
