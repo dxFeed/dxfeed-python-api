@@ -32,6 +32,9 @@ class Subscription(object):
                                                  event_type=event_type,
                                                  data_len=data_len)
 
+    def __del__(self):
+        self.close_subscription()
+
     @property
     def event_type(self):
         return self.__event_type
@@ -91,6 +94,3 @@ class Subscription(object):
         df: pandas DataFrame
         """
         return self.__sub.to_dataframe(keep)
-
-    def __del__(self):
-        self.close_subscription()
