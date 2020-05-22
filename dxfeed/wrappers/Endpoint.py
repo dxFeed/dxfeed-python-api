@@ -17,11 +17,14 @@ class Endpoint(object):
         - multiple addresses: `(host1:port1)(host2)(host3:port3[username=xxx,password=yyy])`
         
         Default: demo.dxfeed.com:7300
+    connect: bool
+        When True `connect` method  is called during instance creation. Default - True
     """
-    def __init__(self, connection_address: str = 'demo.dxfeed.com:7300'):
+    def __init__(self, connection_address: str = 'demo.dxfeed.com:7300', connect: bool = True):
         self.__con_address = connection_address
         self.__connection = ConnectionClass()
-        self.connect()
+        if connect:
+            self.connect()
 
     @property
     def connection_status(self):
@@ -32,6 +35,13 @@ class Endpoint(object):
         return dxf_get_current_connected_address(self.__connection)
 
     def connect(self):
+        """
+        Creates connection.
+
+        Returns
+        -------
+        self: Endpoint
+        """
         if dxf_get_current_connection_status(self.__connection, return_str=False):
             dxf_close_connection(self.__connection)
         self.__connection = dxf_create_connection(self.__con_address)
