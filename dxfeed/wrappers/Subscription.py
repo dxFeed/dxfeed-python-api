@@ -74,10 +74,10 @@ class Subscription(object):
         dxf_detach_listener(self.__sub)
         return self
 
-    def get_data(self):
+    def get_list(self):
         return self.__sub.get_data()
 
-    def to_dataframe(self, keep: bool=True):
+    def get_dataframe(self, keep: bool=True):
         """
         Method converts data to the Pandas DataFrame
 
