@@ -42,6 +42,3 @@ cdef void series_default_listener(int event_type, dxf_const_string_t symbol_name
 
 cdef void configuration_default_listener(int event_type, dxf_const_string_t symbol_name,
 			                     const dxf_event_data_t* data, int data_count, void* user_data) nogil
-
-cdef void book_default_listener(const dxf_price_level_book_data_ptr_t book_data,
-                                void* user_data) nogil
