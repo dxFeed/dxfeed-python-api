@@ -26,6 +26,9 @@ class Endpoint(object):
         if connect:
             self.connect()
 
+    def __del__(self):
+        self.close_connection()
+
     @property
     def connection_status(self):
         return dxf_get_current_connection_status(self.__connection, return_str=True)
@@ -68,6 +71,3 @@ class Endpoint(object):
 
     def close_connection(self):
         dxf_close_connection(self.__connection)
-
-    def __del__(self):
-        self.close_connection()
