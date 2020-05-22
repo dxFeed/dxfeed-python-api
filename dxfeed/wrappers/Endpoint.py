@@ -34,17 +34,26 @@ class Endpoint(object):
     def address(self):
         return self.__con_address
 
-    def connect(self):
+    def connect(self, reconnect: bool = True):
         """
-        Creates connection.
+        Creates connection. If connection status differs from "Not connected" and `reconnect` is False, does nothing
+
+        Parameters
+        ----------
+        reconnect: bool
+            When True closes previous connection. Default - True
 
         Returns
         -------
         self: Endpoint
         """
-        if dxf_get_current_connection_status(self.__connection, return_str=False):
+        con_status = dxf_get_current_connection_status(self.__connection, return_str=True)
+        if reconnect:
             dxf_close_connection(self.__connection)
-        self.__connection = dxf_create_connection(self.address)
+
+        if con_status == 'Not connected':
+            self.__connection = dxf_create_connection(self.address)
+
         return self
 
     def create_subscription(self, event_type: str, data_len: int = 100000, date_time: Union[str, datetime] = None):
