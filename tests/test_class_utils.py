@@ -39,3 +39,14 @@ def test_handle_datetime_with_complete_string_format(dt_fmt):
     expected_date_time = datetime.strptime(date_time, dt_fmt)
     actual_datetime = cu.handle_datetime(expected_date_time, fmt=dt_fmt)
     assert expected_date_time == actual_datetime
+
+
+@pytest.mark.filterwarnings('ignore::UserWarning')
+@pytest.mark.parametrize('dt_fmt', ValueStorage.dt_formats)
+def test_handle_datetime_with_no_seconds_string_format(dt_fmt):
+    fmt = dt_fmt[:dt_fmt.rfind('%S')-1]
+    date_time = ValueStorage.dt.strftime(fmt)
+    actual_datetime = cu.handle_datetime(date_time, fmt=dt_fmt)
+    expected_datetime = ValueStorage.dt.replace(second=0, microsecond=0)
+    assert actual_datetime == expected_datetime
+

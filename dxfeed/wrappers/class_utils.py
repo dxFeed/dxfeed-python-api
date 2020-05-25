@@ -2,6 +2,7 @@ from typing import Union, Iterable
 import collections
 from warnings import warn
 from datetime import datetime
+import pandas as pd
 
 
 def to_iterable_of_strings(value: Union[str, Iterable[str]]) -> Iterable[str]:
@@ -36,7 +37,7 @@ def handle_datetime(date_time: Union[str, datetime], fmt: str = '%Y-%m-%d %H:%M:
                 warn_message = f'datetime argument does not exactly match {fmt} format,' + \
                                ' date was parsed automatically as ' + \
                                date_time.strftime(format=fmt)
-                warn(warn_message)
+                warn(warn_message, UserWarning)
             except ValueError:
                 raise ValueError(f'datetime should use {fmt} format!')
     return date_time
