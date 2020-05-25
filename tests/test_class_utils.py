@@ -50,3 +50,27 @@ def test_handle_datetime_with_no_seconds_string_format(dt_fmt):
     expected_datetime = ValueStorage.dt.replace(second=0, microsecond=0)
     assert actual_datetime == expected_datetime
 
+
+@pytest.mark.filterwarnings('ignore::UserWarning')
+@pytest.mark.parametrize('dt_fmt', ValueStorage.dt_formats)
+def test_handle_datetime_with_no_mins_string_format(dt_fmt):
+    fmt = dt_fmt[:dt_fmt.rfind('%M')-1]
+    date_time = ValueStorage.dt.strftime(fmt)
+    actual_datetime = cu.handle_datetime(date_time, fmt=dt_fmt)
+    expected_datetime = ValueStorage.dt.replace(minute=0, second=0, microsecond=0)
+    assert actual_datetime == expected_datetime
+
+
+@pytest.mark.filterwarnings('ignore::UserWarning')
+@pytest.mark.parametrize('dt_fmt', ValueStorage.dt_formats)
+def test_handle_datetime_with_no_hours_string_format(dt_fmt):
+    fmt = dt_fmt[:dt_fmt.rfind('%H')-1]
+    date_time = ValueStorage.dt.strftime(fmt)
+    actual_datetime = cu.handle_datetime(date_time, fmt=dt_fmt)
+    expected_datetime = ValueStorage.dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    assert actual_datetime == expected_datetime
+
+
+@pytest.mark.xfail
+def test_handle_datetime_wrong_type():
+    cu.handle_datetime(20201010)
