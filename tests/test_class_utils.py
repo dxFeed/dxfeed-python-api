@@ -1,5 +1,12 @@
 from dxfeed.wrappers import class_utils as cu
 import pytest
+from datetime import datetime
+
+
+class ValueStorage(object):
+    dt_formats = ['%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S', '%Y/%m/%d %H:%M:%S']
+    base_format = '%Y-%m-%d %H:%M:%S.%f'
+    dt = datetime(2007, 12, 6, 16, 29, 43, 79043)
 
 
 def test_to_iterable_of_strings_with_string():
@@ -17,3 +24,18 @@ def test_to_iterable_of_strings_with_iterable():
 @pytest.mark.xfail
 def test_to_iterable_of_strings_with_incorrect_type():
     cu.to_iterable_of_strings(123)
+
+
+@pytest.mark.parametrize('dt_fmt', ValueStorage.dt_formats)
+def test_handle_datetime_from_datetime(dt_fmt):
+    date_time = datetime.now()
+    actual_datetime = cu.handle_datetime(date_time, fmt=dt_fmt)
+    assert date_time == actual_datetime
+
+
+@pytest.mark.parametrize('dt_fmt', ValueStorage.dt_formats)
+def test_handle_datetime_with_complete_string_format(dt_fmt):
+    date_time = ValueStorage.dt.strftime(format=dt_fmt)
+    expected_date_time = datetime.strptime(date_time, dt_fmt)
+    actual_datetime = cu.handle_datetime(expected_date_time, fmt=dt_fmt)
+    assert expected_date_time == actual_datetime
