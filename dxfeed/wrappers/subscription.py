@@ -54,6 +54,17 @@ class Subscription(object):
         return dxf_get_symbols(self.__sub)
 
     def add_symbols(self, symbols: Union[str, Iterable[str]]):
+        """
+        Method to add symbol. Supports addition of one symbol as a string as well as list of symbols
+        Parameters
+        ----------
+        symbols: str, Iterable
+            Symbols to add. Previously added and remained symbols are ignored on C-API level
+
+        Returns
+        -------
+        self: Subscription
+        """
         dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable_of_strings(symbols))
         return self
 
@@ -77,20 +88,45 @@ class Subscription(object):
         return self
 
     def close_subscription(self):
+        """
+        Method to close subscription. All received data will remain in the object.
+        """
         dxf_close_subscription(sc=self.__sub)
 
     def attach_listener(self):
+        """
+        Method to attach default listener.
+
+        Returns
+        -------
+        self: Subscription
+        """
         dxf_attach_listener(self.__sub)
         return self
 
     def detach_listener(self):
+        """
+        Removes listener so new events won't be received
+
+        Returns
+        -------
+        self: Subscription
+        """
         dxf_detach_listener(self.__sub)
         return self
 
     def get_list(self):
+        """
+        Method to get data. When called internal field is cleared
+
+        Returns
+        -------
+        data: list
+            List of events. Each event contains list with data related to subscription type.
+        """
         return self.__sub.get_data()
 
-    def get_dataframe(self, keep: bool=True):
+    def get_dataframe(self, keep: bool = True):
         """
         Method converts data to the Pandas DataFrame
 
@@ -101,6 +137,7 @@ class Subscription(object):
 
         Returns
         -------
-        df: pandas DataFrame
+        df: pandas.DataFrame
+            Dataframe each row - one event.
         """
         return self.__sub.to_dataframe(keep)
