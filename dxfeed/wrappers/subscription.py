@@ -1,12 +1,33 @@
 from dxfeed.core.DXFeedPy import *
 from typing import Iterable, Union
 from datetime import datetime
-import pandas as pd
-from warnings import warn
 import dxfeed.wrappers.class_utils as cu
 
 
 class Subscription(object):
+    """
+    Class for subscription management. Recommended to be created only via create_subscription method in Endpoint class.
+    Also stores incoming events
+
+    Attributes
+    ----------
+    connection: dxfeed.core.DXFeedPy.ConnectionClass
+        Core class written in cython, that handle connection related details on the low level
+    event_type: str
+        One of possible event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle',
+        'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
+    data_len: int
+        The amount of events kept in Subscription class. By default event is received as list and each event is stored
+        in deque of fixed size. To have no limits for the deque set this value to -1.
+    date_time: str or datetime.datetime
+        If present timed subscription will be created (conflated stream). For sting date format is following:
+        %Y-%m-%d %H:%M:%S.%f. If None - stream subscription will be created (non-conflated). Default - None.
+
+    Note
+    ----
+    Some event types (e.g. Candle) support only timed subscription.
+
+    """
     def __init__(self, connection, event_type: str, date_time: Union[str, datetime], data_len: int = 100000):
         self.__event_type = event_type
         if date_time is None:
