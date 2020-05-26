@@ -60,6 +60,29 @@ class Endpoint(object):
         return self
 
     def create_subscription(self, event_type: str, data_len: int = 100000, date_time: Union[str, datetime] = None):
+        """
+        Method creates certain event type subscription and returns Subscription class
+
+        Parameters
+        ----------
+        event_type: str
+            One of possible event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle',
+            'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
+        data_len: int
+            The amount of events kept in Subscription class. To have no limits set this value to -1
+        date_time: str or datetime.datetime
+            If present timed subscription will be created (conflated stream). For sting date format is following:
+            %Y-%m-%d %H:%M:%S.%f. If None - stream subscription will be created. Default - None.
+
+        Note
+        ----
+        Some event types (e.g. Candle) support only timed subscription.
+
+        Returns
+        -------
+        subscription: Subscription
+            Subscription class related to current connection
+        """
         con_status = dxf_get_current_connection_status(self.__connection, return_str=False)
         if con_status == 0 or con_status == 2:
             raise ValueError('Connection is not established')
