@@ -93,4 +93,7 @@ class Endpoint(object):
         return subscription
 
     def close_connection(self):
+        """
+        Method to close connections and all related subscriptions.
+        """
         dxf_close_connection(self.__connection)
