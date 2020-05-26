@@ -1,3 +1,3 @@
-from dxfeed.wrappers.Endpoint import Endpoint
+from dxfeed.wrappers.endpoint import Endpoint
 
 __all__ = ['Endpoint']

@@ -6,11 +6,11 @@ API Reference
 High-level functionality
 ------------------------
 
-.. automodule:: dxfeed.wrappers.Endpoint
+.. automodule:: dxfeed.wrappers.endpoint
 	:members:
 	:inherited-members:
 
-.. automodule:: dxfeed.wrappers.Subscription
+.. automodule:: dxfeed.wrappers.subscription
 	:members:
 	:inherited-members:
 

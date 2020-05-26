@@ -1,5 +1,5 @@
 from dxfeed.core.DXFeedPy import *
-from dxfeed.wrappers.Subscription import Subscription
+from dxfeed.wrappers.subscription import Subscription
 
 
 class Endpoint(object):
