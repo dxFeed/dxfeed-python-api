@@ -30,6 +30,7 @@ Table of contents:
    self
    installation.rst
    basic_usage.rst
+   core_usage.rst
    custom_listener.rst
    api.rst
    devs.rst
