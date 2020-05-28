@@ -3,83 +3,103 @@
 Core functionality
 ==================
 
-All the functions in C API have similar ones in Python with the same name. Not all arguments are
-supported by now, this work is in progress.
+Import core functions
+~~~~~~~~~~~~~~~~~~~~~
 
-First of all you have to import the package:
+Here we deal with low level C styled api
 
-.. code-block:: python
+.. code:: ipython3
 
-    import dxfeed.core.DXFeedPy as dxc
+    from dxfeed.core import DXFeedPy as dxc
+    import time  # for timed suscription
 
-Next, the connection to dxfeed server should be established:
+Create connection
+~~~~~~~~~~~~~~~~~
 
-.. code-block:: python
+There are two ways at the moment to create connection: with token or
+with specifying connection address. Here we use the latter for
+simplicity.
 
-    con = dxc.dxf_create_connection(address='demo.dxfeed.com:7300')
+.. code:: ipython3
 
-To get events of certain types the subscription with this type should be
-create. One connection may have several subscriptions.
+    con = dxc.dxf_create_connection('demo.dxfeed.com:7300')
 
-.. code-block:: python
+Create subscription
+~~~~~~~~~~~~~~~~~~~
 
-    sub1 = dxc.dxf_create_subscription(con, 'Trade')
-    sub2 = dxc.dxf_create_subscription(con, 'Quote')
+There are two types of subscriptions: ordinary for delivering stream
+data as-is and timed for conflated data. Except type of subscription you
+should provide type of events you want to get. Note: some event types,
+e.g. Candle, support only timed subscription.
 
-.. note::
+.. code:: ipython3
 
-    'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
-    'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' event types are supported.
+    sub = dxc.dxf_create_subscription(con, 'Trade')
+    sub_timed = dxc.dxf_create_subscription_timed(con, 'Candle', int(time.time() * 1000))
 
-Special function called listener should be attached to the subscription to start receiving
-events. There are default listeners already implemented in dxpyfeed, but you
-can write your own with cython: :ref:`custom_listener`. To attach
-default listener just call `dxf_attach_listener`
+Attach listener
+~~~~~~~~~~~~~~~
 
-.. code-block:: python
+A special function that processes incoming events should be initialized.
+There are default ones for each event type. You can write a listener that will do your instructions.
+For details: :ref:`custom_listener`.
 
-    dxc.dxf_attach_listener(sub1)
-    dxc.dxf_attach_listener(sub2)
+.. code:: ipython3
 
-Each subscription should be provided with tickers to get events for:
+    dxc.dxf_attach_listener(sub)
+    dxc.dxf_attach_listener(sub_timed)
 
-.. code-block:: python
+Add tickers
+~~~~~~~~~~~
 
-    dxc.dxf_add_symbols(sub1, ['AAPL', 'MSFT'])
-    dxc.dxf_add_symbols(sub2, ['AAPL', 'C'])
+Symbols that will be processed should be defined
 
-The data can be extracted with `get_data()` method. It is stored as dict with list of columns and list
-of events. Note that `get_data` extracts the data and then clean the field. To look at data call this property:
+.. code:: ipython3
 
-.. code-block:: python
+    dxc.dxf_add_symbols(sub, ['AAPL', 'MSFT'])
+    dxc.dxf_add_symbols(sub_timed, ['AAPL', 'C'])
 
-    sub1.get_data()
-    sub2.get_data()
+Access data
+~~~~~~~~~~~
 
-The more convenient way to look at data is to convert it into pandas DataFrame.
-`to_dataframe` method of subscription class is responsible for that:
+Data is stored as deque in subscription class. Its length by default is
+100000. When you call method below you extracts all data recieved to the
+moment and clears the buffer in class.
 
-.. code-block:: python
+.. code:: ipython3
 
-    sub1.to_dataframe()
-    sub2.to_dataframe()
+    sub.get_data()
 
-To stop receiving events just detach the listener:
+.. code:: ipython3
 
-.. code-block:: python
+    sub_timed.get_data()
 
-     dxc.dxf_detach_listener(sub1)
-     dxc.dxf_detach_listener(sub2)
+Detach listener
+~~~~~~~~~~~~~~~
 
-When you are done with subscription you'd better close it:
+When you are no longer interested in recieving data detach the listener
 
-.. code-block:: python
+.. code:: ipython3
 
-    dxc.dxf_close_subscription(sub1)
-    dxc.dxf_close_subscription(sub2)
+    dxc.dxf_detach_listener(sub)
+    dxc.dxf_detach_listener(sub_timed)
 
-Same with connection:
+Close connection
+~~~~~~~~~~~~~~~~
 
-.. code-block:: python
+.. code:: ipython3
 
     dxc.dxf_close_connection(con)
+
+Transform data to pandas DataFrame
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: ipython3
+
+    df1 = sub.to_dataframe()
+    df1.head()
+
+.. code:: ipython3
+
+    df2 = sub_timed.to_dataframe()
+    df2.head()
