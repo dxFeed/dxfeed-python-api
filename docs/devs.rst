@@ -3,6 +3,8 @@
 For developers
 ==============
 
+Source code: `github.com/dxFeed/dxfeed-python-api <https://github.com/dxFeed/dxfeed-python-api>`_
+
 Get the code
 ------------
 
