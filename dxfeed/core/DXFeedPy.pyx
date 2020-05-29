@@ -89,7 +89,8 @@ cdef class SubscriptionClass:
     cdef object __weakref__  # Weak referencing enabling
     cdef object event_type_str
     cdef list columns
-    cdef object data
+    # cdef object data
+    cdef lis.Observer data
     cdef void *u_data
 
     def __init__(self, data_len: int):
@@ -101,10 +102,11 @@ cdef class SubscriptionClass:
         """
         self.subscription = NULL
         self.columns = list()
-        if data_len > 0:
-            self.data = deque_wl(maxlen=data_len)
-        else:
-            self.data = deque_wl()
+        # if data_len > 0:
+        #     self.data = deque_wl(maxlen=data_len)
+        # else:
+        #     self.data = deque_wl()
+        self.data = lis.Observer()
         self.u_data = <void *> self.data
         self.listener = NULL
 

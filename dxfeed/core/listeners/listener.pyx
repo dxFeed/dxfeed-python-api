@@ -10,6 +10,10 @@ cdef class FuncWrapper:
         out.func = f
         return out
 
+cdef class Observer:
+    cpdef update(self, event):
+        print(f' Got {event}')
+
 TRADE_COLUMNS = ['Symbol', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume', 'Time', 'IsETH']
 cdef void trade_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
@@ -17,10 +21,10 @@ cdef void trade_default_listener(int event_type,
                                  int data_count, void*user_data) nogil:
     cdef dxf_trade_t* trades = <dxf_trade_t*> data
     with gil:
-        py_data = <object> user_data
+        py_data = <Observer> user_data
 
         for i in range(data_count):
-            py_data.safe_append([unicode_from_dxf_const_string_t(symbol_name),
+            py_data.update([unicode_from_dxf_const_string_t(symbol_name),
                                  trades[i].price,
                                  unicode_from_dxf_const_string_t(&trades[i].exchange_code),
                                  trades[i].size,
