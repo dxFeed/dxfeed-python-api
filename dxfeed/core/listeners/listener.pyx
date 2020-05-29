@@ -12,7 +12,11 @@ cdef class FuncWrapper:
 
 cdef class Observer:
     cpdef update(self, event):
-        print(f' Got {event}')
+        self.manual_update(event)
+
+    @staticmethod
+    def manual_update(event):
+        print(f' Got {event} from update')
 
 TRADE_COLUMNS = ['Symbol', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume', 'Time', 'IsETH']
 cdef void trade_default_listener(int event_type,

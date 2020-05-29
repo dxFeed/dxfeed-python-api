@@ -113,6 +113,12 @@ cdef class SubscriptionClass:
     def __dealloc__(self):
         dxf_close_subscription(self)
 
+
+    def set_data(self, new_obj):
+        self.data = new_obj
+        self.u_data = <void *> self.data
+
+
     def get_data(self):
         """
         Method returns list with data, specified in event listener and returned data will be removed from object buffer
