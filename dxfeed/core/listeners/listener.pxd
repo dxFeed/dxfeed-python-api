@@ -8,7 +8,7 @@ cdef class FuncWrapper:
     cdef FuncWrapper make_from_ptr(dxf_event_listener_t f)
 
 cdef class Observer:
-    cpdef  update(self, event)
+    cdef void update(self, event) nogil
 
 cdef void trade_default_listener(int event_type, dxf_const_string_t symbol_name,
                                  const dxf_event_data_t* data, int data_count, void* user_data) nogil
