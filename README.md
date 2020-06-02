@@ -2,6 +2,11 @@
 
 [![PyPI](https://img.shields.io/pypi/v/dxfeed)](https://pypi.org/project/dxfeed/)
 [![Documentation Status](https://readthedocs.org/projects/dxfeed/badge/?version=latest)](https://dxfeed.readthedocs.io/en/latest/?badge=latest)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dxfeed)](https://pypi.org/project/dxfeed/)
+[![PyPI - Wheel](https://img.shields.io/pypi/wheel/dxfeed)](https://pypi.org/project/dxfeed/)
+[![PyPI - License](https://img.shields.io/pypi/l/dxfeed)](https://github.com/dxFeed/dxfeed-python-api/blob/master/LICENSE)
+
+
 
 This package provides access to [dxFeed](https://www.dxfeed.com/) streaming data.
 The library is build as a thin wrapper over [dxFeed C-API library](https://github.com/dxFeed/dxfeed-c-api).
