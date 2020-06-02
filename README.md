@@ -5,6 +5,7 @@
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dxfeed)](https://pypi.org/project/dxfeed/)
 [![PyPI - Wheel](https://img.shields.io/pypi/wheel/dxfeed)](https://pypi.org/project/dxfeed/)
 [![PyPI - License](https://img.shields.io/pypi/l/dxfeed)](https://github.com/dxFeed/dxfeed-python-api/blob/master/LICENSE)
+[![Test workflow](https://github.com/dxFeed/dxfeed-python-api/workflows/Test%20package/badge.svg)](https://github.com/dxFeed/dxfeed-python-api/actions)
 
 
 
