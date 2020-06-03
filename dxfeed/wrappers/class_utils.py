@@ -5,7 +5,7 @@ from datetime import datetime
 import pandas as pd
 
 
-def to_iterable_of_strings(value: Union[str, Iterable[str]]) -> Iterable[str]:
+def to_iterable(value: Union[str, Iterable[str]]) -> Iterable[str]:
     """
     Function to correctly wrap string into iterable object
 
@@ -18,13 +18,14 @@ def to_iterable_of_strings(value: Union[str, Iterable[str]]) -> Iterable[str]:
     -------
     : iterable
     """
-    if isinstance(value, str):
-        return [value]
-
     if isinstance(value, collections.abc.Iterable):
-        return value
+        if isinstance(value, str):
+            res = [value]
+        else:
+            res = value
     else:
         raise TypeError(f'Expected string or iterable type, got {type(value)}')
+    return res
 
 
 def handle_datetime(date_time: Union[str, datetime], fmt: str = '%Y-%m-%d %H:%M:%S.%f'):

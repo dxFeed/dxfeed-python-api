@@ -65,7 +65,7 @@ class Subscription(object):
         -------
         self: Subscription
         """
-        dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable_of_strings(symbols))
+        dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
         return self
 
     def remove_symbols(self, symbols: Union[str, Iterable[str]] = None):
@@ -82,7 +82,7 @@ class Subscription(object):
         self: Subscription
         """
         if symbols:
-            dxf_remove_symbols(self.__sub, symbols=cu.to_iterable_of_strings(symbols))
+            dxf_remove_symbols(self.__sub, symbols=cu.to_iterable(symbols))
         else:
             dxf_clear_symbols(self.__sub)
         return self
