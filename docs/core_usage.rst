@@ -1,10 +1,10 @@
 .. _core_usage:
 
-Core functionality
-==================
+Low-level API
+=============
 
-Import core functions
-~~~~~~~~~~~~~~~~~~~~~
+Import low-level functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here we deal with low level C styled api
 
