@@ -28,6 +28,11 @@ e.g. connection address or status
     print(f'Connected address: {endpoint.address}')
     print(f'Connection status: {endpoint.connection_status}')
 
+.. code:: text
+
+    demo.dxfeed.com:7300
+    Connected and authorized
+
 Configure and create subscription
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -48,7 +53,7 @@ you should also provide time to start subscription from.
 
 .. code:: ipython3
 
-    trade_sub = trade_sub.add_symbols(['C', 'TSLA'])
+    trade_sub = trade_sub.add_symbols(['C', 'AAPL'])
 
 For timed subscription you may provide either datetime object or string.
 String might be incomlete, in this case you will get warning with how
@@ -74,6 +79,11 @@ Subscription instance properties
     print(f'Subscription event type: {tns_sub.event_type}')
     print(f'Subscription symbols: {candle_sub.symbols}')
 
+.. code:: text
+
+    TimeAndSale
+    ['AAPL', 'MSFT']
+
 Access data
 ~~~~~~~~~~~
 
@@ -85,15 +95,6 @@ extracts all data recieved to the moment and clears the buffer in class.
 
     candle_sub.get_data()
 
-Detach listener
-~~~~~~~~~~~~~~~
-
-.. code:: ipython3
-
-    trade_sub.detach_listener()
-    tns_sub.detach_listener()
-    candle_sub.detach_listener();
-
 Close connection
 ~~~~~~~~~~~~~~~~
 
@@ -102,20 +103,15 @@ Close connection
     endpoint.close_connection()
     print(f'Connection status: {endpoint.connection_status}')
 
+.. code:: text
+
+    Not connected
+
 Transform data to pandas DataFrame
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: ipython3
 
     trade_df = trade_sub.to_dataframe()
-    trade_df.head()
-
-.. code:: ipython3
-
     tns_df = tns_sub.to_dataframe()
-    tns_df.head()
-
-.. code:: ipython3
-
     candle_df = candle_sub.to_dataframe()
-    candle_df.head()
