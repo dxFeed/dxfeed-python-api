@@ -35,7 +35,7 @@ def handle_datetime(date_time: Union[str, datetime], fmt: str = '%Y-%m-%d %H:%M:
         except ValueError:
             try:
                 date_time = pd.to_datetime(date_time, format=fmt, infer_datetime_format=True)
-                warn_message = f'datetime argument does not exactly match {fmt} format,' + \
+                warn_message = f'Datetime argument does not exactly match {fmt} format,' + \
                                ' date was parsed automatically as ' + \
                                date_time.strftime(format=fmt)
                 warn(warn_message, UserWarning)
