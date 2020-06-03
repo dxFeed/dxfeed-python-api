@@ -271,8 +271,8 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
                      'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]
     if event_type not in correct_types:
         raise ValueError(f'Incorrect event type! Got {event_type}, expected one of {correct_types}')
-    if time < 0 or not isinstance(time, int):
-        raise ValueError('time argument should be non-negative integer!')
+    if not isinstance(time, int) or time < 0:
+        raise ValueError('Time argument should be UNIX timestamp in milliseconds(non-negative integer)!')
 
     sc = cc.make_new_subscription(data_len=data_len)
     sc.event_type_str = event_type
