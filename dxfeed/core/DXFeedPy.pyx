@@ -235,7 +235,7 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int =
 
     error_code = process_last_error(verbose=False)
     if error_code:
-        raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
+        raise RuntimeError(f'In underlying C-API library error {error_code} occurred!')
     return sc
 
 def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int,  data_len: int = 100000):
