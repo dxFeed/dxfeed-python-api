@@ -28,8 +28,16 @@ pip3 install dxfeed
 
 ## Basic usage
 
-### Import package
+Following steps should be performed:
 
+* Import
+* Create Endpoint
+* Create Subscription
+* Attach listener
+* Add tickers
+* Finally close subscription and connection 
+
+### Import package
 
 ```python
 import dxfeed as dx
