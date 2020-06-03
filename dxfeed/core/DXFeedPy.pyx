@@ -6,9 +6,6 @@ from dxfeed.core.utils.helpers import *
 cimport dxfeed.core.pxd_include.DXFeed as clib
 cimport dxfeed.core.pxd_include.DXErrorCodes as dxec
 cimport dxfeed.core.listeners.listener as lis
-from dxfeed.core.utils.data_class import DequeWithLock as deque_wl
-from datetime import datetime
-import pandas as pd
 from typing import Optional, Union, Iterable
 from warnings import warn
 from weakref import WeakSet
