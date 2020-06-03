@@ -3,7 +3,7 @@
 API Reference
 =============
 
-High-level functionality
+API
 ------------------------
 
 .. automodule:: dxfeed.wrappers.endpoint
@@ -14,7 +14,7 @@ High-level functionality
 	:members:
 	:inherited-members:
 
-Low-level functionality
+Low-level API
 -----------------------
 
 .. automodule:: dxfeed.core.DXFeedPy
