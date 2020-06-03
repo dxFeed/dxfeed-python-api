@@ -214,7 +214,7 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int =
         Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
         'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
     data_len: int
-        Sets maximum amount of events, that are kept in Subscription class
+        Sets maximum amount of events, that are kept in Subscription class. Default 100000.
 
     Returns
     -------
@@ -256,7 +256,7 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
     time: int
         UTC time in the past (unix time in milliseconds)
     data_len: int
-        Sets maximum amount of events, that are kept in Subscription class
+        Sets maximum amount of events, that are kept in Subscription class. Default 100000.
 
 
     Returns
