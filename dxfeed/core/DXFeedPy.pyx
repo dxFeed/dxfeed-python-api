@@ -223,9 +223,10 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int =
     """
     if not cc.connection:
         raise ValueError('Connection is not valid')
-    if event_type not in ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
-                          'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
-        raise ValueError('Incorrect event type!')
+    correct_types = ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+                     'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]
+    if event_type not in correct_types:
+        raise ValueError(f'Incorrect event type! Got {event_type}, expected one of {correct_types}')
 
     sc = cc.make_new_subscription(data_len=data_len)
     sc.event_type_str = event_type
@@ -266,9 +267,10 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
     """
     if not cc.connection:
         raise ValueError('Connection is not valid')
-    if event_type not in ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
-                          'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
-        raise ValueError('Incorrect event type!')
+    correct_types = ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+                     'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]
+    if event_type not in correct_types:
+        raise ValueError(f'Incorrect event type! Got {event_type}, expected one of {correct_types}')
     if time < 0 or not isinstance(time, int):
         raise ValueError('time argument should be non-negative integer!')
 
