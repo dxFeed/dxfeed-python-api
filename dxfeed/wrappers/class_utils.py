@@ -40,7 +40,7 @@ def handle_datetime(date_time: Union[str, datetime], fmt: str = '%Y-%m-%d %H:%M:
                                date_time.strftime(format=fmt)
                 warn(warn_message, UserWarning)
             except ValueError:
-                raise ValueError(f'datetime should use {fmt} format!')
+                raise ValueError(f'Datetime should use {fmt} format!')
     if not isinstance(date_time, datetime):
-        raise TypeError('date_time incorrect type? should be string or datetime')
+        raise TypeError(f'Datetime has incorrect type of {type(date_time)}, should be string or datetime')
     return date_time
