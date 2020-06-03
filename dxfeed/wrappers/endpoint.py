@@ -50,9 +50,10 @@ class Endpoint(object):
         -------
         self: Endpoint
         """
-        con_status = dxf_get_current_connection_status(self.__connection, return_str=True)
         if reconnect:
             dxf_close_connection(self.__connection)
+
+        con_status = dxf_get_current_connection_status(self.__connection, return_str=True)
 
         if con_status == 'Not connected':
             self.__connection = dxf_create_connection(self.address)
