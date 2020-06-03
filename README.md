@@ -49,15 +49,15 @@ Create instance of Endpoint class which will connect provided address.
 
 
 ```python
-connector = dx.Endpoint('demo.dxfeed.com:7300')
+endpoint = dx.Endpoint('demo.dxfeed.com:7300')
 ```
 
 Endpoint instance contains information about the connection, e.g. connection address or status
 
 
 ```python
-print(f'Connected address: {connector.address}')
-print(f'Connection status: {connector.connection_status}')
+print(f'Connected address: {endpoint.address}')
+print(f'Connection status: {endpoint.connection_status}')
 ```
 
 ```text
@@ -70,7 +70,7 @@ You should specify event type. For timed subscription (conflated stream) you sho
 
 
 ```python
-trade_sub = connector.create_subscription('Trade', data_len=-1)
+trade_sub = endpoint.create_subscription('Trade', data_len=-1)
 ```
 
 **Attach default listener** - function that process incoming events
@@ -91,14 +91,14 @@ For timed subscription you may provide either datetime object or string. String 
 
 
 ```python
-tns_sub = connector.create_subscription('TimeAndSale', date_time=datetime.now()) \
-                   .attach_listener() \
-                   .add_symbols(['AMZN'])
+tns_sub = endpoint.create_subscription('TimeAndSale', date_time=datetime.now()) \
+                  .attach_listener() \
+                  .add_symbols(['AMZN'])
 ```
 
 
 ```python
-candle_sub = connector.create_subscription('Candle', date_time='2020-04-16 13:05')
+candle_sub = endpoint.create_subscription('Candle', date_time='2020-04-16 13:05')
 candle_sub = candle_sub.attach_listener()
 candle_sub = candle_sub.add_symbols(['AAPL', 'MSFT'])
 ```
@@ -124,21 +124,15 @@ Data is stored as deque. Its length is configured with data_len parameter and by
 candle_sub.get_data()
 ```
 
-### Detach listener
 
-
-```python
-trade_sub.detach_listener()
-tns_sub.detach_listener()
-candle_sub.detach_listener();
 ```
 
 ### Close connection
 
 
 ```python
-connector.close_connection()
-print(f'Connection status: {connector.connection_status}')
+endpoint.close_connection()
+print(f'Connection status: {endpoint.connection_status}')
 ```
 
 ```text
@@ -150,17 +144,14 @@ Not connected
 
 ```python
 trade_df = trade_sub.to_dataframe()
-trade_df.head()
 ```
 
 
 ```python
 tns_df = tns_sub.to_dataframe()
-tns_df.head()
 ```
 
 
 ```python
 candle_df = candle_sub.to_dataframe()
-candle_df.head()
 ```
