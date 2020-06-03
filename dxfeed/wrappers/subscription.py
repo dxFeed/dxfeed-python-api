@@ -18,7 +18,7 @@ class Subscription(object):
         'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
     data_len: int
         The amount of events kept in Subscription class. By default event is received as list and each event is stored
-        in deque of fixed size. To have no limits for the deque set this value to -1.
+        in deque of fixed size. To have no limits for the deque set this value to -1. Default 100000.
     date_time: str or datetime.datetime
         If present timed subscription will be created (conflated stream). For sting date format is following:
         %Y-%m-%d %H:%M:%S.%f. If None - stream subscription will be created (non-conflated). Default - None.
@@ -74,7 +74,7 @@ class Subscription(object):
 
         Parameters
         ----------
-        symbols: str, iterable
+        symbols: str, Iterable
             One ticker or list of tickers to remove from subscription
 
         Returns
