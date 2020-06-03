@@ -18,15 +18,15 @@ Create instance of Endpoint class which will connect provided address.
 
 .. code:: ipython3
 
-    connector = dx.Endpoint('demo.dxfeed.com:7300')
+    endpoint = dx.Endpoint('demo.dxfeed.com:7300')
 
 Endpoint instance contains information about the connection,
 e.g. connection address or status
 
 .. code:: ipython3
 
-    print(f'Connected address: {connector.address}')
-    print(f'Connection status: {connector.connection_status}')
+    print(f'Connected address: {endpoint.address}')
+    print(f'Connection status: {endpoint.connection_status}')
 
 Configure and create subscription
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,7 +36,7 @@ you should also provide time to start subscription from.
 
 .. code:: ipython3
 
-    trade_sub = connector.create_subscription('Trade', data_len=-1)
+    trade_sub = endpoint.create_subscription('Trade', data_len=-1)
 
 **Attach default listener** - function that process incoming events
 
@@ -56,13 +56,13 @@ your provided date parsed automatically
 
 .. code:: ipython3
 
-    tns_sub = connector.create_subscription('TimeAndSale', date_time=datetime.now()) \
-                       .attach_listener() \
-                       .add_symbols(['AMZN'])
+    tns_sub = endpoint.create_subscription('TimeAndSale', date_time=datetime.now()) \
+                      .attach_listener() \
+                      .add_symbols(['AMZN'])
 
 .. code:: ipython3
 
-    candle_sub = connector.create_subscription('Candle', date_time='2020-04-16 13:05')
+    candle_sub = endpoint.create_subscription('Candle', date_time='2020-04-16 13:05')
     candle_sub = candle_sub.attach_listener()
     candle_sub = candle_sub.add_symbols(['AAPL', 'MSFT'])
 
@@ -99,8 +99,8 @@ Close connection
 
 .. code:: ipython3
 
-    connector.close_connection()
-    print(f'Connection status: {connector.connection_status}')
+    endpoint.close_connection()
+    print(f'Connection status: {endpoint.connection_status}')
 
 Transform data to pandas DataFrame
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
