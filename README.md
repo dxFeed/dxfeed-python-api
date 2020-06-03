@@ -143,15 +143,15 @@ Not connected
 
 
 ```python
-trade_df = trade_sub.to_dataframe()
+trade_df = trade_sub.get_dataframe()
 ```
 
 
 ```python
-tns_df = tns_sub.to_dataframe()
+tns_df = tns_sub.get_dataframe()
 ```
 
 
 ```python
-candle_df = candle_sub.to_dataframe()
+candle_df = candle_sub.get_dataframe()
 ```
