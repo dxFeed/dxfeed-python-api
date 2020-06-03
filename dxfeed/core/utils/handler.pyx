@@ -1,4 +1,4 @@
-
+from warnings import warn
 
 cdef class EventHandler:
     cdef void __update(self, event) nogil:
@@ -6,4 +6,4 @@ cdef class EventHandler:
             self.update(event)
 
     def update(self, event):
-        print(f' Got {event} from __update')
+        warn(Warning('You have not implemented update method in your EventHandler, that is called, when event comes!'))
