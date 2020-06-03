@@ -53,15 +53,15 @@ cdef class ConnectionClass:
     Data structure that contains connection
     """
     cdef clib.dxf_connection_t connection
-    cdef object __sub_refs
+    cdef object __weakrefs
 
     def __init__(self):
-        self.__sub_refs = WeakSet()
+        self.__weakrefs = WeakSet()
 
     def __dealloc__(self):
         dxf_close_connection(self)
 
-    def get_sub_refs(self):
+    def get_weakrefs(self):
         """
         Method to get list of references to all subscriptions related to current connection
 
@@ -70,27 +70,23 @@ cdef class ConnectionClass:
         :list
             List of weakref objects. Empty list if no refs
         """
-        return list(self.__sub_refs)
+        return list(self.__weakrefs)
 
-    cpdef SubscriptionClass make_new_subscription(self, data_len: int):
-        cdef SubscriptionClass out = SubscriptionClass(data_len)
-        out.connection = self.connection
-        self.__sub_refs.add(out)
-        return out
+    def add_weakref(self, obj):
+        # TODO: docs, type checking
+        self.__weakrefs.add(obj)
 
 
 cdef class SubscriptionClass:
     """
     Data structure that contains subscription and related fields
     """
-    cdef clib.dxf_connection_t connection
     cdef clib.dxf_subscription_t subscription
-    cdef dxf_event_listener_t listener
     cdef object __weakref__  # Weak referencing enabling
     cdef object event_type_str
+    cdef dxf_event_listener_t listener
     cdef list columns
-    # cdef object data
-    cdef lis.Observer data
+    cdef object __event_handler
     cdef void *u_data
 
     def __init__(self, data_len: int):
@@ -101,58 +97,15 @@ cdef class SubscriptionClass:
             Sets maximum amount of events, that are kept in Subscription class
         """
         self.subscription = NULL
-        self.columns = list()
-        # if data_len > 0:
-        #     self.data = deque_wl(maxlen=data_len)
-        # else:
-        #     self.data = deque_wl()
-        self.data = lis.Observer()
-        self.u_data = <void *> self.data
-        self.listener = NULL
+        self.__event_handler = None
 
     def __dealloc__(self):
         dxf_close_subscription(self)
 
+    def set_event_handler(self, event_handler):
+        # TODO: docs, typing
+        self.__event_handler = event_handler
 
-    def set_data(self, new_obj):
-        self.data = new_obj
-        self.u_data = <void *> self.data
-
-
-    def get_data(self):
-        """
-        Method returns list with data, specified in event listener and returned data will be removed from object buffer
-
-        Returns
-        -------
-        list
-            List with data
-        """
-        return self.data.safe_get()
-
-    def to_dataframe(self, keep: bool=True):
-        """
-        Method converts data to the Pandas DataFrame
-
-        Parameters
-        ----------
-        keep: bool
-            When True copies data to dataframe, otherwise pops. Default True
-
-        Returns
-        -------
-        df: pandas DataFrame
-        """
-        if keep:
-            df_data = self.data.copy()
-        else:
-            df_data = self.data.safe_get()
-
-        df = pd.DataFrame(df_data, columns=self.columns)
-        time_columns = df.columns[df.columns.str.contains('Time')]
-        for column in time_columns:
-            df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
-        return df
 
 def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com:7300'):
     """
@@ -203,11 +156,9 @@ def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str] = None,
-                            data_len: int = 100000):
+def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int = 100000):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass
-
     Parameters
     ----------
     cc: ConnectionClass
@@ -215,11 +166,8 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
     event_type: str
         Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
         'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
-    candle_time: str
-        String of %Y-%m-%d %H:%M:%S datetime format for retrieving candles. By default set to now
     data_len: int
         Sets maximum amount of events, that are kept in Subscription class
-
     Returns
     -------
     sc: SubscriptionClass
@@ -231,20 +179,54 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
                           'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
         raise ValueError('Incorrect event type!')
 
-    sc = cc.make_new_subscription(data_len=data_len)
+    sc = SubscriptionClass(data_len=data_len)
+    cc.add_weakref(sc)
     sc.event_type_str = event_type
     et_type_int = event_type_convert(event_type)
 
-    try:
-        candle_time = datetime.strptime(candle_time, '%Y-%m-%d %H:%M:%S') if candle_time else datetime.utcnow()
-        timestamp = int((candle_time - datetime(1970, 1, 1)).total_seconds()) * 1000 - 5000
-    except ValueError:
-        raise Exception("Inappropriate date format, should be %Y-%m-%d %H:%M:%S")
+    clib.dxf_create_subscription(cc.connection, et_type_int, &sc.subscription)
 
-    if event_type == 'Candle':
-        clib.dxf_create_subscription_timed(sc.connection, et_type_int, timestamp, &sc.subscription)
-    else:
-        clib.dxf_create_subscription(sc.connection, et_type_int, &sc.subscription)
+    error_code = process_last_error(verbose=False)
+    if error_code:
+        raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
+    return sc
+
+def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int,  data_len: int = 100000):
+    """
+    Creates a timed subscription with the specified parameters.
+    Notes
+    -----
+    Default limit for 'Candle' event type is 8000 records. The other event types have default limit of 1000 records.
+    Parameters
+    ----------
+    cc: ConnectionClass
+        Variable with connection information
+    event_type: str
+        Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+        'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
+    time: int
+        UTC time in the past (unix time in milliseconds)
+    data_len: int
+        Sets maximum amount of events, that are kept in Subscription class
+    Returns
+    -------
+    sc: SubscriptionClass
+        Cython SubscriptionClass with information about subscription
+    """
+    if not cc.connection:
+        raise ValueError('Connection is not valid')
+    if event_type not in ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+                          'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
+        raise ValueError('Incorrect event type!')
+    if time < 0 or not isinstance(time, int):
+        raise ValueError('time argument should be non-negative integer!')
+
+    sc = SubscriptionClass(data_len=data_len)
+    cc.add_weakref(sc)
+    sc.event_type_str = event_type
+    et_type_int = event_type_convert(event_type)
+
+    clib.dxf_create_subscription_timed(cc.connection, et_type_int, time, &sc.subscription)
 
     error_code = process_last_error(verbose=False)
     if error_code:
@@ -282,6 +264,9 @@ def dxf_attach_listener(SubscriptionClass sc):
     """
     if not sc.subscription:
         raise ValueError('Subscription is not valid')
+    if not sc.__event_handler:
+        raise ValueError('Event handler is not defined!')
+
     if sc.event_type_str == 'Trade':
         sc.columns = lis.TRADE_COLUMNS
         sc.listener = lis.trade_default_listener
@@ -379,7 +364,7 @@ def dxf_close_connection(ConnectionClass cc):
         Variable with connection information
     """
     if cc.connection:
-        related_subs = cc.get_sub_refs()
+        related_subs = cc.get_weakrefs()
         for sub in related_subs:
             dxf_close_subscription(sub)
 
