@@ -52,6 +52,11 @@ print(f'Connected address: {connector.address}')
 print(f'Connection status: {connector.connection_status}')
 ```
 
+```text
+demo.dxfeed.com:7300
+Connected and authorized
+```
+
 ### Configure and create subscription
 You should specify event type. For timed subscription (conflated stream) you should also provide time to start subscription from.
 
@@ -98,6 +103,11 @@ print(f'Subscription event type: {tns_sub.event_type}')
 print(f'Subscription symbols: {candle_sub.symbols}')
 ```
 
+```text
+TimeAndSale
+['AAPL', 'MSFT']
+```
+
 ### Access data
 Data is stored as deque. Its length is configured with data_len parameter and by default is 100000. When you call method below you extracts all data recieved to the moment and clears the buffer in class.
 
@@ -121,6 +131,10 @@ candle_sub.detach_listener();
 ```python
 connector.close_connection()
 print(f'Connection status: {connector.connection_status}')
+```
+
+```text
+Not connected
 ```
 
 ### Transform data to pandas DataFrame
