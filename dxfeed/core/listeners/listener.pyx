@@ -1,5 +1,5 @@
 from dxfeed.core.utils.helpers cimport *
-
+from dxfeed.core.utils.handler cimport EventHandler
 cdef class FuncWrapper:
     def __cinit__(self):
         self.func = NULL
@@ -10,13 +10,6 @@ cdef class FuncWrapper:
         out.func = f
         return out
 
-cdef class Observer:
-    cdef void update(self, event) nogil:
-        with gil:
-            self.manual_update(event)
-
-    def manual_update(self, event):
-        print(f' Got {event} from update')
 
 TRADE_COLUMNS = ['Symbol', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume', 'Time', 'IsETH']
 cdef void trade_default_listener(int event_type,
@@ -25,11 +18,11 @@ cdef void trade_default_listener(int event_type,
                                  int data_count, void*user_data) nogil:
     cdef dxf_trade_t* trades = <dxf_trade_t*> data
     with gil:
-        py_data = <Observer> user_data
+        py_data = <EventHandler> user_data
 
         for i in range(data_count):
 
-            py_data.update([unicode_from_dxf_const_string_t(symbol_name),
+            py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
                                  trades[i].price,
                                  unicode_from_dxf_const_string_t(&trades[i].exchange_code),
                                  trades[i].size,

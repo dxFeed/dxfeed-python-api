@@ -37,6 +37,8 @@ dxfeed_c = ('dxfeed_c', dxfeed_c_lib_args)
 
 extensions = [Extension('dxfeed.core.utils.helpers', ['dxfeed/core/utils/helpers.' + ext],
                         include_dirs=include_dirs),
+              Extension('dxfeed.core.utils.handler', ['dxfeed/core/utils/handler.' + ext],
+                        include_dirs=include_dirs),
               Extension('dxfeed.core.listeners.listener', ['dxfeed/core/listeners/listener.' + ext],
                         include_dirs=include_dirs),
               Extension('dxfeed.core.DXFeedPy', ['dxfeed/core/DXFeedPy.' + ext_pp], libraries=libs,
