@@ -124,9 +124,6 @@ Data is stored as deque. Its length is configured with data_len parameter and by
 candle_sub.get_data()
 ```
 
-
-```
-
 ### Close connection
 
 
