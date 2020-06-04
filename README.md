@@ -61,8 +61,8 @@ print(f'Connection status: {endpoint.connection_status}')
 ```
 
 ```text
-demo.dxfeed.com:7300
-Connected and authorized
+Connected address: demo.dxfeed.com:7300
+Connection status: Connected and authorized
 ```
 
 ### Configure and create subscription
@@ -112,8 +112,8 @@ print(f'Subscription symbols: {candle_sub.symbols}')
 ```
 
 ```text
-TimeAndSale
-['AAPL', 'MSFT']
+Subscription event type: TimeAndSale
+Subscription symbols: ['AAPL', 'MSFT']
 ```
 
 ### Access data
@@ -133,7 +133,7 @@ print(f'Connection status: {endpoint.connection_status}')
 ```
 
 ```text
-Not connected
+Connection status: Not connected
 ```
 
 ### Transform data to pandas DataFrame
