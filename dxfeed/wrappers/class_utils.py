@@ -18,14 +18,11 @@ def to_iterable(value: Union[str, Iterable[str]]) -> Iterable[str]:
     -------
     : iterable
     """
-    if isinstance(value, collections.abc.Iterable):
-        if isinstance(value, str):
-            res = [value]
-        else:
-            res = value
-    else:
+    if isinstance(value, str):
+        value = [value]
+    if not isinstance(value, collections.abc.Iterable):
         raise TypeError(f'Expected string or iterable type, got {type(value)}')
-    return res
+    return value
 
 
 def handle_datetime(date_time: Union[str, datetime], fmt: str = '%Y-%m-%d %H:%M:%S.%f'):
