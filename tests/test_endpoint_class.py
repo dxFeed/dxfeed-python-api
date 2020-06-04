@@ -13,6 +13,11 @@ def dxfeed():
     dxf.close_connection()
 
 
+def test_endpoint_no_arguments():
+    dxf = dx.Endpoint()
+    assert 'Connected' == dxf.connection_status
+
+
 def test_connection_status_property(dxfeed):
     assert 'Connected' == dxfeed.connection_status
 
