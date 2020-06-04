@@ -7,7 +7,7 @@ name: Test package
 on:
   push:
     branches:
-      - master
+      - EN-1642-reconfig-cicd
 
 jobs:
   installation:
@@ -32,16 +32,15 @@ jobs:
       shell: bash
     - name: Set poetry env
       run: |
-        poetry config virtualenvs.create false
         poetry install --no-root --no-dev
-        pip install taskipy cython
-        task build -f sdist
-        pip uninstall --yes taskipy cython
+        poetry run pip install taskipy cython
+        poetry run task build -f sdist
+        poetry run pip uninstall --yes taskipy cython
       shell: bash
     - name: Install package artifact
       run: |
-        pip install dist/dxfeed*
-        pip uninstall --yes dxfeed
+        poetry run pip install dist/dxfeed*
+        poetry run pip uninstall --yes dxfeed
       shell: bash
   tests:
     needs: installation
@@ -66,15 +65,14 @@ jobs:
       shell: bash
     - name: Set poetry env
       run: |
-        poetry config virtualenvs.create false
         poetry install --no-root
       shell: bash
     - name: Run tests
       run: |
-        task test
+        poetry run task test
       shell: bash
     - name: Generate doc
       run: |
-        task html_docs
+        poetry run task html_docs
       shell: bash
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.7
