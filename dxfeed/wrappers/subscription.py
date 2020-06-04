@@ -1,5 +1,5 @@
 from dxfeed.core.DXFeedPy import *
-from typing import Iterable, Union
+from typing import Iterable, Union, Optional
 from datetime import datetime
 import dxfeed.wrappers.class_utils as cu
 
@@ -68,7 +68,7 @@ class Subscription(object):
         dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
         return self
 
-    def remove_symbols(self, symbols: Union[str, Iterable[str]] = None):
+    def remove_symbols(self, symbols: Optional[Union[str, Iterable[str]]] = None):
         """
         Method removes symbols from subscription. If no symbols provided removes all symbols
 
