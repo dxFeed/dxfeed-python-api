@@ -34,59 +34,127 @@ pip3 install dxfeed
 
 ## Basic usage
 
-All the functions in C API have similar ones in Python with the same name. Not all arguments are
-supported by now, this work is in progress.
+Following steps should be performed:
 
-**Import dxfeed library**:
+* Import
+* Create Endpoint
+* Create Subscription
+* Attach listener
+* Add tickers
+* Finally close subscription and connection 
+
+### Import package
 
 ```python
 import dxfeed as dx
-``` 
-
-**Create connection**:
-
-```python
-con = dx.dxf_create_connection(address='demo.dxfeed.com:7300')
+from datetime import datetime  # for timed subscription
 ```
 
-**Create one or several subscriptions of certain event types**:
-```python
-sub1 = dx.dxf_create_subscription(con, 'Trade')
-sub2 = dx.dxf_create_subscription(con, 'Quote')
-```
-'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
-'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' event types are supported.
+### Configure and create connection with Endpoint class
+Create instance of Endpoint class which will connect provided address. 
 
-**Attach listeners**:
+
 ```python
-dx.dxf_attach_listener(sub1)
-dx.dxf_attach_listener(sub2)
+endpoint = dx.Endpoint('demo.dxfeed.com:7300')
 ```
 
-**Add tickers you want to get data for**:
+Endpoint instance contains information about the connection, e.g. connection address or status
+
+
 ```python
-dx.dxf_add_symbols(sub1, ['AAPL', 'MSFT'])
-dx.dxf_add_symbols(sub2, ['AAPL', 'C'])
+print(f'Connected address: {endpoint.address}')
+print(f'Connection status: {endpoint.connection_status}')
 ```
 
-`dxfeed` has default listeners for each event type, but you are able to write 
-your custom one. You can find how to do it at `example/Custom listener example.ipynb`.
-
-**Look at the data**:
-```python
-sub1.get_data()
-sub2.get_data()
-```
-The data is stored in Subscription class. You can also turn dict to pandas DataFrame simply calling
-`sub1.to_dataframe()`.
-
-**Detach the listener, if you want to stop recieving data**:
-```python
-dx.dxf_detach_listener(sub1)
-dx.dxf_detach_listener(sub2)
+```text
+Connected address: demo.dxfeed.com:7300
+Connection status: Connected and authorized
 ```
 
-**Finally, close your connection**:
+### Configure and create subscription
+You should specify event type. For timed subscription (conflated stream) you should also provide time to start subscription from.
+
+
 ```python
-dx.dxf_close_connection(con)
+trade_sub = endpoint.create_subscription('Trade', data_len=-1)
+```
+
+**Attach default listener** - function that process incoming events
+
+
+```python
+trade_sub = trade_sub.attach_listener()
+```
+
+**Add tikers** you want to recieve events for
+
+
+```python
+trade_sub = trade_sub.add_symbols(['C', 'TSLA'])
+```
+
+For timed subscription you may provide either datetime object or string. String might be incomlete, in this case you will get warning with how your provided date parsed automatically
+
+
+```python
+tns_sub = endpoint.create_subscription('TimeAndSale', date_time=datetime.now()) \
+                  .attach_listener() \
+                  .add_symbols(['AMZN'])
+```
+
+
+```python
+candle_sub = endpoint.create_subscription('Candle', date_time='2020-04-16 13:05')
+candle_sub = candle_sub.attach_listener()
+candle_sub = candle_sub.add_symbols(['AAPL', 'MSFT'])
+```
+
+#### Subscription instance properties
+
+
+```python
+print(f'Subscription event type: {tns_sub.event_type}')
+print(f'Subscription symbols: {candle_sub.symbols}')
+```
+
+```text
+Subscription event type: TimeAndSale
+Subscription symbols: ['AAPL', 'MSFT']
+```
+
+### Access data
+Data is stored as deque. Its length is configured with data_len parameter and by default is 100000. When you call method below you extracts all data recieved to the moment and clears the buffer in class.
+
+
+```python
+candle_sub.get_data()
+```
+
+### Close connection
+
+
+```python
+endpoint.close_connection()
+print(f'Connection status: {endpoint.connection_status}')
+```
+
+```text
+Connection status: Not connected
+```
+
+### Transform data to pandas DataFrame
+
+
+```python
+trade_df = trade_sub.get_dataframe()
+```
+
+
+```python
+tns_df = tns_sub.get_dataframe()
+```
+
+
+```python
+candle_df = candle_sub.get_dataframe()
 ```

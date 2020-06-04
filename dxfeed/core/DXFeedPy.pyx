@@ -153,7 +153,14 @@ def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com
     Parameters
     ----------
     address: str
-        dxfeed url address
+        One of possible connection addresses:
+
+            - the single address: `host:port` or just `host`
+            - address with credentials: `host:port[username=xxx,password=yyy]`
+            - multiple addresses: `(host1:port1)(host2)(host3:port3[username=xxx,password=yyy])`
+            - the data from file: `/path/to/file` on nix and `drive:\\path\\to\\file` on Windows
+
+        Default: demo.dxfeed.com:7300
 
     Returns
     -------
@@ -169,7 +176,7 @@ def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com
     return cc
 
 def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
-                                     token: Union[str, unicode, bytes]):
+                                      token: Union[str, unicode, bytes]):
     """
     Function creates connection to dxfeed given url address and token
 
@@ -195,8 +202,7 @@ def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Optional[str] = None,
-                            data_len: int = 100000):
+def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int = 100000):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass
 
@@ -207,10 +213,8 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
     event_type: str
         Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
         'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
-    candle_time: str
-        String of %Y-%m-%d %H:%M:%S datetime format for retrieving candles. By default set to now
     data_len: int
-        Sets maximum amount of events, that are kept in Subscription class
+        Sets maximum amount of events, that are kept in Subscription class. Default 100000.
 
     Returns
     -------
@@ -219,24 +223,62 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, candle_time: Op
     """
     if not cc.connection:
         raise ValueError('Connection is not valid')
-    if event_type not in ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
-                          'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
-        raise ValueError('Incorrect event type!')
+    correct_types = ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+                     'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]
+    if event_type not in correct_types:
+        raise ValueError(f'Incorrect event type! Got {event_type}, expected one of {correct_types}')
 
     sc = cc.make_new_subscription(data_len=data_len)
     sc.event_type_str = event_type
     et_type_int = event_type_convert(event_type)
 
-    try:
-        candle_time = datetime.strptime(candle_time, '%Y-%m-%d %H:%M:%S') if candle_time else datetime.utcnow()
-        timestamp = int((candle_time - datetime(1970, 1, 1)).total_seconds()) * 1000 - 5000
-    except ValueError:
-        raise Exception("Inappropriate date format, should be %Y-%m-%d %H:%M:%S")
+    clib.dxf_create_subscription(sc.connection, et_type_int, &sc.subscription)
 
-    if event_type == 'Candle':
-        clib.dxf_create_subscription_timed(sc.connection, et_type_int, timestamp, &sc.subscription)
-    else:
-        clib.dxf_create_subscription(sc.connection, et_type_int, &sc.subscription)
+    error_code = process_last_error(verbose=False)
+    if error_code:
+        raise RuntimeError(f'In underlying C-API library error {error_code} occurred!')
+    return sc
+
+def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int,  data_len: int = 100000):
+    """
+    Creates a timed subscription with the specified parameters.
+
+    Notes
+    -----
+    Default limit for 'Candle' event type is 8000 records. The other event types have default limit of 1000 records.
+
+    Parameters
+    ----------
+    cc: ConnectionClass
+        Variable with connection information
+    event_type: str
+        Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+        'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
+    time: int
+        UTC time in the past (unix time in milliseconds)
+    data_len: int
+        Sets maximum amount of events, that are kept in Subscription class. Default 100000.
+
+
+    Returns
+    -------
+    sc: SubscriptionClass
+        Cython SubscriptionClass with information about subscription
+    """
+    if not cc.connection:
+        raise ValueError('Connection is not valid')
+    correct_types = ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+                     'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]
+    if event_type not in correct_types:
+        raise ValueError(f'Incorrect event type! Got {event_type}, expected one of {correct_types}')
+    if not isinstance(time, int) or time < 0:
+        raise ValueError('Time argument should be UNIX timestamp in milliseconds(non-negative integer)!')
+
+    sc = cc.make_new_subscription(data_len=data_len)
+    sc.event_type_str = event_type
+    et_type_int = event_type_convert(event_type)
+
+    clib.dxf_create_subscription_timed(sc.connection, et_type_int, time, &sc.subscription)
 
     error_code = process_last_error(verbose=False)
     if error_code:

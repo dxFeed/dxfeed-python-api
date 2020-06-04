@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dxfeed"
-version = "0.2.1"
+version = "0.3.0"
 description = "DXFeed Python API via C API"
 authors = ["Index Management Team <im@dxfeed.com>"]
 build = "build.py"
@@ -45,6 +45,8 @@ pytest = "^5.3.5"
 sphinx = "^2.4.4"
 toml = "^0.10.0"
 sphinx_rtd_theme = "^0.4.3"
+pygments = "^2.6.1"
+jupyter = "^1.0.0"
 
 [tool.poetry.extras]
 docs = ["toml"]
