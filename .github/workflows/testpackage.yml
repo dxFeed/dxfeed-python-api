@@ -13,7 +13,7 @@ jobs:
   installation:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest]
         python-version: [3.6, 3.7, 3.8]
 
     runs-on: ${{ matrix.os }}
@@ -47,7 +47,7 @@ jobs:
     needs: installation
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest]
         python-version: [3.6, 3.7, 3.8]
 
     runs-on: ${{ matrix.os }}
