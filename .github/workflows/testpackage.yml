@@ -13,8 +13,8 @@ jobs:
   installation:
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        python-version: [3.6]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.6, 3.7, 3.8]
 
     runs-on: ${{ matrix.os }}
 
@@ -71,7 +71,7 @@ jobs:
       shell: bash
     - name: Run tests
       run: |
-        pytest tests
+        task test
       shell: bash
     - name: Generate doc
       run: |
