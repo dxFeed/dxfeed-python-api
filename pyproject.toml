@@ -37,6 +37,7 @@ pandas = "^0.25.1"
 # Refer to: https://github.com/sdispater/poetry/issues/129
 # Issue to watch for: https://github.com/python-poetry/poetry/issues/1644
 toml = { version = "^0.10.0", optional = true }
+jupyter = { version = "^1.0.0", optional = true }
 
 [tool.poetry.dev-dependencies]
 cython = "^0.29.13"
@@ -46,7 +47,6 @@ sphinx = "^2.4.4"
 toml = "^0.10.0"
 sphinx_rtd_theme = "^0.4.3"
 pygments = "^2.6.1"
-jupyter = { version = "^1.0.0", optional = true }
 
 [tool.poetry.extras]
 docs = ["toml", "jupyter"]
