@@ -47,7 +47,7 @@ jobs:
     needs: installation
     strategy:
       matrix:
-        os: [ macos-latest]
+        os: [ubuntu-latest]
         python-version: [ 3.8]
 
     runs-on: ${{ matrix.os }}
