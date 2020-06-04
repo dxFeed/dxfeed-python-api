@@ -33,14 +33,14 @@ jobs:
     - name: Set poetry env
       run: |
         poetry install --no-root --no-dev
-        poetry run pip install taskipy cython
+        poetry add taskipy cython
         poetry run task build -f sdist
-        poetry run pip uninstall --yes taskipy cython
+        poetry remove taskipy cython
       shell: bash
     - name: Install package artifact
       run: |
-        poetry run pip install dist/dxfeed*
-        poetry run pip uninstall --yes dxfeed
+        poetry add dist/dxfeed*
+        poetry remove dxfeed
       shell: bash
   tests:
     needs: installation
