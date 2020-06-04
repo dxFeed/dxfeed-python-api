@@ -14,14 +14,12 @@ def dxfeed():
 
 
 def test_connection_status_property(dxfeed):
-    expected_status = 'Connected'
-    assert expected_status == dxfeed.connection_status
+    assert 'Connected' == dxfeed.connection_status
 
 
 def test_create_endpoint_without_connection():
-    expected_status = 'Not connected'
     dxf = dx.Endpoint(connect=False)
-    assert expected_status == dxf.connection_status
+    assert 'Not connected' == dxf.connection_status
 
 
 def test_address_property(dxfeed):
@@ -30,8 +28,7 @@ def test_address_property(dxfeed):
 
 def test_closing_connection(dxfeed):
     dxfeed.close_connection()
-    expected_status = 'Not connected'
-    assert expected_status == dxfeed.connection_status
+    assert 'Not connected' == dxfeed.connection_status
 
 
 @pytest.mark.xfail()
