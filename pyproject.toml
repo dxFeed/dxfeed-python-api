@@ -45,6 +45,7 @@ pytest = "^5.3.5"
 sphinx = "^2.4.4"
 toml = "^0.10.0"
 sphinx_rtd_theme = "^0.4.3"
+pygments = "^2.6.1"
 
 [tool.poetry.extras]
 docs = ["toml"]
