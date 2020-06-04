@@ -1,1 +1,2 @@
-from dxfeed.wrappers import Endpoint
+from dxfeed.wrappers.endpoint import Endpoint
+
