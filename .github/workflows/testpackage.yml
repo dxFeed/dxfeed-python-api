@@ -7,7 +7,7 @@ name: Test package
 on:
   push:
     branches:
-      - master
+      - EN-1642-reconfig-cicd
 
 jobs:
   installation:
@@ -67,7 +67,7 @@ jobs:
     - name: Set poetry env
       run: |
         poetry config virtualenvs.create false
-        poetry install --no-root
+        poetry install --no-root --user
       shell: bash
     - name: Run tests
       run: |
