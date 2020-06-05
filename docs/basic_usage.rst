@@ -3,83 +3,115 @@
 Basic Usage
 ===========
 
-All the functions in C API have similar ones in Python with the same name. Not all arguments are
-supported by now, this work is in progress.
+Import package
+~~~~~~~~~~~~~~
 
-First of all you have to import the package:
-
-.. code-block:: python
+.. code:: python3
 
     import dxfeed as dx
+    from datetime import datetime  # for timed subscription
 
-Next, the connection to dxfeed server should be established:
+Configure and create connection with Endpoint class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: python
+Create instance of Endpoint class which will connect provided address.
 
-    con = dx.dxf_create_connection(address='demo.dxfeed.com:7300')
+.. code:: python3
 
-To get events of certain types the subscription with this type should be
-create. One connection may have several subscriptions.
+    endpoint = dx.Endpoint('demo.dxfeed.com:7300')
 
-.. code-block:: python
+Endpoint instance contains information about the connection,
+e.g. connection address or status
 
-    sub1 = dx.dxf_create_subscription(con, 'Trade')
-    sub2 = dx.dxf_create_subscription(con, 'Quote')
+.. code:: python3
 
-.. note::
+    print(f'Connected address: {endpoint.address}')
+    print(f'Connection status: {endpoint.connection_status}')
 
-    'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH', 'SpreadOrder',
-    'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' event types are supported.
+.. code:: text
 
-Special function called listener should be attached to the subscription to start receiving
-events. There are default listeners already implemented in dxpyfeed, but you
-can write your own with cython: :ref:`custom_listener`. To attach
-default listener just call `dxf_attach_listener`
+    Connected address: demo.dxfeed.com:7300
+    Connection status: Connected and authorized
 
-.. code-block:: python
+Configure and create subscription
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    dx.dxf_attach_listener(sub1)
-    dx.dxf_attach_listener(sub2)
+You should specify event type. For timed subscription (conflated stream)
+you should also provide time to start subscription from.
 
-Each subscription should be provided with tickers to get events for:
+.. code:: python3
 
-.. code-block:: python
+    trade_sub = endpoint.create_subscription('Trade', data_len=-1)
 
-    dx.dxf_add_symbols(sub1, ['AAPL', 'MSFT'])
-    dx.dxf_add_symbols(sub2, ['AAPL', 'C'])
+**Attach default listener** - function that process incoming events
 
-The data can be extracted with `get_data()` method. It is stored as dict with list of columns and list
-of events. Note that `get_data` extracts the data and then clean the field. To look at data call this property:
+.. code:: python3
 
-.. code-block:: python
+    trade_sub = trade_sub.attach_listener()
 
-    sub1.get_data()
-    sub2.get_data()
+**Add tikers** you want to recieve events for
 
-The more convenient way to look at data is to convert it into pandas DataFrame.
-`to_dataframe` method of subscription class is responsible for that:
+.. code:: python3
 
-.. code-block:: python
+    trade_sub = trade_sub.add_symbols(['C', 'AAPL'])
 
-    sub1.to_dataframe()
-    sub2.to_dataframe()
+For timed subscription you may provide either datetime object or string.
+String might be incomlete, in this case you will get warning with how
+your provided date parsed automatically
 
-To stop receiving events just detach the listener:
+.. code:: python3
 
-.. code-block:: python
+    tns_sub = endpoint.create_subscription('TimeAndSale', date_time=datetime.now()) \
+                      .attach_listener() \
+                      .add_symbols(['AMZN'])
 
-     dx.dxf_detach_listener(sub1)
-     dx.dxf_detach_listener(sub2)
+.. code:: python3
 
-When you are done with subscription you'd better close it:
+    candle_sub = endpoint.create_subscription('Candle', date_time='2020-04-16 13:05')
+    candle_sub = candle_sub.attach_listener()
+    candle_sub = candle_sub.add_symbols(['AAPL', 'MSFT'])
 
-.. code-block:: python
+Subscription instance properties
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    dx.dxf_close_subscription(sub1)
-    dx.dxf_close_subscription(sub2)
+.. code:: python3
 
-Same with connection:
+    print(f'Subscription event type: {tns_sub.event_type}')
+    print(f'Subscription symbols: {candle_sub.symbols}')
 
-.. code-block:: python
+.. code:: text
 
-    dx.dxf_close_connection(con)
+    Subscription event type: TimeAndSale
+    Subscription symbols: ['AAPL', 'MSFT']
+
+Access data
+~~~~~~~~~~~
+
+Data is stored as deque. Its length is configured with data_len
+parameter and by default is 100000. When you call method below you
+extracts all data recieved to the moment and clears the buffer in class.
+
+.. code:: python3
+
+    candle_sub.get_data()
+
+Close connection
+~~~~~~~~~~~~~~~~
+
+.. code:: python3
+
+    endpoint.close_connection()
+    print(f'Connection status: {endpoint.connection_status}')
+
+.. code:: text
+
+    Connection status: Not connected
+
+Transform data to pandas DataFrame
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python3
+
+    trade_df = trade_sub.to_dataframe()
+    tns_df = tns_sub.to_dataframe()
+    candle_df = candle_sub.to_dataframe()

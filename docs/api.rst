@@ -3,8 +3,19 @@
 API Reference
 =============
 
-Core functions
---------------
+API
+------------------------
+
+.. automodule:: dxfeed.wrappers.endpoint
+	:members:
+	:inherited-members:
+
+.. automodule:: dxfeed.wrappers.subscription
+	:members:
+	:inherited-members:
+
+Low-level API
+-----------------------
 
 .. automodule:: dxfeed.core.DXFeedPy
 	:members:

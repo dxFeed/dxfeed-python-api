@@ -112,7 +112,14 @@ def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com
     Parameters
     ----------
     address: str
-        dxfeed url address
+        One of possible connection addresses:
+
+            - the single address: `host:port` or just `host`
+            - address with credentials: `host:port[username=xxx,password=yyy]`
+            - multiple addresses: `(host1:port1)(host2)(host3:port3[username=xxx,password=yyy])`
+            - the data from file: `/path/to/file` on nix and `drive:\\path\\to\\file` on Windows
+
+        Default: demo.dxfeed.com:7300
 
     Returns
     -------
@@ -128,7 +135,7 @@ def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com
     return cc
 
 def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
-                                     token: Union[str, unicode, bytes]):
+                                      token: Union[str, unicode, bytes]):
     """
     Function creates connection to dxfeed given url address and token
 
@@ -165,7 +172,8 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int =
         Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
         'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
     data_len: int
-        Sets maximum amount of events, that are kept in Subscription class
+        Sets maximum amount of events, that are kept in Subscription class. Default 100000.
+
     Returns
     -------
     sc: SubscriptionClass
@@ -173,9 +181,10 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int =
     """
     if not cc.connection:
         raise ValueError('Connection is not valid')
-    if event_type not in ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
-                          'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
-        raise ValueError('Incorrect event type!')
+    correct_types = ['Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
+                     'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]
+    if event_type not in correct_types:
+        raise ValueError(f'Incorrect event type! Got {event_type}, expected one of {correct_types}')
 
     sc = SubscriptionClass(data_len=data_len)
     cc.add_weakref(sc)
