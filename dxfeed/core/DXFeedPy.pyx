@@ -28,8 +28,8 @@ cpdef int process_last_error(verbose: bool=True):
     error_code: int
         Error code is returned
     """
-    cdef int error_code = dxec.dx_ec_success
-    cdef dxf_const_string_t error_descr = NULL
+    cdef int error_code
+    cdef dxf_const_string_t error_descr
     cdef int res
 
     res = clib.dxf_get_last_error(&error_code, &error_descr)
