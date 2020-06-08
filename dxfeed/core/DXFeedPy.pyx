@@ -107,6 +107,9 @@ cdef class SubscriptionClass:
         self.__event_handler = event_handler
         self.u_data = <void *> self.__event_handler
 
+    def get_event_handler(self):
+        return self.__event_handler
+
 
 def dxf_create_connection(address: Union[str, unicode, bytes] = 'demo.dxfeed.com:7300'):
     """

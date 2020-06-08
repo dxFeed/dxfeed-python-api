@@ -83,7 +83,7 @@ trade_sub = endpoint.create_subscription('Trade', data_len=-1)
 
 
 ```python
-trade_sub = trade_sub.attach_listener()
+trade_sub = trade_sub.attach_default_listener()
 ```
 
 **Add tikers** you want to recieve events for
@@ -98,14 +98,14 @@ For timed subscription you may provide either datetime object or string. String 
 
 ```python
 tns_sub = endpoint.create_subscription('TimeAndSale', date_time=datetime.now()) \
-                  .attach_listener() \
+                  .attach_default_listener() \
                   .add_symbols(['AMZN'])
 ```
 
 
 ```python
 candle_sub = endpoint.create_subscription('Candle', date_time='2020-04-16 13:05')
-candle_sub = candle_sub.attach_listener()
+candle_sub = candle_sub.attach_default_listener()
 candle_sub = candle_sub.add_symbols(['AAPL', 'MSFT'])
 ```
 

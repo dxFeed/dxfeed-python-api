@@ -1,4 +1,5 @@
 from dxfeed.core.DXFeedPy import *
+from dxfeed.core.utils.handler import DefaultHandler
 from typing import Iterable, Union, Optional
 from datetime import datetime
 import dxfeed.wrappers.class_utils as cu
@@ -16,9 +17,6 @@ class Subscription(object):
     event_type: str
         One of possible event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle',
         'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
-    data_len: int
-        The amount of events kept in Subscription class. By default event is received as list and each event is stored
-        in deque of fixed size. To have no limits for the deque set this value to -1. Default 100000.
     date_time: str or datetime.datetime
         If present timed subscription will be created (conflated stream). For sting date format is following:
         %Y-%m-%d %H:%M:%S.%f. If None - stream subscription will be created (non-conflated). Default - None.
@@ -66,6 +64,7 @@ class Subscription(object):
         self: Subscription
         """
         dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
+        self.attach_default_listener()  # TODO: describe in docs
         return self
 
     def remove_symbols(self, symbols: Optional[Union[str, Iterable[str]]] = None):
@@ -93,7 +92,7 @@ class Subscription(object):
         """
         dxf_close_subscription(sc=self.__sub)
 
-    def attach_listener(self):
+    def attach_default_listener(self):
         """
         Method to attach default listener.
 
@@ -101,6 +100,9 @@ class Subscription(object):
         -------
         self: Subscription
         """
+        # TODO: describe in docs
+        if not self.__sub.get_event_handler():
+            self.__sub.set_event_handler(DefaultHandler())
         dxf_attach_listener(self.__sub)
         return self
 
@@ -114,6 +116,10 @@ class Subscription(object):
         """
         dxf_detach_listener(self.__sub)
         return self
+
+    def get_event_handler(self):
+        # TODO: docs
+        return self.__sub.get_event_handler()
 
     def get_list(self):
         """
