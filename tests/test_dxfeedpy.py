@@ -120,16 +120,3 @@ def test_symbol_clearing(connection):
     actual_symbols = dxc.dxf_get_symbols(sc=sub)
     dxc.dxf_close_subscription(sub)
     assert actual_symbols == []
-
-
-@pytest.mark.parametrize('sub_type', ValueStorage.event_types)
-def test_default_listeners(connection, sub_type):
-    con_err_status = dxc.process_last_error(verbose=False)
-    sub = dxc.dxf_create_subscription(connection, sub_type)
-    sub_err_status = dxc.process_last_error(verbose=False)
-    dxc.dxf_attach_listener(sub)
-    add_lis_err_status = dxc.process_last_error(verbose=False)
-    dxc.dxf_detach_listener(sub)
-    drop_lis_err_status = dxc.process_last_error(verbose=False)
-    dxc.dxf_close_subscription(sub)
-    assert (con_err_status, sub_err_status, add_lis_err_status, drop_lis_err_status) == (0, 0, 0, 0)

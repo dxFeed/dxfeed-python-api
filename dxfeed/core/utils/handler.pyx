@@ -1,6 +1,9 @@
 from warnings import warn
 
 cdef class EventHandler:
+    def __init__(self):
+        self.columns = list()
+
     cdef void __update(self, event) nogil:
         with gil:
             self.update(event)

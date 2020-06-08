@@ -82,7 +82,6 @@ cdef class SubscriptionClass:
     cdef object __weakref__  # Weak referencing enabling
     cdef object event_type_str
     cdef dxf_event_listener_t listener
-    cdef list columns
     cdef object __event_handler
     cdef void *u_data
 
@@ -279,46 +278,46 @@ def dxf_attach_listener(SubscriptionClass sc):
         raise ValueError('Event handler is not defined!')
 
     if sc.event_type_str == 'Trade':
-        sc.columns = lis.TRADE_COLUMNS
+        sc.__event_handler.columns = lis.TRADE_COLUMNS
         sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'Quote':
-        sc.columns = lis.QUOTE_COLUMNS
+        sc.__event_handler.columns = lis.QUOTE_COLUMNS
         sc.listener = lis.quote_default_listener
     elif sc.event_type_str == 'Summary':
-        sc.columns = lis.SUMMARY_COLUMNS
+        sc.__event_handler.columns = lis.SUMMARY_COLUMNS
         sc.listener = lis.summary_default_listener
     elif sc.event_type_str == 'Profile':
-        sc.columns = lis.PROFILE_COLUMNS
+        sc.__event_handler.columns = lis.PROFILE_COLUMNS
         sc.listener = lis.profile_default_listener
     elif sc.event_type_str == 'TimeAndSale':
-        sc.columns = lis.TIME_AND_SALE_COLUMNS
+        sc.__event_handler.columns = lis.TIME_AND_SALE_COLUMNS
         sc.listener = lis.time_and_sale_default_listener
     elif sc.event_type_str == 'Candle':
-        sc.columns = lis.CANDLE_COLUMNS
+        sc.__event_handler.columns = lis.CANDLE_COLUMNS
         sc.listener = lis.candle_default_listener
     elif sc.event_type_str == 'Order':
-        sc.columns = lis.ORDER_COLUMNS
+        sc.__event_handler.columns = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
     elif sc.event_type_str == 'TradeETH':
-        sc.columns = lis.TRADE_COLUMNS
+        sc.__event_handler.columns = lis.TRADE_COLUMNS
         sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'SpreadOrder':
-        sc.columns = lis.ORDER_COLUMNS
+        sc.__event_handler.columns = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
     elif sc.event_type_str == 'Greeks':
-        sc.columns = lis.GREEKS_COLUMNS
+        sc.__event_handler.columns = lis.GREEKS_COLUMNS
         sc.listener = lis.greeks_default_listener
     elif sc.event_type_str == 'TheoPrice':
-        sc.columns = lis.THEO_PRICE_COLUMNS
+        sc.__event_handler.columns = lis.THEO_PRICE_COLUMNS
         sc.listener = lis.theo_price_default_listener
     elif sc.event_type_str == 'Underlying':
-        sc.columns = lis.UNDERLYING_COLUMNS
+        sc.__event_handler.columns = lis.UNDERLYING_COLUMNS
         sc.listener = lis.underlying_default_listener
     elif sc.event_type_str == 'Series':
-        sc.columns = lis.SERIES_COLUMNS
+        sc.__event_handler.columns = lis.SERIES_COLUMNS
         sc.listener = lis.series_default_listener
     elif sc.event_type_str == 'Configuration':
-        sc.columns = lis.CONFIGURATION_COLUMNS
+        sc.__event_handler.columns = lis.CONFIGURATION_COLUMNS
         sc.listener = lis.configuration_default_listener
     else:
         raise Exception(f'No default listener for {sc.event_type_str} event type')
@@ -345,7 +344,7 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
         raise ValueError('Subscription is not valid')
     if data:
         sc.data = data
-    sc.columns = columns
+    sc.__event_handler.columns = columns
     sc.listener = fw.func
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
