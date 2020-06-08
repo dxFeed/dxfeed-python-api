@@ -4,6 +4,7 @@ import pandas as pd
 
 
 cdef class EventHandler:
+    # TODO: docs
     def __init__(self):
         self.columns = list()
 
@@ -15,6 +16,7 @@ cdef class EventHandler:
         warn(Warning('You have not implemented update method in your EventHandler, that is called, when event comes!'))
 
 cdef class DefaultHandler(EventHandler):
+    # TODO: docs
     def __init__(self, data_len: int=100000):
         self.__data = deque(maxlen=data_len)
 

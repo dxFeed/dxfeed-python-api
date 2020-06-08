@@ -61,7 +61,7 @@ class Endpoint(object):
 
         return self
 
-    def create_subscription(self, event_type: str, data_len: int = 100000, date_time: Union[str, datetime] = None):
+    def create_subscription(self, event_type: str, date_time: Union[str, datetime] = None):
         """
         Method creates certain event type subscription and returns Subscription class
 
@@ -70,8 +70,6 @@ class Endpoint(object):
         event_type: str
             One of possible event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle',
             'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
-        data_len: int
-            The amount of events kept in Subscription class. To have no limits set this value to -1
         date_time: str or datetime.datetime
             If present timed subscription will be created (conflated stream). For sting date format is following:
             %Y-%m-%d %H:%M:%S.%f. If None - stream subscription will be created. Default - None.
@@ -90,8 +88,7 @@ class Endpoint(object):
             raise ValueError('Connection is not established')
         subscription = Subscription(connection=self.__connection,
                                     event_type=event_type,
-                                    date_time=date_time,
-                                    data_len=data_len)
+                                    date_time=date_time)
         return subscription
 
     def close_connection(self):
