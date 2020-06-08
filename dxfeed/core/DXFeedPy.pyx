@@ -96,8 +96,12 @@ cdef class SubscriptionClass:
         self.subscription = NULL
         self.__event_handler = None
 
-    def __dealloc__(self):
+    def __close(self):
+        # TODO: docs
         dxf_close_subscription(self)
+
+    def __dealloc__(self):
+        self.__close()
 
     def set_event_handler(self, event_handler):
         # TODO: docs, typing
@@ -371,9 +375,9 @@ def dxf_close_connection(ConnectionClass cc):
         Variable with connection information
     """
     if cc.connection:
-        related_subs = cc.get_weakrefs()
-        for sub in related_subs:
-            dxf_close_subscription(sub)
+        con_dependants = cc.get_weakrefs()
+        for dependant in con_dependants:
+            dependant.__close()
 
         clib.dxf_close_connection(cc.connection)
         cc.connection = NULL
