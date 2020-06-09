@@ -1,4 +1,5 @@
 import dxfeed.core.DXFeedPy as dxc
+from dxfeed.core.utils.handler import DefaultHandler
 import pytest
 
 
@@ -120,3 +121,10 @@ def test_symbol_clearing(connection):
     actual_symbols = dxc.dxf_get_symbols(sc=sub)
     dxc.dxf_close_subscription(sub)
     assert actual_symbols == []
+
+
+@pytest.mark.parametrize('sub_type', ValueStorage.event_types)
+def test_default_event_handler(connection, sub_type):
+    sub = dxc.dxf_create_subscription(cc=connection, event_type=sub_type)
+    sub.set_event_handler(DefaultHandler())
+    assert isinstance(sub.get_event_handler(), DefaultHandler)
