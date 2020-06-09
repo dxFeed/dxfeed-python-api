@@ -63,8 +63,8 @@ class Subscription(object):
         -------
         self: Subscription
         """
-        dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
         self.attach_default_listener()  # TODO: describe in docs
+        dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
         return self
 
     def remove_symbols(self, symbols: Optional[Union[str, Iterable[str]]] = None):
