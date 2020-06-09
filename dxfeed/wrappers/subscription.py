@@ -125,31 +125,3 @@ class Subscription(object):
         # TODO: docs
         self.__sub.set_event_handler(handler)
         return self
-
-
-    def get_list(self):
-        """
-        Method to get data. When called internal field is cleared
-
-        Returns
-        -------
-        data: list
-            List of events. Each event contains list with data related to subscription type.
-        """
-        return self.__sub.get_data()
-
-    def get_dataframe(self, keep: bool = True):
-        """
-        Method converts data to the Pandas DataFrame
-
-        Parameters
-        ----------
-        keep: bool
-            When True copies data to dataframe, otherwise pops. Default True
-
-        Returns
-        -------
-        df: pandas.DataFrame
-            Dataframe each row - one event.
-        """
-        return self.__sub.to_dataframe(keep)

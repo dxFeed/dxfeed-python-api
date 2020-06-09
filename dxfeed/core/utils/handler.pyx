@@ -26,7 +26,7 @@ cdef class DefaultHandler(EventHandler):
     def get_list(self):
         data = self.__data.copy()
         self.__data.clear()
-        return data
+        return list(data)
 
     def get_dataframe(self, keep: bool=True):
         df_data = self.__data.copy()
