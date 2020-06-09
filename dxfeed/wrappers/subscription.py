@@ -101,8 +101,8 @@ class Subscription(object):
         self: Subscription
         """
         # TODO: describe in docs
-        if not self.__sub.get_event_handler():
-            self.__sub.set_event_handler(DefaultHandler())
+        if not self.get_event_handler():
+            self.set_event_handler(DefaultHandler())
         dxf_attach_listener(self.__sub)
         return self
 
@@ -120,6 +120,12 @@ class Subscription(object):
     def get_event_handler(self):
         # TODO: docs
         return self.__sub.get_event_handler()
+
+    def set_event_handler(self, handler):
+        # TODO: docs
+        self.__sub.set_event_handler(handler)
+        return self
+
 
     def get_list(self):
         """
