@@ -128,3 +128,17 @@ def test_default_event_handler(connection, sub_type):
     sub = dxc.dxf_create_subscription(cc=connection, event_type=sub_type)
     sub.set_event_handler(DefaultHandler())
     assert isinstance(sub.get_event_handler(), DefaultHandler)
+
+
+def test_weakref():
+    con = dxc.ConnectionClass()
+    sub = dxc.SubscriptionClass()
+    con.add_weakref(sub)
+    assert con.get_weakrefs()[0] is sub
+
+
+@pytest.mark.xfail
+def test_weakref_fail_on_incorrect_type():
+    con = dxc.ConnectionClass()
+    obj = list()
+    con.add_weakref(obj)
