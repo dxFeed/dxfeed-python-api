@@ -53,7 +53,9 @@ class Subscription(object):
 
     def add_symbols(self, symbols: Union[str, Iterable[str]]):
         """
-        Method to add symbol. Supports addition of one symbol as a string as well as list of symbols
+        Method to add symbol. Supports addition of one symbol as a string as well as list of symbols.
+        If no event handler was set, DefaultHandler will be initialized.
+
         Parameters
         ----------
         symbols: str, Iterable
@@ -63,7 +65,7 @@ class Subscription(object):
         -------
         self: Subscription
         """
-        self.attach_default_listener()  # TODO: describe in docs
+        self.attach_default_listener()
         dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
         return self
 
@@ -94,13 +96,12 @@ class Subscription(object):
 
     def attach_default_listener(self):
         """
-        Method to attach default listener.
+        Method to attach default listener. If event handler was not previously set, DefaultHandler will be initialized.
 
         Returns
         -------
         self: Subscription
         """
-        # TODO: describe in docs
         if not self.get_event_handler():
             self.set_event_handler(DefaultHandler())
         dxf_attach_listener(self.__sub)
@@ -118,10 +119,27 @@ class Subscription(object):
         return self
 
     def get_event_handler(self):
-        # TODO: docs
+        """
+        Method to get event handler. If no handlers passed previously returns None.
+
+        Returns
+        -------
+        handler: EventHandler
+        """
         return self.__sub.get_event_handler()
 
-    def set_event_handler(self, handler):
-        # TODO: docs
+    def set_event_handler(self, handler: EventHandler):
+        """
+        Method to set the handler.
+
+        Parameters
+        ----------
+        handler: EventHandler
+            Event handler with `update` method defined.
+
+        Returns
+        -------
+        self: Subscription
+        """
         self.__sub.set_event_handler(handler)
         return self
