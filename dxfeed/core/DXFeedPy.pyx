@@ -9,6 +9,7 @@ cimport dxfeed.core.listeners.listener as lis
 from typing import Optional, Union, Iterable
 from warnings import warn
 from weakref import WeakSet
+from dxfeed.core.utils.handler import EventHandler
 
 # for importing variables
 import dxfeed.core.listeners.listener as lis
@@ -60,7 +61,7 @@ cdef class ConnectionClass:
 
     def get_weakrefs(self):
         """
-        Method to get list of references to all subscriptions related to current connection
+        Method to get list of references to all subscriptions related to current connection.
 
         Returns
         -------
@@ -69,8 +70,17 @@ cdef class ConnectionClass:
         """
         return list(self.__weakrefs)
 
-    def add_weakref(self, obj):
-        # TODO: docs, type checking
+    def add_weakref(self, obj: SubscriptionClass):
+        """
+        Method to link ConnectionClass with its users (e.g. SubscriptionClass) via weak reference.
+
+        Parameters
+        ----------
+        obj: SubscriptionClass
+            Object to be linked to ConnectionClass
+        -------
+
+        """
         self.__weakrefs.add(obj)
 
 
@@ -85,7 +95,7 @@ cdef class SubscriptionClass:
     cdef object __event_handler
     cdef void *u_data
 
-    def __init__(self, data_len: int):
+    def __init__(self):
         """
         Parameters
         ----------
@@ -96,14 +106,23 @@ cdef class SubscriptionClass:
         self.__event_handler = None
 
     def __close(self):
-        # TODO: docs
+        """
+        Common method for ConnectionClass related classes to finalize everything related to object.
+        """
         dxf_close_subscription(self)
 
     def __dealloc__(self):
         self.__close()
 
-    def set_event_handler(self, event_handler):
-        # TODO: docs, typing
+    def set_event_handler(self, event_handler: EventHandler):
+        """
+        Method to assign event handler to SubscriptionClass.
+
+        Parameters
+        ----------
+        event_handler: EventHandler
+            Handler to attach to SubscriptionClass
+        """
         self.__event_handler = event_handler
         self.u_data = <void *> self.__event_handler
 
@@ -169,7 +188,8 @@ def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
 
 def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int = 100000):
     """
-    Function creates subscription and writes all relevant information to SubscriptionClass
+    Function creates subscription and writes all relevant information to SubscriptionClass.
+
     Parameters
     ----------
     cc: ConnectionClass
@@ -177,8 +197,6 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int =
     event_type: str
         Event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle', 'TradeETH',
         'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
-    data_len: int
-        Sets maximum amount of events, that are kept in Subscription class. Default 100000.
 
     Returns
     -------
@@ -192,7 +210,7 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int =
     if event_type not in correct_types:
         raise ValueError(f'Incorrect event type! Got {event_type}, expected one of {correct_types}')
 
-    sc = SubscriptionClass(data_len=data_len)
+    sc = SubscriptionClass()
     cc.add_weakref(sc)
     sc.event_type_str = event_type
     et_type_int = event_type_convert(event_type)
@@ -204,12 +222,14 @@ def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int =
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return sc
 
-def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int,  data_len: int = 100000):
+def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int):
     """
     Creates a timed subscription with the specified parameters.
+
     Notes
     -----
     Default limit for 'Candle' event type is 8000 records. The other event types have default limit of 1000 records.
+
     Parameters
     ----------
     cc: ConnectionClass
@@ -219,8 +239,7 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
         'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
     time: int
         UTC time in the past (unix time in milliseconds)
-    data_len: int
-        Sets maximum amount of events, that are kept in Subscription class
+
     Returns
     -------
     sc: SubscriptionClass
@@ -234,7 +253,7 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
     if time < 0 or not isinstance(time, int):
         raise ValueError('time argument should be non-negative integer!')
 
-    sc = SubscriptionClass(data_len=data_len)
+    sc = SubscriptionClass()
     cc.add_weakref(sc)
     sc.event_type_str = event_type
     et_type_int = event_type_convert(event_type)
