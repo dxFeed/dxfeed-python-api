@@ -26,19 +26,17 @@ class Subscription(object):
     Some event types (e.g. Candle) support only timed subscription.
 
     """
-    def __init__(self, connection, event_type: str, date_time: Union[str, datetime], data_len: int = 100000):
+    def __init__(self, connection, event_type: str, date_time: Union[str, datetime]):
         self.__event_type = event_type
         if date_time is None:
             self.__sub = dxf_create_subscription(cc=connection,
-                                                 event_type=event_type,
-                                                 data_len=data_len)
+                                                 event_type=event_type)
         else:
             date_time = cu.handle_datetime(date_time, fmt='%Y-%m-%d %H:%M:%S.%f')
             timestamp = int(date_time.timestamp() * 1000)
             self.__sub = dxf_create_subscription_timed(cc=connection,
                                                        event_type=event_type,
-                                                       time=timestamp,
-                                                       data_len=data_len)
+                                                       time=timestamp)
 
     def __del__(self):
         self.close_subscription()
