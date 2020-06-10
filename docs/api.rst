@@ -14,6 +14,10 @@ API
 	:members:
 	:inherited-members:
 
+.. automodule:: dxfeed.core.utils.handler
+	:members:
+	:inherited-members:
+
 Low-level API
 -----------------------
 
@@ -28,5 +32,3 @@ Utils functions
 	:members:
 	:inherited-members:
 
-.. automodule:: dxfeed.core.utils.data_class
-	:members:
