@@ -1,5 +1,7 @@
 from dxfeed.core.utils.helpers cimport *
 from dxfeed.core.utils.handler cimport EventHandler
+
+
 cdef class FuncWrapper:
     def __cinit__(self):
         self.func = NULL

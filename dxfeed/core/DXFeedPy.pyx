@@ -116,15 +116,31 @@ cdef class SubscriptionClass:
 
     def set_event_handler(self, event_handler: EventHandler):
         """
-        Method to assign event handler to SubscriptionClass.
+        Method to assign event handler to SubscriptionClass. If the SubscriptionClass already has active listener
+        the method will save the listener. After that listener will be reattached.
 
         Parameters
         ----------
         event_handler: EventHandler
             Handler to attach to SubscriptionClass
         """
-        self.__event_handler = event_handler
-        self.u_data = <void *> self.__event_handler
+        if self.listener:
+            # saving current listener - related data
+            warn(Warning('Handler replacing'))
+            try:
+                tmp_columns = self.__event_handler.columns
+            except ValueError:
+                tmp_columns = list()
+            tmp_listener = lis.FuncWrapper.make_from_ptr(self.listener)
+            # reattaching listener
+            dxf_detach_listener(self)
+            self.__event_handler = event_handler
+            self.u_data = <void *> self.__event_handler
+            dxf_attach_custom_listener(self, tmp_listener, tmp_columns)
+        else:
+            self.__event_handler = event_handler
+            self.u_data = <void *> self.__event_handler
+
 
     def get_event_handler(self):
         return self.__event_handler
@@ -347,7 +363,7 @@ def dxf_attach_listener(SubscriptionClass sc):
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
 
-def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns: Iterable[str], data: Iterable = None):
+def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns: Iterable[str]):
     """
     Attaches custom listener
 
@@ -359,14 +375,16 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
         c function wrapped in FuncWrapper class with Cython
     columns: list
         Columns for internal data of SubscriptionClass
-    data: dict
-        Dict with new internal data structure of  SubscriptionClass
     """
     if not sc.subscription:
         raise ValueError('Subscription is not valid')
-    if data:
-        sc.data = data
-    sc.__event_handler.columns = columns
+    if not sc.__event_handler:
+        raise ValueError('Event handler is not defined!')
+
+    try:
+        sc.__event_handler.columns = columns
+    except ValueError:
+        warn(Warning('Event handler does not have columns attribute!'))
     sc.listener = fw.func
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
