@@ -142,3 +142,17 @@ def test_weakref_fail_on_incorrect_type():
     con = dxc.ConnectionClass()
     obj = list()
     con.add_weakref(obj)
+
+
+@pytest.mark.filterwarnings('ignore::Warning')
+def test_double_event_handler_attachment(connection):
+    handler1 = DefaultHandler()
+    handler2 = DefaultHandler()
+    sub = dxc.dxf_create_subscription(cc=connection, event_type='Trade')
+    sub.set_event_handler(handler1)
+    dxc.dxf_attach_listener(sub)
+    symbols = ['AAPL', 'MSFT']
+    dxc.dxf_add_symbols(sub, symbols)
+    sub.set_event_handler(handler2)
+    assert sub.get_event_handler() is handler2
+    assert dxc.dxf_get_symbols(sub) == symbols

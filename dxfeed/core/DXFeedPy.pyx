@@ -125,18 +125,19 @@ cdef class SubscriptionClass:
             Handler to attach to SubscriptionClass
         """
         if self.listener:
-            # saving current listener - related data
-            warn(Warning('Handler replacing'))
-            try:
-                tmp_columns = self.__event_handler.columns
-            except ValueError:
-                tmp_columns = list()
-            tmp_listener = lis.FuncWrapper.make_from_ptr(self.listener)
-            # reattaching listener
-            dxf_detach_listener(self)
-            self.__event_handler = event_handler
-            self.u_data = <void *> self.__event_handler
-            dxf_attach_custom_listener(self, tmp_listener, tmp_columns)
+            if event_handler is not self.__event_handler:
+                # saving current listener - related data
+                warn(Warning('Handler replacing'))
+                try:
+                    tmp_columns = self.__event_handler.columns
+                except ValueError:
+                    tmp_columns = list()
+                tmp_listener = lis.FuncWrapper.make_from_ptr(self.listener)
+                # reattaching listener
+                dxf_detach_listener(self)
+                self.__event_handler = event_handler
+                self.u_data = <void *> self.__event_handler
+                dxf_attach_custom_listener(self, tmp_listener, tmp_columns)
         else:
             self.__event_handler = event_handler
             self.u_data = <void *> self.__event_handler
