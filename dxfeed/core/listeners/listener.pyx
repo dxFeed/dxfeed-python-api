@@ -160,7 +160,7 @@ cdef void candle_default_listener(int event_type,
                               candle[i].open_interest,
                               candle[i].imp_volatility])
 
-ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'TimeNanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
+ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Nanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
                  'Side', 'ExchangeCode', 'MarketMaker', 'SpreadSymbol']
 cdef void order_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
