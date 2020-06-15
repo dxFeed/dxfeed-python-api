@@ -19,6 +19,7 @@ On this website, you will find dxfeed usage examples and docstrings to each func
 and its methods and fields.
 
 Source code: `github.com/dxFeed/dxfeed-python-api <https://github.com/dxFeed/dxfeed-python-api>`_
+
 Package distribution: `pypi.org/project/dxfeed <https://pypi.org/project/dxfeed>`_
 
 Table of contents:
