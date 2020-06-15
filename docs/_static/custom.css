@@ -19,8 +19,9 @@ table {
     overflow-x: scroll;
 }
 
-.highlight {
+.highlight-text > .highlight > pre {
+    background-color: wheat;
     display: block;
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
 }

@@ -31,6 +31,7 @@ Table of contents:
    self
    installation.rst
    basic_usage.rst
+   custom_handler.rst
    api.rst
    core_usage.rst
    custom_listener.rst

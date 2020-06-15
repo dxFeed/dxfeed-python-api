@@ -53,7 +53,7 @@ e.g. connection address or status
     print(f'Connection status: {endpoint.connection_status}')
 
 
-.. parsed-literal::
+.. code-block:: text
 
     Connected address: demo.dxfeed.com:7300
     Connection status: Connected and authorized
@@ -98,7 +98,7 @@ with how your provided date parsed automatically
     candle_sub = candle_sub.add_symbols(['AAPL', 'MSFT'])
 
 
-.. parsed-literal::
+.. code-block:: text
 
     c:\job\python-api\dxfeed\wrappers\class_utils.py:38: UserWarning: Datetime argument does not exactly match %Y-%m-%d %H:%M:%S.%f format, date was parsed automatically as 2020-04-16 13:05:00.000000
       warn(warn_message, UserWarning)
@@ -121,7 +121,7 @@ Subscription instance properties
     print(f'Cnadle subscription symbols: {candle_sub.symbols}')
 
 
-.. parsed-literal::
+.. code-block:: text
 
     TimeAndSale subscription event type: TimeAndSale
     Cnadle subscription symbols: ['AAPL', 'MSFT']
@@ -139,7 +139,7 @@ handler that stores no data.
     print(f'Candle columns: {candle_handler.columns}')
 
 
-.. parsed-literal::
+.. code-block:: text
 
     Trade columns: ['Symbol', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume', 'Time', 'IsETH']
     Candle columns: ['Symbol', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close', 'Volume', 'VWap', 'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
@@ -257,7 +257,7 @@ handler that stores no data.
 
 
 
-.. parsed-literal::
+.. code-block:: text
 
     [['MSFT',
       6838531241273198328,
@@ -325,7 +325,7 @@ Close connection
     print(f'Connection status: {endpoint.connection_status}')
 
 
-.. parsed-literal::
+.. code-block:: text
 
     Connection status: Not connected
     
