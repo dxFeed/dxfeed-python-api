@@ -18,3 +18,9 @@ table {
     display: block;
     overflow-x: scroll;
 }
+
+.highlight {
+    display: block;
+    max-height: 200px;
+    overflow-y: auto;
+}
