@@ -1,7 +1,12 @@
 .. _api:
 
+.. meta::
+   :description lang=en: dxfeed package docstrings.
+
 API Reference
 =============
+
+This page contains only automatically generated documentation to functions, classes, methods, etc.
 
 API
 ------------------------
