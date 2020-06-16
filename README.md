@@ -14,13 +14,17 @@ The library is build as a thin wrapper over [dxFeed C-API library](https://githu
 We use [Cython](https://cython.org/) in this project as it combines flexibility, reliability and
 usability in writing C extensions.
 
-This package already contains basic C-API functions related to creating connections, subscriptions etc.
-Moreover default listeners (functions responsible for event processing) are ready to use. The user is also able to
-write his own custom listener in Cython
+The design of the dxfeed package allows users to write any logic related to events in python as well as 
+extending lower level Cython functionality. Moreover, one may start working with the API using the default 
+values like function arguments or a default event handler.
+
+Documentation: [dxfeed.readthedocs.io](https://dxfeed.readthedocs.io/en/latest/)
+
+Package distribution: [pypi.org/project/dxfeed](https://pypi.org/project/dxfeed/)
 
 ## Installation
 
-**Requirements:** python >3.6, pandas
+**Requirements:** python >= 3.6, pandas
 
 ```python
 pip3 install pandas
@@ -39,7 +43,7 @@ Following steps should be performed:
 * Import
 * Create Endpoint
 * Create Subscription
-* Attach listener
+* Attach event handler
 * Add tickers
 * Finally close subscription and connection 
 
@@ -76,37 +80,46 @@ You should specify event type. For timed subscription (conflated stream) you sho
 
 
 ```python
-trade_sub = endpoint.create_subscription('Trade', data_len=-1)
+trade_sub = endpoint.create_subscription('Trade')
 ```
 
-**Attach default listener** - function that process incoming events
+**Attach default or custom event handler** - class that process incoming events. For details about custom
+event handler look into `CustomHandlerExample.ipynb` jupyter notebook in `exapmles` folder of this repository.
 
 
 ```python
-trade_sub = trade_sub.attach_default_listener()
+trade_handler = dx.DefaultHandler()
+trade_sub = trade_sub.set_event_handler(trade_handler)
 ```
 
-**Add tikers** you want to recieve events for
+**Add tikers** you want to receive events for
 
 
 ```python
-trade_sub = trade_sub.add_symbols(['C', 'TSLA'])
+trade_sub = trade_sub.add_symbols(['C', 'AAPL'])
 ```
 
-For timed subscription you may provide either datetime object or string. String might be incomlete, in this case you will get warning with how your provided date parsed automatically
+For timed subscription you may provide either datetime object or string. String might be incomlete, in 
+this case you will get warning with how your provided date parsed automatically. 
 
 
 ```python
 tns_sub = endpoint.create_subscription('TimeAndSale', date_time=datetime.now()) \
-                  .attach_default_listener() \
                   .add_symbols(['AMZN'])
 ```
 
 
 ```python
 candle_sub = endpoint.create_subscription('Candle', date_time='2020-04-16 13:05')
-candle_sub = candle_sub.attach_default_listener()
 candle_sub = candle_sub.add_symbols(['AAPL', 'MSFT'])
+```
+
+We didn't provide subscriptions with event handlers. In such a case DefaultHandler is initiated automatically.
+One may get it with `get_event_handler` method.
+
+```python
+tns_handler = tns_sub.get_event_handler()
+candle_handler = candle_sub.get_event_handler()
 ```
 
 #### Subscription instance properties
@@ -123,11 +136,10 @@ Subscription symbols: ['AAPL', 'MSFT']
 ```
 
 ### Access data
-Data is stored as deque. Its length is configured with data_len parameter and by default is 100000. When you call method below you extracts all data recieved to the moment and clears the buffer in class.
-
+In DefaultHandler the data is stored as deque. Its length may be configured, by default 100000 events.
 
 ```python
-candle_sub.get_data()
+candle_handler.get_list()
 ```
 
 ### Close connection
@@ -144,17 +156,10 @@ Connection status: Not connected
 
 ### Transform data to pandas DataFrame
 
+DefaultHandler has `get_dataframe` method, which allows you to get pandas.DataFrame object with events as rows.
 
 ```python
-trade_df = trade_sub.get_dataframe()
-```
-
-
-```python
-tns_df = tns_sub.get_dataframe()
-```
-
-
-```python
-candle_df = candle_sub.get_dataframe()
+trade_df = trade_handler.get_dataframe()
+tns_df = tns_handler.get_dataframe()
+candle_df = candle_handler.get_dataframe()
 ```
