@@ -50,7 +50,7 @@ cdef class DefaultHandler(EventHandler):
 
     def update(self, event: list):
         """
-        Utility method that is called by underlying Cython level when new event is received. Sores events in
+        Utility method that is called by underlying Cython level when new event is received. Stores events in
         collection.deque.
 
         Parameters
