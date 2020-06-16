@@ -60,9 +60,14 @@ cdef class DefaultHandler(EventHandler):
         """
         self.__data.append(event)
 
-    def get_list(self):
+    def get_list(self, keep: bool=True):
         """
         Method to get data stored in collections.deque as list.
+
+        Parameters
+        ----------
+        keep: bool
+            When False clears internal collections.deque object after call. Default True.
 
         Returns
         -------
@@ -70,7 +75,8 @@ cdef class DefaultHandler(EventHandler):
             List of received events.
         """
         data = self.__data.copy()
-        self.__data.clear()
+        if not keep:
+            self.__data.clear()
         return list(data)
 
     def get_dataframe(self, keep: bool=True):
@@ -92,9 +98,8 @@ cdef class DefaultHandler(EventHandler):
         df: pandas.DataFrame
             Dataframe with received events.
         """
-        df_data = self.__data.copy()
-        if not keep:
-            self.__data.clear()
+        df_data = self.get_list(keep=keep)
+
 
         df = pd.DataFrame(df_data, columns=self.columns)
         time_columns = df.columns[df.columns.str.contains('Time')]
