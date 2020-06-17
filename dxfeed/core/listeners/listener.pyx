@@ -270,7 +270,7 @@ cdef void underlying_default_listener(int event_type,
                               underlying[i].back_volatility,
                               underlying[i].put_call_ratio])
 
-SERIES_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Sequence', 'Expiration', 'Volatility',
+SERIES_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Expiration', 'Volatility',
                   'PutCallRatio', 'ForwardPrice', 'Dividend', 'Interest']
 cdef void series_default_listener(int event_type,
                                   dxf_const_string_t symbol_name,
@@ -285,7 +285,6 @@ cdef void series_default_listener(int event_type,
                               series[i].event_flags,
                               series[i].index,
                               series[i].time,
-                              series[i].sequence,
                               series[i].sequence,
                               series[i].expiration,
                               series[i].volatility,
