@@ -127,7 +127,7 @@ cdef void profile_default_listener(int event_type,
 
 TIME_AND_SALE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'ExchangeCode', 'Price', 'Size', 'BidPrice',
                          'AskPrice', 'ExchangeSaleConditions', 'RawFlags', 'Buyer', 'Seller', 'Side', 'Type',
-                         'IsValidTick', 'IsEthTrade', 'TradeThroughExempt', 'IsSpreadLeg']
+                         'IsValidTick', 'IsEthTrade', 'TradeThroughExempt', 'IsSpreadLeg', 'Scope']
 cdef void time_and_sale_default_listener(int event_type,
                                          dxf_const_string_t symbol_name,
                                          const dxf_event_data_t*data,
@@ -155,7 +155,8 @@ cdef void time_and_sale_default_listener(int event_type,
                               tns[i].is_valid_tick,
                               tns[i].is_eth_trade,
                               tns[i].trade_through_exempt,
-                              tns[i].is_spread_leg])
+                              tns[i].is_spread_leg,
+                              tns[i].scope])
 
 CANDLE_COLUMNS = ['Symbol', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close', 'Volume', 'VWap',
                   'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']

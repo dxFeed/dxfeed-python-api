@@ -257,7 +257,8 @@ cdef extern from "EventData.h":
         dxf_bool_t is_valid_tick,
         dxf_bool_t is_eth_trade,
         dxf_char_t trade_through_exempt,
-        dxf_bool_t is_spread_leg
+        dxf_bool_t is_spread_leg,
+        dxf_order_scope_t scope
 
 
 # /* Candle ------------------------------------------------------------------- */
