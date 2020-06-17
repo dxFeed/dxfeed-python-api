@@ -163,7 +163,8 @@ cdef extern from "EventData.h":
         dxf_int_t raw_flags,
         dxf_char_t exchange_code,
         dxf_price_type_t day_close_price_type,
-        dxf_price_type_t prev_day_close_price_type
+        dxf_price_type_t prev_day_close_price_type,
+        dxf_order_scope_t scope
 
 
 # /* Profile ------------------------------------------------------------------ */

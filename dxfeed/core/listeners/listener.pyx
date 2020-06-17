@@ -41,8 +41,8 @@ cdef void trade_default_listener(int event_type,
                               trades[i].is_eth,
                               trades[i].scope])
 
-QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'Nanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime', 'AskExchangeCode',
-                 'AskPrice', 'AskSize', 'Scope']
+QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'Nanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime',
+                 'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
 cdef void quote_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -67,8 +67,9 @@ cdef void quote_default_listener(int event_type,
                               quotes[i].ask_size,
                               <int> quotes[i].scope])
 
-SUMMARY_COLUMNS = ['Symbol', 'DayId', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice', 'PrevDayId', 'PrevDayClosePrice',
-                   'PrevDayVolume', 'OpenInterest', 'ExchangeCode']
+SUMMARY_COLUMNS = ['Symbol', 'DayId', 'DayOpenPrice', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice', 'PrevDayId',
+                   'PrevDayClosePrice', 'PrevDayVolume', 'OpenInterest', 'RawFlags', 'ExchangeCode',
+                   'DayClosePriceType', 'PrevDayClosePriceType', 'Scope']
 cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_name,
                                    const dxf_event_data_t*data, int data_count, void*user_data) nogil:
     cdef dxf_summary_t*summary = <dxf_summary_t*> data
@@ -78,6 +79,7 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
         for i in range(data_count):
             py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
                               summary[i].day_id,
+                              summary[i].day_open_price,
                               summary[i].day_high_price,
                               summary[i].day_low_price,
                               summary[i].day_close_price,
@@ -85,7 +87,11 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
                               summary[i].prev_day_close_price,
                               summary[i].prev_day_volume,
                               summary[i].open_interest,
-                              unicode_from_dxf_const_string_t(&summary[i].exchange_code)])
+                              summary[i].raw_flags,
+                              unicode_from_dxf_const_string_t(&summary[i].exchange_code),
+                              summary[i].day_close_price_type,
+                              summary[i].prev_day_close_price_type,
+                              summary[i].scope])
 
 PROFILE_COLUMNS = ['Symbol', 'Beta', 'EPS', 'DivFreq', 'ExdDivAmount', 'ExdDivDate', '52HighPrice', '52LowPrice',
                    'Shares', 'Description', 'RawFlags', 'StatusReason']
