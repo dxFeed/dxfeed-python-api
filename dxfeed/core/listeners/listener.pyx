@@ -41,7 +41,7 @@ cdef void trade_default_listener(int event_type,
                               trades[i].is_eth,
                               trades[i].scope])
 
-QUOTE_COLUMNS = ['Symbol', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime', 'AskExchangeCode',
+QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'Nanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime', 'AskExchangeCode',
                  'AskPrice', 'AskSize', 'Scope']
 cdef void quote_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
@@ -54,6 +54,9 @@ cdef void quote_default_listener(int event_type,
 
         for i in range(data_count):
             py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
+                              quotes[i].sequence,
+                              quotes[i].time,
+                              quotes[i].time_nanos,
                               quotes[i].bid_time,
                               unicode_from_dxf_const_string_t(&quotes[i].bid_exchange_code),
                               quotes[i].bid_price,
