@@ -13,7 +13,8 @@ cdef class FuncWrapper:
         return out
 
 
-TRADE_COLUMNS = ['Symbol', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume', 'Time', 'IsETH']
+TRADE_COLUMNS = ['Symbol', 'Sequence', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume',
+                 'DayTurnover', 'Direction', 'Time', 'Nanos', 'RawFlags', 'IsETH', 'Scope']
 cdef void trade_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -25,14 +26,20 @@ cdef void trade_default_listener(int event_type,
         for i in range(data_count):
 
             py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
+                              trades[i].sequence,
                               trades[i].price,
                               unicode_from_dxf_const_string_t(&trades[i].exchange_code),
                               trades[i].size,
                               trades[i].tick,
                               trades[i].change,
                               trades[i].day_volume,
+                              trades[i].day_turnover,
+                              trades[i].direction,
                               trades[i].time,
-                              trades[i].is_eth])
+                              trades[i].time_nanos,
+                              trades[i].raw_flags,
+                              trades[i].is_eth,
+                              trades[i].scope])
 
 QUOTE_COLUMNS = ['Symbol', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime', 'AskExchangeCode',
                  'AskPrice', 'AskSize', 'Scope']
