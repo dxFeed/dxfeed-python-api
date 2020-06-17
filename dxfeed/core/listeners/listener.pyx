@@ -94,7 +94,8 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
                               summary[i].scope])
 
 PROFILE_COLUMNS = ['Symbol', 'Beta', 'EPS', 'DivFreq', 'ExdDivAmount', 'ExdDivDate', '52HighPrice', '52LowPrice',
-                   'Shares', 'Description', 'RawFlags', 'StatusReason']
+                   'Shares', 'FreeFloat', 'HighLimitPrice', 'LowLimitPrice', 'HaltStartTime', 'HaltEndTime',
+                   'Description', 'RawFlags', 'StatusReason', 'TradingStatus', 'ShortSaleRestriction']
 cdef void profile_default_listener(int event_type,
                                    dxf_const_string_t symbol_name,
                                    const dxf_event_data_t*data,
@@ -113,9 +114,16 @@ cdef void profile_default_listener(int event_type,
                               p[i]._52_high_price,
                               p[i]._52_low_price,
                               p[i].shares,
+                              p[i].free_float,
+                              p[i].high_limit_price,
+                              p[i].low_limit_price,
+                              p[i].halt_start_time,
+                              p[i].halt_end_time,
                               unicode_from_dxf_const_string_t(p[i].description),
                               p[i].raw_flags,
-                              unicode_from_dxf_const_string_t(p[i].status_reason)])
+                              unicode_from_dxf_const_string_t(p[i].status_reason),
+                              p[i].trading_status,
+                              p[i].ssr])
 
 TIME_AND_SALE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'ExchangeCode', 'Price', 'Size', 'BidPrice',
                          'AskPrice', 'ExchangeSaleConditions', 'RawFlags', 'Buyer', 'Seller', 'Side', 'Type',
