@@ -63,7 +63,7 @@ class Subscription(object):
         -------
         self: Subscription
         """
-        self.attach_default_listener()
+        self._attach_default_listener()
         dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
         return self
 
@@ -92,7 +92,7 @@ class Subscription(object):
         """
         dxf_close_subscription(sc=self.__sub)
 
-    def attach_default_listener(self):
+    def _attach_default_listener(self):
         """
         Method to attach default listener. If event handler was not previously set, DefaultHandler will be initialized.
 
@@ -105,7 +105,7 @@ class Subscription(object):
         dxf_attach_listener(self.__sub)
         return self
 
-    def detach_listener(self):
+    def _detach_listener(self):
         """
         Removes listener so new events won't be received
 
