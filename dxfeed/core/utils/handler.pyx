@@ -16,7 +16,7 @@ cdef class EventHandler:
     def __init__(self):
         self.columns = list()
 
-    cdef void __update(self, event) nogil:
+    cdef void cython_internal_update_method(self, event) nogil:
         with gil:
             self.update(event)
 
