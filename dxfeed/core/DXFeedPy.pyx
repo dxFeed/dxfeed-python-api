@@ -407,8 +407,7 @@ def dxf_close_connection(ConnectionClass cc):
         Variable with connection information
     """
     if cc.connection:
-        con_dependants = cc.get_weakrefs()
-        for dependant in con_dependants:
+        for dependant in cc.get_weakrefs():
             dependant.__close()
 
         clib.dxf_close_connection(cc.connection)
