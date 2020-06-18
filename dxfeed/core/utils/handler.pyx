@@ -1,5 +1,5 @@
 from warnings import warn
-from collections import deque
+from dxfeed.core.utils.data_class import DequeWithLock as deque_wl
 import pandas as pd
 
 
@@ -35,50 +35,48 @@ cdef class EventHandler:
 cdef class DefaultHandler(EventHandler):
     """
     The class implements one possible event handler, which is considered as default. This class just stores upcoming
-    events in deque and has methods to get data as list or as pandas.DataFrame.
+    events in custom deque with thread lock and has methods to get data as list or as pandas.DataFrame.
 
     Attributes
     ----------
     data_len: int
-        The length of internal collections.deque object. Default is 100000.
+        The length of internal DequeWithLock object. Default is 100000.
     columns: list
         After attaching listener the field contains one-word descriptors of the values in upcoming event the order
         coincides.
     """
     def __init__(self, data_len: int=100000):
         super().__init__()
-        self.__data = deque(maxlen=data_len)
+        self.__data = deque_wl(maxlen=data_len)
 
     def update(self, event: list):
         """
         Utility method that is called by underlying Cython level when new event is received. Stores events in
-        collection.deque.
+        DequeWithLock.
 
         Parameters
         ----------
         event: list
             List of various data specific to certain event type.
         """
-        self.__data.append(event)
+        self.__data.safe_append(event)
 
     def get_list(self, keep: bool=True):
         """
-        Method to get data stored in collections.deque as list.
+        Method to get data stored in DequeWithLock as list.
 
         Parameters
         ----------
         keep: bool
-            When False clears internal collections.deque object after call. Default True.
+            When False clears internal DequeWithLock object after call. Default True.
 
         Returns
         -------
         data: list
             List of received events.
         """
-        data = self.__data.copy()
-        if not keep:
-            self.__data.clear()
-        return list(data)
+        data = self.__data.safe_get(keep=keep)
+        return data
 
     def get_dataframe(self, keep: bool=True):
         """
@@ -92,7 +90,7 @@ cdef class DefaultHandler(EventHandler):
         Parameters
         ----------
         keep: bool
-            When False clears internal collections.deque object after call. Default True.
+            When False clears internal DequeWithLock object after call. Default True.
 
         Returns
         -------
