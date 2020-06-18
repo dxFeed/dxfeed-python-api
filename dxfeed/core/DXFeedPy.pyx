@@ -128,16 +128,12 @@ cdef class SubscriptionClass:
             if event_handler is not self.__event_handler:
                 # saving current listener - related data
                 warn(Warning('Handler replacing'))
-                try:
-                    tmp_columns = self.__event_handler.columns
-                except ValueError:
-                    tmp_columns = list()
                 tmp_listener = lis.FuncWrapper.make_from_ptr(self.listener)
                 # reattaching listener
                 dxf_detach_listener(self)
                 self.__event_handler = event_handler
                 self.u_data = <void *> self.__event_handler
-                dxf_attach_custom_listener(self, tmp_listener, tmp_columns)
+                dxf_attach_custom_listener(self, tmp_listener)
         else:
             self.__event_handler = event_handler
             self.u_data = <void *> self.__event_handler
@@ -365,7 +361,7 @@ def dxf_attach_listener(SubscriptionClass sc):
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
 
-def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns: Iterable[str]):
+def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw):
     """
     Attaches custom listener
 
@@ -375,8 +371,6 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
         SubscriptionClass with information about subscription
     fw: FuncWrapper
         c function wrapped in FuncWrapper class with Cython
-    columns: list
-        Columns for internal data of SubscriptionClass
     """
     if not sc.subscription:
         raise ValueError('Subscription is not valid')
@@ -384,10 +378,6 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
     if not event_handler:
         raise ValueError('Event handler is not defined!')
 
-    try:
-        event_handler.columns = columns
-    except ValueError:
-        warn(Warning('Event handler does not have columns attribute!'))
     sc.listener = fw.func
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
