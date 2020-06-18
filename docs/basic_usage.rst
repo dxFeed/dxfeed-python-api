@@ -9,18 +9,21 @@ library, the highest is Python wrapper classes. Cython level in the
 middle aims to connect these two. Here we are going to look into Python
 level.
 
-Python level, in its turn, mainly consists of three class types. The
-first one is the Endpoint. This class is responsible for connection
-management.
+Python level, in its turn, mainly consists of three class types:
 
-The Endpoint is also responsible for creating dependent classes, for
+1. Endpoint
+2. Subscription
+3. EventHandler
+
+The **Endpoint** is responsible for connection management and  creating dependent classes, for
 example Subscription. One Endpoint may have several different
-Subscriptions, but each Subscription is related to one Endpoint. This
-class sets the type of subscription (stream or timed), the type of
+Subscriptions, but each Subscription is related to one Endpoint.
+
+**Subscription** class sets the type of subscription (stream or timed), the type of
 events (e.g. Trade, Candle), etc.
 
 After you specified the data you want to receive, you have to specify
-how to process upcoming events. This is where the EventHandler class and
+how to process upcoming events. This is where the **EventHandler** class and
 its children come into play. Every time an event arrives Cython event
 listener will call ``self.update(event)`` method. You have to inherit
 from the EventHandler class and redefine the update method. Or you may
