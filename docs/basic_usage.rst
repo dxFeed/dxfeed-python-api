@@ -121,12 +121,14 @@ Subscription instance properties
 .. code:: python3
 
     print(f'TimeAndSale subscription event type: {tns_sub.event_type}')
+    print(f'Candle subscription event type: {candle_sub.event_type}')
     print(f'Candle subscription symbols: {candle_sub.symbols}')
 
 
 .. code-block:: text
 
     TimeAndSale subscription event type: TimeAndSale
+    Candle subscription event type: Candle
     Candle subscription symbols: ['AAPL', 'MSFT']
     
 
