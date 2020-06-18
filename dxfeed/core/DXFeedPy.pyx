@@ -264,7 +264,7 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
                           'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
         raise ValueError('Incorrect event type!')
     if time < 0 or not isinstance(time, int):
-        raise ValueError('time argument should be non-negative integer!')
+        raise ValueError('Time argument should be non-negative integer!')
 
     sc = SubscriptionClass()
     cc.add_weakref(sc)
