@@ -3,6 +3,10 @@
 Low-level API
 =============
 
+.. note::
+    High-Level API have priority support in case of any issues. We highly recommend
+    to use it and touch the Low-Level API only in special cases.
+
 This tutorial is about the Cython level of the package, which connects
 Python and C API. Though high-level Python classes provide the necessary
 functionality safely and conveniently, the user is not restricted to use
