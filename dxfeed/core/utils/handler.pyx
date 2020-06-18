@@ -46,6 +46,7 @@ cdef class DefaultHandler(EventHandler):
         coincides.
     """
     def __init__(self, data_len: int=100000):
+        super().__init__()
         self.__data = deque(maxlen=data_len)
 
     def update(self, event: list):
