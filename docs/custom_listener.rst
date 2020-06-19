@@ -8,13 +8,6 @@ processing incoming events (see Custom Event Handler example).
 
 This tutorial is for cases that are not covered by previous tutorials.
 
-.. note::
-    This tutorial is converted from jupyter notebook. It uses built-in Jupyter magic functions (details:
-    https://ipython.readthedocs.io/en/7.15.0/interactive/magics.html) which
-    start with ``%`` or ``%%`` sign. These function allows us to use only
-    Jupyter Notebook for the demostration. You are free to use any
-    IDE/editor without magics.
-
 Pipeline
 ~~~~~~~~
 
@@ -32,13 +25,12 @@ package**
 
 .. code:: bash
 
-    %%bash
     rm custom_listener -rf
     mkdir custom_listener
 
-.. code:: python3
+.. code:: bash
 
-    %cd custom_listener
+    cd custom_listener
 
 
 .. code:: text
@@ -50,11 +42,10 @@ Create .pyx file with the whole logic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Here we will write listener for Trade event type that will store only
-price and ticker
+price and ticker. Save in cust.pyx file
 
 .. code:: python3
 
-    %%writefile cust.pyx
     from dxfeed.core.listeners.listener cimport *
     from dxfeed.core.utils.helpers cimport unicode_from_dxf_const_string_t
     from dxfeed.core.utils.handler cimport EventHandler
@@ -74,14 +65,9 @@ price and ticker
     tc = FuncWrapper.make_from_ptr(trade_custom_listener)
 
 
-.. code:: text
+.. code:: bash
 
-    Writing cust.pyx
-    
-
-.. code:: python3
-
-    !ls
+    ls
 
 
 .. code:: text
@@ -108,9 +94,10 @@ price and ticker
 Create setup.py to build the binary file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+setup.py contents:
+
 .. code:: python3
 
-    %%writefile setup.py
     from Cython.Build import cythonize
     from setuptools import setup, Extension
     from dxfeed.core.utils.helpers import get_include
@@ -124,10 +111,6 @@ Create setup.py to build the binary file
         ext_modules=cythonize([ext], language_level=3)
     )
 
-
-.. code:: text
-
-    Writing setup.py
     
 
 -  Line 4 imports dxfeed to get access to ``get_include`` function,
@@ -136,9 +119,9 @@ Create setup.py to build the binary file
 Build the binary file
 ^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: python3
+.. code:: bash
 
-    !python setup.py build_ext --inplace
+    python setup.py build_ext --inplace
 
 
 .. code:: text
@@ -153,9 +136,9 @@ Build the binary file
     copying build\lib.win-amd64-3.7\cust.cp37-win_amd64.pyd -> 
     
 
-.. code:: python3
+.. code:: bash
 
-    !ls
+    ls
 
 
 .. code:: text
