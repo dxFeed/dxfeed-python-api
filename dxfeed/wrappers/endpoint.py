@@ -4,12 +4,21 @@ from datetime import datetime
 
 
 class Endpoint(object):
+    """
+    Class for connection management. After successful creation Instance will be connected to server
+    with provided credentials
+
+    Attributes
+    ----------
+    connection_status: str
+        Status of current connection
+    address: str
+        Current connection endpoint address
+
+    """
     def __init__(self, connection_address: str = 'demo.dxfeed.com:7300', connect: bool = True):
         """
-        Class for connection management. After successful creation Instance will be connected to server
-        with provided credentials
-
-        Attributes
+        Parameters
         ----------
         connection_address: str
             One of possible connection addresses:

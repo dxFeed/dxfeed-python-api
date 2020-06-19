@@ -6,12 +6,27 @@ import dxfeed.wrappers.class_utils as cu
 
 
 class Subscription(object):
+    """
+    Class for subscription management. Recommended to be created only via create_subscription method in Endpoint class.
+    Also stores incoming events
+
+    Attributes
+    ----------
+    event_type: str
+        One of possible event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle',
+        'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
+    symbols: Iterable
+        Symbols of current subscription.
+
+    Note
+    ----
+    Some event types (e.g. Candle) support only timed subscription.
+
+    """
     def __init__(self, connection, event_type: str, date_time: Union[str, datetime], exact_format: bool = True):
         """
-        Class for subscription management. Recommended to be created only via create_subscription method in Endpoint class.
-        Also stores incoming events
 
-        Attributes
+        Parameters
         ----------
         connection: dxfeed.core.DXFeedPy.ConnectionClass
             Core class written in cython, that handle connection related details on the low level
@@ -23,11 +38,6 @@ class Subscription(object):
             %Y-%m-%d %H:%M:%S.%f. If None - stream subscription will be created (non-conflated). Default - None.
         exact_format: bool
             If False no warning will be thrown in case of incomplete date_time parameter. Default - True
-
-        Note
-        ----
-        Some event types (e.g. Candle) support only timed subscription.
-
         """
         self.__event_type = event_type
         if date_time is None:

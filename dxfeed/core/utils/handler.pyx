@@ -5,16 +5,16 @@ from typing import Iterable
 
 
 cdef class EventHandler:
-    def __init__(self):
-        """
-        Master class for user defined event handlers. `update` method should be considered as abstract.
+    """
+    Master class for user defined event handlers. `update` method should be considered as abstract.
 
-        Attributes
-        ----------
-        columns: list
-            After attaching listener the field contains one-word descriptors of the values in upcoming event the order
-            coincides
-        """
+    Attributes
+    ----------
+    columns: list
+        After attaching listener the field contains one-word descriptors of the values in upcoming event the order
+        coincides
+    """
+    def __init__(self):
         self.columns = list()
 
     cdef void cython_internal_update_method(self, event) nogil:
