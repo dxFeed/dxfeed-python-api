@@ -20,19 +20,21 @@ class Subscription(object):
     date_time: str or datetime.datetime
         If present timed subscription will be created (conflated stream). For sting date format is following:
         %Y-%m-%d %H:%M:%S.%f. If None - stream subscription will be created (non-conflated). Default - None.
+    exact_format: bool
+        If False no warning will be thrown in case of incomplete date_time parameter. Default - True
 
     Note
     ----
     Some event types (e.g. Candle) support only timed subscription.
 
     """
-    def __init__(self, connection, event_type: str, date_time: Union[str, datetime]):
+    def __init__(self, connection, event_type: str, date_time: Union[str, datetime], exact_format: bool = True):
         self.__event_type = event_type
         if date_time is None:
             self.__sub = dxf_create_subscription(cc=connection,
                                                  event_type=event_type)
         else:
-            date_time = cu.handle_datetime(date_time, fmt='%Y-%m-%d %H:%M:%S.%f')
+            date_time = cu.handle_datetime(date_time, fmt='%Y-%m-%d %H:%M:%S.%f', exact_format=exact_format)
             timestamp = int(date_time.timestamp() * 1000)
             self.__sub = dxf_create_subscription_timed(cc=connection,
                                                        event_type=event_type,

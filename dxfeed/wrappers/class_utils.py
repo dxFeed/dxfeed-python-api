@@ -25,17 +25,17 @@ def to_iterable(value: Union[str, Iterable[str]]) -> Iterable[str]:
     return value
 
 
-def handle_datetime(date_time: Union[str, datetime], fmt: str = '%Y-%m-%d %H:%M:%S.%f'):
+def handle_datetime(date_time: Union[str, datetime], fmt: str = '%Y-%m-%d %H:%M:%S.%f', exact_format: bool = True):
     if isinstance(date_time, str):
         try:
             date_time = datetime.strptime(date_time, fmt)
         except ValueError:
             try:
                 date_time = pd.to_datetime(date_time, format=fmt, infer_datetime_format=True)
-                warn_message = f'Datetime argument does not exactly match {fmt} format,' + \
-                               ' date was parsed automatically as ' + \
-                               date_time.strftime(format=fmt)
-                warn(warn_message, UserWarning)
+                if exact_format:
+                    warn(Warning(f'Datetime argument does not exactly match {fmt} format,' +
+                                 ' date was parsed automatically as ' +
+                                 date_time.strftime(format=fmt)))
             except ValueError:
                 raise ValueError(f'Datetime should use {fmt} format!')
     if not isinstance(date_time, datetime):
