@@ -8,6 +8,13 @@ processing incoming events (see Custom Event Handler example).
 
 This tutorial is for cases that are not covered by previous tutorials.
 
+.. note::
+    This tutorial is converted from jupyter notebook. It uses built-in Jupyter magic functions (details:
+    https://ipython.readthedocs.io/en/7.15.0/interactive/magics.html) which
+    start with ``%`` or ``%%`` sign. These function allows us to use only
+    Jupyter Notebook for the demostration. You are free to use any
+    IDE/editor without magics.
+
 Pipeline
 ~~~~~~~~
 
@@ -36,7 +43,7 @@ package**
 
 .. code:: text
 
-    C:\python-api\examples\Low_level_API\custom_listener
+    C:\job\python-api\examples\Low_level_API\custom_listener
     
 
 Create .pyx file with the whole logic
@@ -61,8 +68,8 @@ price and ticker
             py_data = <EventHandler> user_data
     
             for i in range(data_count):
-                py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                                  trades[i].price])
+                py_data.cython_internal_update_method([unicode_from_dxf_const_string_t(symbol_name),
+                                                       trades[i].price])
     
     tc = FuncWrapper.make_from_ptr(trade_custom_listener)
 
@@ -72,7 +79,7 @@ price and ticker
     Writing cust.pyx
     
 
-.. code:: ipython3
+.. code:: python3
 
     !ls
 
@@ -129,7 +136,7 @@ Create setup.py to build the binary file
 Build the binary file
 ^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code:: python3
 
     !python setup.py build_ext --inplace
 
@@ -140,14 +147,13 @@ Build the binary file
     [1/1] Cythonizing cust.pyx
     running build_ext
     building 'cust' extension
-    creating build
     ...
     Generating code
     Finished generating code
     copying build\lib.win-amd64-3.7\cust.cp37-win_amd64.pyd -> 
     
 
-.. code:: ipython3
+.. code:: python3
 
     !ls
 
@@ -197,31 +203,28 @@ Attach custom handler
 .. code:: python3
 
     handler = CustomHandler()
+    handler.columns = ['Symbol', 'Price']
     sub.set_event_handler(handler)
 
 Attach custom listener
 
 .. code:: python3
 
-    dxc.dxf_attach_custom_listener(sub, cust.tc, ['Symbol', 'Price'])
+    dxc.dxf_attach_custom_listener(sub, cust.tc)
     dxc.dxf_add_symbols(sub, ['AAPL', 'MSFT'])
 
 Get data
 
 .. code:: python3
 
-    handler.get_data()[-5:]
+    handler.get_data()[-3:]
 
 
 
 
 .. code:: text
 
-    [['AAPL', 335.23],
-     ['AAPL', 335.23],
-     ['AAPL', 335.23],
-     ['MSFT', 186.71],
-     ['MSFT', 186.71]]
+    [['MSFT', 196.14], ['MSFT', 196.27], ['MSFT', 196.33]]
 
 
 
