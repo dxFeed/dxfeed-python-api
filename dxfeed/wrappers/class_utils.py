@@ -26,6 +26,23 @@ def to_iterable(value: Union[str, Iterable[str]]) -> Iterable[str]:
 
 
 def handle_datetime(date_time: Union[str, datetime], fmt: str = '%Y-%m-%d %H:%M:%S.%f', exact_format: bool = True):
+    """
+    Function to convert string of date and time to datetime object.
+
+    Parameters
+    ----------
+    date_time: str, datetime.datetime
+        Datetime to convert
+    fmt: str
+        Format of expected datetime
+    exact_format: bool
+        If False no warning will be thrown in case of incomplete date_time parameter. Default - True
+
+    Returns
+    -------
+    date_time: datetime.datetime
+        date_time argument converted to datetime.datetime object.
+    """
     if isinstance(date_time, str):
         try:
             date_time = datetime.strptime(date_time, fmt)
