@@ -50,7 +50,7 @@ cdef class DefaultHandler(EventHandler):
         super().__init__()
         self.__data = deque_wl(maxlen=data_len)
 
-    def update(self, event: list):
+    def update(self, event: Iterable):
         """
         Utility method that is called by underlying Cython level when new event is received. Stores events in
         DequeWithLock.
