@@ -96,12 +96,6 @@ cdef class SubscriptionClass:
     cdef void *u_data
 
     def __init__(self):
-        """
-        Parameters
-        ----------
-        data_len: int
-            Sets maximum amount of events, that are kept in Subscription class
-        """
         self.subscription = NULL
         self.__event_handler = None
 
@@ -199,7 +193,7 @@ def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int = 100000):
+def dxf_create_subscription(ConnectionClass cc, event_type: str):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass.
 

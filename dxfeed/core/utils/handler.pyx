@@ -5,16 +5,16 @@ from typing import Iterable
 
 
 cdef class EventHandler:
-    """
-    Master class for user defined event handlers. `update` method should be considered as abstract.
-
-    Attributes
-    ----------
-    columns: list
-        After attaching listener the field contains one-word descriptors of the values in upcoming event the order
-        coincides
-    """
     def __init__(self):
+        """
+        Master class for user defined event handlers. `update` method should be considered as abstract.
+
+        Attributes
+        ----------
+        columns: list
+            After attaching listener the field contains one-word descriptors of the values in upcoming event the order
+            coincides
+        """
         self.columns = list()
 
     cdef void cython_internal_update_method(self, event) nogil:
@@ -34,19 +34,19 @@ cdef class EventHandler:
         warn(Warning('You have not implemented update method in your EventHandler, that is called, when event comes!'))
 
 cdef class DefaultHandler(EventHandler):
-    """
-    The class implements one possible event handler, which is considered as default. This class just stores upcoming
-    events in custom deque with thread lock and has methods to get data as list or as pandas.DataFrame.
-
-    Attributes
-    ----------
-    data_len: int
-        The length of internal DequeWithLock object. Default is 100000.
-    columns: list
-        After attaching listener the field contains one-word descriptors of the values in upcoming event the order
-        coincides.
-    """
     def __init__(self, data_len: int=100000):
+        """
+        The class implements one possible event handler, which is considered as default. This class just stores upcoming
+        events in custom deque with thread lock and has methods to get data as list or as pandas.DataFrame.
+
+        Attributes
+        ----------
+        data_len: int
+            The length of internal DequeWithLock object. Default is 100000.
+        columns: list
+            After attaching listener the field contains one-word descriptors of the values in upcoming event the order
+            coincides.
+        """
         super().__init__()
         self.__data = deque_wl(maxlen=data_len)
 
