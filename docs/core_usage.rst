@@ -23,6 +23,7 @@ differ.
     from dxfeed.core import DXFeedPy as dxc
     from dxfeed.core.utils.handler import DefaultHandler
     from datetime import datetime  # for timed suscription
+    from dateutil.relativedelta import relativedelta
 
 Create connection
 ~~~~~~~~~~~~~~~~~
@@ -46,7 +47,7 @@ e.g. Candle, support only timed subscription.
 .. code:: python3
 
     sub = dxc.dxf_create_subscription(con, 'Trade')
-    sub_timed = dxc.dxf_create_subscription_timed(con, 'Candle', int(datetime.now().timestamp()))
+    sub_timed = dxc.dxf_create_subscription_timed(con, 'Candle', int((datetime.now() - relativedelta(days=3)).timestamp()))
 
 Attach event handler
 ~~~~~~~~~~~~~~~~~~~~
@@ -80,12 +81,15 @@ be initialized. There are default ones for each event type.
 Add tickers
 ~~~~~~~~~~~
 
-Symbols that will be processed should be defined
+Symbols that will be processed should be defined. For Candle event type
+along with base symbol, you should specify an aggregation period. You
+can also set price type. More details:
+https://kb.dxfeed.com/display/DS/REST+API#RESTAPI-Candlesymbols.
 
 .. code:: python3
 
     dxc.dxf_add_symbols(sub, ['AAPL', 'MSFT'])
-    dxc.dxf_add_symbols(sub_timed, ['AAPL', 'C'])
+    dxc.dxf_add_symbols(sub_timed, ['AAPL{=d}', 'MSFT{=d}'])
 
 Access data
 ~~~~~~~~~~~
@@ -95,16 +99,18 @@ methods to access the data.
 
 .. code:: python3
 
-    trade_handler.get_list()[:3]
+    trade_handler.get_list()[-5:]
 
 
 
 
 .. code:: text
 
-    [['AAPL', 336.1948, 'D', 300, 1, -2.6052, 6946983.0, 1592230640159, 0],
-     ['MSFT', 187.41, 'N', 200, 1, -0.33, 6418645.0, 1592230639955, 0],
-     ['AAPL', 336.8, 'A', 100, 2, -2.35, 5890.0, 1592230481599, 0]]
+    [['MSFT', 196.14, 'X', 100, 2, 0.0, 100.0, 1592510399515, 0],
+     ['MSFT', 196.27, 'Y', 100, 2, 0.0, 18.0, 1592510398017, 0],
+     ['MSFT', 196.33, 'Z', 100, 1, 0.0, 2693.0, 1592510399823, 0],
+     ['AAPL', 351.57, 'D', 200, 1, 0.0, 44022.0, 1592510399435, 0],
+     ['AAPL', 351.73, 'Q', 1406354, 1, 0.0, 234771.0, 1592510400351, 0]]
 
 
 
@@ -155,57 +161,57 @@ methods to access the data.
       <tbody>
         <tr>
           <th>0</th>
-          <td>AAPL</td>
-          <td>6838585486932591349</td>
-          <td>2020-06-15 14:44:20.619</td>
-          <td>148213</td>
-          <td>1.0</td>
-          <td>335.225</td>
-          <td>335.225</td>
-          <td>335.225</td>
-          <td>335.225</td>
-          <td>200.0</td>
-          <td>335.225</td>
-          <td>200.0</td>
-          <td>NaN</td>
+          <td>AAPL{=d}</td>
+          <td>6839841934068940800</td>
+          <td>2020-06-19</td>
           <td>0</td>
-          <td>NaN</td>
+          <td>807.0</td>
+          <td>354.05</td>
+          <td>355.55</td>
+          <td>353.35</td>
+          <td>354.79</td>
+          <td>184838.0</td>
+          <td>354.45447</td>
+          <td>75518.0</td>
+          <td>109320.0</td>
+          <td>0</td>
+          <td>0.3690</td>
         </tr>
         <tr>
           <th>1</th>
-          <td>AAPL</td>
-          <td>6838585485699465971</td>
-          <td>2020-06-15 14:44:20.325</td>
-          <td>148211</td>
-          <td>1.0</td>
-          <td>335.212</td>
-          <td>335.212</td>
-          <td>335.212</td>
-          <td>335.212</td>
-          <td>1500.0</td>
-          <td>335.212</td>
-          <td>1500.0</td>
-          <td>NaN</td>
+          <td>AAPL{=d}</td>
+          <td>6839470848894566400</td>
+          <td>2020-06-18</td>
           <td>0</td>
-          <td>NaN</td>
+          <td>96172.0</td>
+          <td>351.41</td>
+          <td>353.45</td>
+          <td>349.22</td>
+          <td>351.73</td>
+          <td>24205096.0</td>
+          <td>351.56873</td>
+          <td>8565421.0</td>
+          <td>10394906.0</td>
+          <td>0</td>
+          <td>0.3673</td>
         </tr>
         <tr>
           <th>2</th>
-          <td>AAPL</td>
-          <td>6838585485678494449</td>
-          <td>2020-06-15 14:44:20.320</td>
-          <td>148209</td>
-          <td>1.0</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>200.0</td>
-          <td>335.220</td>
-          <td>NaN</td>
-          <td>200.0</td>
+          <td>AAPL{=d}</td>
+          <td>6839099763720192000</td>
+          <td>2020-06-17</td>
           <td>0</td>
-          <td>NaN</td>
+          <td>110438.0</td>
+          <td>355.15</td>
+          <td>355.40</td>
+          <td>351.09</td>
+          <td>351.59</td>
+          <td>28601626.0</td>
+          <td>353.70998</td>
+          <td>10686232.0</td>
+          <td>12141490.0</td>
+          <td>0</td>
+          <td>0.3713</td>
         </tr>
       </tbody>
     </table>
@@ -236,7 +242,7 @@ Transform data to pandas DataFrame
 .. code:: python3
 
     df1 = trade_handler.get_dataframe()
-    df1.head()
+    df1.head(3)
 
 
 
@@ -276,61 +282,37 @@ Transform data to pandas DataFrame
         <tr>
           <th>0</th>
           <td>AAPL</td>
-          <td>336.600</td>
+          <td>351.73</td>
           <td>Q</td>
-          <td>150</td>
-          <td>2</td>
-          <td>-2.200</td>
-          <td>2144212.0</td>
-          <td>2020-06-15 14:17:59.802</td>
+          <td>1406354</td>
+          <td>1</td>
+          <td>0.0</td>
+          <td>234761.0</td>
+          <td>2020-06-18 20:00:00.351</td>
           <td>0</td>
         </tr>
         <tr>
           <th>1</th>
           <td>AAPL</td>
-          <td>336.600</td>
+          <td>351.73</td>
           <td>Q</td>
-          <td>150</td>
-          <td>2</td>
-          <td>-2.200</td>
-          <td>7000532.0</td>
-          <td>2020-06-15 14:17:59.802</td>
+          <td>1406354</td>
+          <td>1</td>
+          <td>0.0</td>
+          <td>41051.0</td>
+          <td>2020-06-18 20:00:00.351</td>
           <td>0</td>
         </tr>
         <tr>
           <th>2</th>
-          <td>AAPL</td>
-          <td>336.610</td>
-          <td>K</td>
-          <td>100</td>
-          <td>1</td>
-          <td>-1.920</td>
-          <td>325307.0</td>
-          <td>2020-06-15 14:17:58.368</td>
-          <td>0</td>
-        </tr>
-        <tr>
-          <th>3</th>
           <td>MSFT</td>
-          <td>187.511</td>
-          <td>D</td>
-          <td>100</td>
+          <td>196.32</td>
+          <td>Q</td>
+          <td>2364517</td>
           <td>2</td>
-          <td>-0.209</td>
-          <td>2083825.0</td>
-          <td>2020-06-15 14:17:59.731</td>
-          <td>0</td>
-        </tr>
-        <tr>
-          <th>4</th>
-          <td>MSFT</td>
-          <td>187.511</td>
-          <td>D</td>
-          <td>100</td>
-          <td>2</td>
-          <td>-0.229</td>
-          <td>6458892.0</td>
-          <td>2020-06-15 14:17:59.731</td>
+          <td>0.0</td>
+          <td>160741.0</td>
+          <td>2020-06-18 20:00:00.327</td>
           <td>0</td>
         </tr>
       </tbody>
@@ -342,7 +324,7 @@ Transform data to pandas DataFrame
 .. code:: python3
 
     df2 = candle_handler.get_dataframe()
-    df2.head()
+    df2.head(3)
 
 
 
@@ -387,96 +369,58 @@ Transform data to pandas DataFrame
       <tbody>
         <tr>
           <th>0</th>
-          <td>AAPL</td>
-          <td>6838585486932591349</td>
-          <td>2020-06-15 14:44:20.619</td>
-          <td>148213</td>
-          <td>1.0</td>
-          <td>335.225</td>
-          <td>335.225</td>
-          <td>335.225</td>
-          <td>335.225</td>
-          <td>200.0</td>
-          <td>335.225</td>
-          <td>200.0</td>
-          <td>NaN</td>
+          <td>AAPL{=d}</td>
+          <td>6839841934068940800</td>
+          <td>2020-06-19</td>
           <td>0</td>
-          <td>NaN</td>
+          <td>807.0</td>
+          <td>354.05</td>
+          <td>355.55</td>
+          <td>353.35</td>
+          <td>354.79</td>
+          <td>184838.0</td>
+          <td>354.45447</td>
+          <td>75518.0</td>
+          <td>109320.0</td>
+          <td>0</td>
+          <td>0.3690</td>
         </tr>
         <tr>
           <th>1</th>
-          <td>AAPL</td>
-          <td>6838585485699465971</td>
-          <td>2020-06-15 14:44:20.325</td>
-          <td>148211</td>
-          <td>1.0</td>
-          <td>335.212</td>
-          <td>335.212</td>
-          <td>335.212</td>
-          <td>335.212</td>
-          <td>1500.0</td>
-          <td>335.212</td>
-          <td>1500.0</td>
-          <td>NaN</td>
+          <td>AAPL{=d}</td>
+          <td>6839470848894566400</td>
+          <td>2020-06-18</td>
           <td>0</td>
-          <td>NaN</td>
+          <td>96172.0</td>
+          <td>351.41</td>
+          <td>353.45</td>
+          <td>349.22</td>
+          <td>351.73</td>
+          <td>24205096.0</td>
+          <td>351.56873</td>
+          <td>8565421.0</td>
+          <td>10394906.0</td>
+          <td>0</td>
+          <td>0.3673</td>
         </tr>
         <tr>
           <th>2</th>
-          <td>AAPL</td>
-          <td>6838585485678494449</td>
-          <td>2020-06-15 14:44:20.320</td>
-          <td>148209</td>
-          <td>1.0</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>200.0</td>
-          <td>335.220</td>
-          <td>NaN</td>
-          <td>200.0</td>
+          <td>AAPL{=d}</td>
+          <td>6839099763720192000</td>
+          <td>2020-06-17</td>
           <td>0</td>
-          <td>NaN</td>
-        </tr>
-        <tr>
-          <th>3</th>
-          <td>AAPL</td>
-          <td>6838585485678494447</td>
-          <td>2020-06-15 14:44:20.320</td>
-          <td>148207</td>
-          <td>1.0</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>100.0</td>
-          <td>335.220</td>
-          <td>NaN</td>
-          <td>100.0</td>
+          <td>110438.0</td>
+          <td>355.15</td>
+          <td>355.40</td>
+          <td>351.09</td>
+          <td>351.59</td>
+          <td>28601626.0</td>
+          <td>353.70998</td>
+          <td>10686232.0</td>
+          <td>12141490.0</td>
           <td>0</td>
-          <td>NaN</td>
-        </tr>
-        <tr>
-          <th>4</th>
-          <td>AAPL</td>
-          <td>6838585485678494445</td>
-          <td>2020-06-15 14:44:20.320</td>
-          <td>148205</td>
-          <td>1.0</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>335.220</td>
-          <td>100.0</td>
-          <td>335.220</td>
-          <td>NaN</td>
-          <td>100.0</td>
-          <td>0</td>
-          <td>NaN</td>
+          <td>0.3713</td>
         </tr>
       </tbody>
     </table>
     </div>
-
-
