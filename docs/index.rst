@@ -1,6 +1,6 @@
 .. meta::
-   :description: DXFeed python api for getting stock exchange data
-   :keywords: python, api, dxfeed, stock exchange, market data, marketdata, finance
+   :description lang=en: DxFeed python api for getting realtime and delayed stock exchange data.
+   :keywords: python, api, dxfeed, stock exchange, market data, marketdata, finance, realtime, delayed, order, candle
 
 Home
 ====
@@ -11,15 +11,16 @@ We use `Cython <https://cython.org/>`_ in this project as it combines flexibilit
 and usability in writing C extensions.
 
 
-dxfeed library already contains basic C-API functions and convenient access to them via wrapper classes.
-For now, the package covers the core C-API functionality, for example, creating connections and subscriptions,
-receiving data, etc.
+The design of the dxfeed package allows users to write any logic related to events in python as well as
+extending lower level Cython functionality. Moreover, one may start working with the API using the default
+values like function arguments or a default event handler.
 
-Moreover, default listeners (functions responsible for event processing) are ready to use. The user may also
-write his custom listener in Cython. The instructions are here: :ref:`custom_listener`.
+On this website, you will find dxfeed usage examples and docstrings to each function, class,
+and its methods and fields.
 
-At this website, you will find information about the functionality of the library, how to write your custom listener,
-documentation to all available functions, and information for developers.
+Source code: `github.com/dxFeed/dxfeed-python-api <https://github.com/dxFeed/dxfeed-python-api>`_
+
+Package distribution: `pypi.org/project/dxfeed <https://pypi.org/project/dxfeed>`_
 
 Table of contents:
 ------------------
@@ -30,6 +31,7 @@ Table of contents:
    self
    installation.rst
    basic_usage.rst
+   custom_handler.rst
    api.rst
    core_usage.rst
    custom_listener.rst

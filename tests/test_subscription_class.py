@@ -12,22 +12,22 @@ class ValueStorage(object):  # config
 
 
 @pytest.fixture(scope='function')
-def dxfeed():
+def endpoint():
     dxf = dx.Endpoint(connection_address=ValueStorage.demo_address)
     yield dxf
     dxf.close_connection()
 
 
 @pytest.fixture(scope='function', params=ValueStorage.event_types)
-def subscription(dxfeed, request):
-    sub = dxfeed.create_subscription(event_type=request.param)
+def subscription(endpoint, request):
+    sub = endpoint.create_subscription(event_type=request.param)
     yield sub
     sub.close_subscription()
 
 
 @pytest.fixture(scope='function', params=ValueStorage.event_types)
-def subscription_timed(dxfeed, request):
-    sub = dxfeed.create_subscription(event_type=request.param, date_time=ValueStorage.date_time)
+def subscription_timed(endpoint, request):
+    sub = endpoint.create_subscription(event_type=request.param, date_time=ValueStorage.date_time)
     yield sub
     sub.close_subscription()
 
@@ -72,3 +72,25 @@ def test_remove_all_symbols_timed(subscription_timed):
     subscription_timed = subscription_timed.add_symbols(ValueStorage.symbols) \
                                            .remove_symbols()
     assert subscription_timed.symbols == []
+
+
+def test_default_event_handler(endpoint):
+    sub = endpoint.create_subscription(event_type='Trade').add_symbols(ValueStorage.symbols)
+    assert isinstance(sub.get_event_handler(), dx.DefaultHandler)
+
+
+def test_default_event_handler_timed(endpoint):
+    sub = endpoint.create_subscription(event_type='Trade', date_time=ValueStorage.date_time).add_symbols(ValueStorage.symbols)
+    assert isinstance(sub.get_event_handler(), dx.DefaultHandler)
+
+
+def test_event_handler_setter(endpoint):
+    handler = dx.EventHandler()
+    sub = endpoint.create_subscription(event_type='Trade').set_event_handler(handler)
+    assert sub.get_event_handler() is handler
+
+
+def test_event_handler_setter_timed(endpoint):
+    handler = dx.EventHandler()
+    sub = endpoint.create_subscription(event_type='Trade', date_time=ValueStorage.date_time).set_event_handler(handler)
+    assert sub.get_event_handler() is handler

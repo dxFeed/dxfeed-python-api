@@ -1,4 +1,3 @@
-# from multiprocessing import Lock
 from collections import deque
 from typing import Any
 from threading import Lock
@@ -15,7 +14,6 @@ class DequeWithLock(deque):
     def safe_append(self, data: Any):
         """
         Method appends data while locked
-
         Parameters
         ----------
         data: any
@@ -27,10 +25,14 @@ class DequeWithLock(deque):
         finally:
             self.lock.release()
 
-    def safe_get(self):
+    def safe_get(self, keep: bool=True):
         """
         Method that pops all the data with subsequent clearing
 
+        Parameters
+        ----------
+        keep: bool
+            When False clears internal collections.deque object after call. Default True.
         Returns
         -------
         list_to_return: list
@@ -40,8 +42,8 @@ class DequeWithLock(deque):
         try:
             self.lock.acquire()
             list_to_return = self.copy()
-            self.clear()
+            if not keep:
+                self.clear()
         finally:
             self.lock.release()
         return list(list_to_return)
-

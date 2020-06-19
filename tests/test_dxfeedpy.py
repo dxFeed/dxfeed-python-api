@@ -1,4 +1,5 @@
 import dxfeed.core.DXFeedPy as dxc
+from dxfeed.core.utils.handler import DefaultHandler
 import pytest
 
 
@@ -123,13 +124,35 @@ def test_symbol_clearing(connection):
 
 
 @pytest.mark.parametrize('sub_type', ValueStorage.event_types)
-def test_default_listeners(connection, sub_type):
-    con_err_status = dxc.process_last_error(verbose=False)
-    sub = dxc.dxf_create_subscription(connection, sub_type)
-    sub_err_status = dxc.process_last_error(verbose=False)
+def test_default_event_handler(connection, sub_type):
+    sub = dxc.dxf_create_subscription(cc=connection, event_type=sub_type)
+    sub.set_event_handler(DefaultHandler())
+    assert isinstance(sub.get_event_handler(), DefaultHandler)
+
+
+def test_weakref():
+    con = dxc.ConnectionClass()
+    sub = dxc.SubscriptionClass()
+    con.add_weakref(sub)
+    assert con.get_weakrefs()[0] is sub
+
+
+@pytest.mark.xfail
+def test_weakref_fail_on_incorrect_type():
+    con = dxc.ConnectionClass()
+    obj = list()
+    con.add_weakref(obj)
+
+
+@pytest.mark.filterwarnings('ignore::Warning')
+def test_double_event_handler_attachment(connection):
+    handler1 = DefaultHandler()
+    handler2 = DefaultHandler()
+    sub = dxc.dxf_create_subscription(cc=connection, event_type='Trade')
+    sub.set_event_handler(handler1)
     dxc.dxf_attach_listener(sub)
-    add_lis_err_status = dxc.process_last_error(verbose=False)
-    dxc.dxf_detach_listener(sub)
-    drop_lis_err_status = dxc.process_last_error(verbose=False)
-    dxc.dxf_close_subscription(sub)
-    assert (con_err_status, sub_err_status, add_lis_err_status, drop_lis_err_status) == (0, 0, 0, 0)
+    symbols = ['AAPL', 'MSFT']
+    dxc.dxf_add_symbols(sub, symbols)
+    sub.set_event_handler(handler2)
+    assert sub.get_event_handler() is handler2
+    assert dxc.dxf_get_symbols(sub) == symbols

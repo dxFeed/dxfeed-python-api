@@ -1,4 +1,5 @@
 from dxfeed.core.DXFeedPy import *
+from dxfeed.core.utils.handler import DefaultHandler
 from typing import Iterable, Union, Optional
 from datetime import datetime
 import dxfeed.wrappers.class_utils as cu
@@ -11,36 +12,43 @@ class Subscription(object):
 
     Attributes
     ----------
-    connection: dxfeed.core.DXFeedPy.ConnectionClass
-        Core class written in cython, that handle connection related details on the low level
     event_type: str
         One of possible event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle',
         'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
-    data_len: int
-        The amount of events kept in Subscription class. By default event is received as list and each event is stored
-        in deque of fixed size. To have no limits for the deque set this value to -1. Default 100000.
-    date_time: str or datetime.datetime
-        If present timed subscription will be created (conflated stream). For sting date format is following:
-        %Y-%m-%d %H:%M:%S.%f. If None - stream subscription will be created (non-conflated). Default - None.
+    symbols: Iterable
+        Symbols of current subscription.
 
     Note
     ----
     Some event types (e.g. Candle) support only timed subscription.
 
     """
-    def __init__(self, connection, event_type: str, date_time: Union[str, datetime], data_len: int = 100000):
+    def __init__(self, connection, event_type: str, date_time: Union[str, datetime], exact_format: bool = True):
+        """
+
+        Parameters
+        ----------
+        connection: dxfeed.core.DXFeedPy.ConnectionClass
+            Core class written in cython, that handle connection related details on the low level
+        event_type: str
+            One of possible event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle',
+            'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
+        date_time: str or datetime.datetime
+            If present timed subscription will be created (conflated stream). For sting date format is following:
+            %Y-%m-%d %H:%M:%S.%f. If None - stream subscription will be created (non-conflated). Default - None.
+        exact_format: bool
+            If False no warning will be thrown in case of incomplete date_time parameter. Default - True
+        """
         self.__event_type = event_type
         if date_time is None:
             self.__sub = dxf_create_subscription(cc=connection,
-                                                 event_type=event_type,
-                                                 data_len=data_len)
+                                                 event_type=event_type)
         else:
-            date_time = cu.handle_datetime(date_time, fmt='%Y-%m-%d %H:%M:%S.%f')
+            date_time = cu.handle_datetime(date_time, fmt='%Y-%m-%d %H:%M:%S.%f', exact_format=exact_format)
             timestamp = int(date_time.timestamp() * 1000)
             self.__sub = dxf_create_subscription_timed(cc=connection,
                                                        event_type=event_type,
-                                                       time=timestamp,
-                                                       data_len=data_len)
+                                                       time=timestamp)
 
     def __del__(self):
         self.close_subscription()
@@ -55,7 +63,9 @@ class Subscription(object):
 
     def add_symbols(self, symbols: Union[str, Iterable[str]]):
         """
-        Method to add symbol. Supports addition of one symbol as a string as well as list of symbols
+        Method to add symbol. Supports addition of one symbol as a string as well as list of symbols.
+        If no event handler was set, DefaultHandler will be initialized.
+
         Parameters
         ----------
         symbols: str, Iterable
@@ -65,6 +75,7 @@ class Subscription(object):
         -------
         self: Subscription
         """
+        self._attach_default_listener()
         dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
         return self
 
@@ -93,18 +104,20 @@ class Subscription(object):
         """
         dxf_close_subscription(sc=self.__sub)
 
-    def attach_listener(self):
+    def _attach_default_listener(self):
         """
-        Method to attach default listener.
+        Method to attach default listener. If event handler was not previously set, DefaultHandler will be initialized.
 
         Returns
         -------
         self: Subscription
         """
+        if not self.get_event_handler():
+            self.set_event_handler(DefaultHandler())
         dxf_attach_listener(self.__sub)
         return self
 
-    def detach_listener(self):
+    def _detach_listener(self):
         """
         Removes listener so new events won't be received
 
@@ -115,29 +128,28 @@ class Subscription(object):
         dxf_detach_listener(self.__sub)
         return self
 
-    def get_list(self):
+    def get_event_handler(self):
         """
-        Method to get data. When called internal field is cleared
+        Method to get event handler. If no handlers passed previously returns None.
 
         Returns
         -------
-        data: list
-            List of events. Each event contains list with data related to subscription type.
+        handler: EventHandler
         """
-        return self.__sub.get_data()
+        return self.__sub.get_event_handler()
 
-    def get_dataframe(self, keep: bool = True):
+    def set_event_handler(self, handler: EventHandler):
         """
-        Method converts data to the Pandas DataFrame
+        Method to set the handler.
 
         Parameters
         ----------
-        keep: bool
-            When True copies data to dataframe, otherwise pops. Default True
+        handler: EventHandler
+            Event handler with `update` method defined.
 
         Returns
         -------
-        df: pandas.DataFrame
-            Dataframe each row - one event.
+        self: Subscription
         """
-        return self.__sub.to_dataframe(keep)
+        self.__sub.set_event_handler(handler)
+        return self
