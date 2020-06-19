@@ -31,11 +31,12 @@ package**
 .. code:: bash
 
     cd custom_listener
+    pwd
 
 
 .. code:: text
 
-    C:\job\python-api\examples\Low_level_API\custom_listener
+    C:\python-api\examples\Low_level_API\custom_listener
     
 
 Create .pyx file with the whole logic
