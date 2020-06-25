@@ -16,7 +16,7 @@
 
 table {
     display: block;
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 
 .highlight-text > .highlight > pre {
