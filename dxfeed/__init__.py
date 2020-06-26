@@ -1,11 +1,6 @@
 from dxfeed.wrappers.endpoint import Endpoint
 from dxfeed.core.utils.handler import EventHandler, DefaultHandler
-try:
-    from importlib_metadata import version
-except ModuleNotFoundError:
-    # Python 3.8
-    from importlib.metadata import version
+import pkg_resources
 
 
-__version__ = version('dxfeed')
-__all__ = ['Endpoint', 'EventHandler', 'DefaultHandler']
+__version__ = pkg_resources.get_distribution('dxfeed').version
