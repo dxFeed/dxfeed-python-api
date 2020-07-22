@@ -1,6 +1,7 @@
 from warnings import warn
 from collections import deque
 import pandas as pd
+from typing import Iterable
 
 
 cdef class EventHandler:
@@ -20,7 +21,7 @@ cdef class EventHandler:
         with gil:
             self.update(event)
 
-    def update(self, event: list):
+    def update(self, event: Iterable):
         """
         Method that is called, when event arrives to related Subscription. Currently (Cython version 0.29.17),
         abstract methods are not implemented, so this implementation is sort of stub method.
@@ -48,7 +49,7 @@ cdef class DefaultHandler(EventHandler):
     def __init__(self, data_len: int=100000):
         self.__data = deque(maxlen=data_len)
 
-    def update(self, event: list):
+    def update(self, event: Iterable):
         """
         Utility method that is called by underlying Cython level when new event is received. Stores events in
         collection.deque.
