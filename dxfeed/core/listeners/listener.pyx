@@ -15,9 +15,9 @@ cdef class FuncWrapper:
 
 TRADE_COLUMNS = ['Symbol', 'Sequence', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume',
                  'DayTurnover', 'Direction', 'Time', 'Nanos', 'RawFlags', 'IsETH', 'Scope']
-trade_tuple = namedtuple('Trade', ['symbol', 'sequence', 'price', 'exchange_code', 'size', 'tick', 'change',
-                                   'day_volume', 'day_turnover', 'direction', 'time', 'time_nanos', 'raw_flags',
-                                   'is_eth', 'scope'])
+TradeTuple = namedtuple('Trade', ['symbol', 'sequence', 'price', 'exchange_code', 'size', 'tick', 'change',
+                                  'day_volume', 'day_turnover', 'direction', 'time', 'time_nanos', 'raw_flags',
+                                  'is_eth', 'scope'])
 cdef void trade_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -27,25 +27,26 @@ cdef void trade_default_listener(int event_type,
         py_data = <EventHandler> user_data
 
         for i in range(data_count):
-            trade_event = trade_tuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
-                                      sequence=trades[i].sequence,
-                                      price=trades[i].price,
-                                      exchange_code=unicode_from_dxf_const_string_t(&trades[i].exchange_code),
-                                      size=trades[i].size,
-                                      tick=trades[i].tick,
-                                      change=trades[i].change,
-                                      day_volume=trades[i].day_volume,
-                                      day_turnover=trades[i].day_turnover,
-                                      direction=trades[i].direction,
-                                      time=trades[i].time,
-                                      time_nanos=trades[i].time_nanos,
-                                      raw_flags=trades[i].raw_flags,
-                                      is_eth=trades[i].is_eth,
-                                      scope=trades[i].scope)
+            trade_event = TradeTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                                     sequence=trades[i].sequence,
+                                     price=trades[i].price,
+                                     exchange_code=unicode_from_dxf_const_string_t(&trades[i].exchange_code),
+                                     size=trades[i].size,
+                                     tick=trades[i].tick,
+                                     change=trades[i].change,
+                                     day_volume=trades[i].day_volume,
+                                     day_turnover=trades[i].day_turnover,
+                                     direction=trades[i].direction,
+                                     time=trades[i].time,
+                                     time_nanos=trades[i].time_nanos,
+                                     raw_flags=trades[i].raw_flags,
+                                     is_eth=trades[i].is_eth,
+                                     scope=trades[i].scope)
             py_data.__update(trade_event)
 
 QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'Nanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime',
                  'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
+QuoteTuple = namedtuple('Quote', ['symbol', 'sequence', 'time', 'time_nanos', 'bid_time'])
 cdef void quote_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
