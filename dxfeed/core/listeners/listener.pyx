@@ -214,6 +214,8 @@ cdef void candle_default_listener(int event_type,
 
 ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Nanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
                  'Side', 'ExchangeCode', 'MarketMaker', 'SpreadSymbol']
+OrderTuple = namedtuple('Order', ['symbol', 'event_flags', 'index', 'time', 'time_nanos', 'sequence', 'price', 'size',
+                                  'count', 'scope', 'side',  'exchange_code', 'market_maker', 'spread_symbol'])
 cdef void order_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -223,20 +225,21 @@ cdef void order_default_listener(int event_type,
     with gil:
         py_data = <EventHandler> user_data
         for i in range(data_count):
-            py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                              order[i].event_flags,
-                              order[i].index,
-                              order[i].time,
-                              order[i].time_nanos,
-                              order[i].sequence,
-                              order[i].price,
-                              order[i].size,
-                              order[i].count,
-                              order[i].scope,
-                              order[i].side,
-                              unicode_from_dxf_const_string_t(&order[i].exchange_code),
-                              unicode_from_dxf_const_string_t(order[i].market_maker),
-                              unicode_from_dxf_const_string_t(order[i].spread_symbol)])
+            order_event = OrderTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                                     event_flags=order[i].event_flags,
+                                     index=order[i].index,
+                                     time=order[i].time,
+                                     time_nanos=order[i].time_nanos,
+                                     sequence=order[i].sequence,
+                                     price=order[i].price,
+                                     size=order[i].size,
+                                     count=order[i].count,
+                                     scope=order[i].scope,
+                                     side=order[i].side,
+                                     exchange_code=unicode_from_dxf_const_string_t(&order[i].exchange_code),
+                                     market_maker=unicode_from_dxf_const_string_t(order[i].market_maker),
+                                     spread_symbol=unicode_from_dxf_const_string_t(order[i].spread_symbol))
+            py_data.__update(order_event)
 
 GREEKS_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Price', 'Volatility', 'Delta', 'Gamma', 'Theta', 'Rho',
                   'Vega']
