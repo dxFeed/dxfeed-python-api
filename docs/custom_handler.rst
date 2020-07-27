@@ -53,7 +53,7 @@ you should also provide time to start subscription from.
 
     candle_sub = endpoint.create_subscription('Candle', date_time=datetime.now() - relativedelta(days=3))
 
-.. code:: python3
+.. code:: ipython3
 
     class DiffHandler(dx.EventHandler):
         def __init__(self):
@@ -64,33 +64,33 @@ you should also provide time to start subscription from.
             self.__prev_volume = None
             self.volume_changes = DequeWithLock()
             self.counter = 0
-            
+
         def update(self, event):
-            if not np.isnan(event[12]):  # AskVolume not nan
+            if not np.isnan(event.ask_volume):  # AskVolume not nan
                 self.counter += 1
-                print(f'Symbol: {event[0]}')
+                print(f'Symbol: {event.symbol}')
                 if self.counter == 1:
-                    self.__prev_open = event[5]
-                    self.__prev_high = event[6]
-                    self.__prev_low = event[7]
-                    self.__prev_close = event[8]
-                    self.__prev_volume = event[12]
+                    self.__prev_open = event.open
+                    self.__prev_high = event.high
+                    self.__prev_low = event.low
+                    self.__prev_close = event.close
+                    self.__prev_volume = event.ask_volume
                     print('First event processed')
                     print('-------------------')
                 else:
-                    print(f'Open changed by: {event[5] - self.__prev_open}')
-                    self.__prev_open = event[5]
-                    print(f'High changed by: {event[6] - self.__prev_high}')
-                    self.__prev_high = event[6]
-                    print(f'Open changed by: {event[7] - self.__prev_low}')
-                    self.__prev_low = event[7]
-                    print(f'Close changed by: {event[8] - self.__prev_close}')
-                    self.__prev_close = event[8]
+                    print(f'Open changed by: {event.open - self.__prev_open}')
+                    self.__prev_open = event.open
+                    print(f'High changed by: {event.high - self.__prev_high}')
+                    self.__prev_high = event.high
+                    print(f'Open changed by: {event.low - self.__prev_low}')
+                    self.__prev_low = event.low
+                    print(f'Close changed by: {event.close - self.__prev_close}')
+                    self.__prev_close = event.close
                     # Volume logic
-                    vol_change = event[12] - self.__prev_volume
+                    vol_change = event.ask_volume - self.__prev_volume
                     self.volume_changes.safe_append(vol_change)
-                    print(f'Volume changed by: {vol_change}, from {self.__prev_volume}, to {event[12]}')
-                    self.__prev_volume = event[12]
+                    print(f'Volume changed by: {vol_change}, from {self.__prev_volume}, to {event.ask_volume}')
+                    self.__prev_volume = event.ask_volume
                     print(f'Ask events prcessed: {self.counter}')
                     print('-------------------')
                     if self.counter % 10 == 0:
@@ -137,7 +137,7 @@ https://kb.dxfeed.com/display/DS/REST+API#RESTAPI-Candlesymbols
     Volume changed by: 0.0, from 12141490.0, to 12141490.0
     Ask events prcessed: 4
     -------------------
-    
+
 
 Close subscription
 ~~~~~~~~~~~~~~~~~~
@@ -158,4 +158,4 @@ Close connection
 .. code:: text
 
     Connection status: Not connected
-    
+
