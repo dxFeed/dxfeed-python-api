@@ -99,7 +99,7 @@ trade_sub = trade_sub.set_event_handler(trade_handler)
 trade_sub = trade_sub.add_symbols(['C', 'AAPL'])
 ```
 
-For timed subscription you may provide either datetime object or string. String might be incomlete, in 
+For timed subscription you may provide either datetime object or string. String might be incomplete, in 
 this case you will get warning with how your provided date parsed automatically. 
 
 

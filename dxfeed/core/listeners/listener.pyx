@@ -42,7 +42,7 @@ cdef void trade_default_listener(int event_type,
                                      raw_flags=trades[i].raw_flags,
                                      is_eth=trades[i].is_eth,
                                      scope=trades[i].scope)
-            py_data.__update(trade_event)
+            py_data.cython_internal_update_method(trade_event)
 
 QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'Nanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime',
                  'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
@@ -72,7 +72,7 @@ cdef void quote_default_listener(int event_type,
                                      ask_price=quotes[i].ask_price,
                                      ask_size=quotes[i].ask_size,
                                      scope=<int> quotes[i].scope)
-            py_data.__update(quote_event)
+            py_data.cython_internal_update_method(quote_event)
 
 SUMMARY_COLUMNS = ['Symbol', 'DayId', 'DayOpenPrice', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice', 'PrevDayId',
                    'PrevDayClosePrice', 'PrevDayVolume', 'OpenInterest', 'RawFlags', 'ExchangeCode',
@@ -103,7 +103,7 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
                               day_close_price_type=summary[i].day_close_price_type,
                               prev_day_close_price_type=summary[i].prev_day_close_price_type,
                               scope=summary[i].scope)
-            py_data.__update(summary_event)
+            py_data.cython_internal_update_method(summary_event)
 
 PROFILE_COLUMNS = ['Symbol', 'Beta', 'EPS', 'DivFreq', 'ExdDivAmount', 'ExdDivDate', '52HighPrice', '52LowPrice',
                    'Shares', 'FreeFloat', 'HighLimitPrice', 'LowLimitPrice', 'HaltStartTime', 'HaltEndTime',
@@ -140,7 +140,7 @@ cdef void profile_default_listener(int event_type,
                               status_reason=unicode_from_dxf_const_string_t(p[i].status_reason),
                               trading_status=p[i].trading_status,
                               ssr=p[i].ssr)
-            py_data.__update(profile_event)
+            py_data.cython_internal_update_method(profile_event)
 
 TIME_AND_SALE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'ExchangeCode', 'Price', 'Size', 'BidPrice',
                          'AskPrice', 'ExchangeSaleConditions', 'RawFlags', 'Buyer', 'Seller', 'Side', 'Type',
@@ -178,7 +178,7 @@ cdef void time_and_sale_default_listener(int event_type,
                                  trade_through_exempt=tns[i].trade_through_exempt,
                                  is_spread_leg=tns[i].is_spread_leg,
                                  scope=tns[i].scope)
-            py_data.__update(tns_event)
+            py_data.cython_internal_update_method(tns_event)
 
 CANDLE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close', 'Volume', 'VWap',
                   'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
@@ -210,7 +210,7 @@ cdef void candle_default_listener(int event_type,
                                        ask_volume=candle[i].ask_volume,
                                        open_interest=candle[i].open_interest,
                                        imp_volatility=candle[i].imp_volatility)
-            py_data.__update(candle_event)
+            py_data.cython_internal_update_method(candle_event)
 
 ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Nanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
                  'Side', 'ExchangeCode', 'MarketMaker', 'SpreadSymbol']
@@ -239,7 +239,7 @@ cdef void order_default_listener(int event_type,
                                      exchange_code=unicode_from_dxf_const_string_t(&order[i].exchange_code),
                                      market_maker=unicode_from_dxf_const_string_t(order[i].market_maker),
                                      spread_symbol=unicode_from_dxf_const_string_t(order[i].spread_symbol))
-            py_data.__update(order_event)
+            py_data.cython_internal_update_method(order_event)
 
 GREEKS_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Price', 'Volatility', 'Delta', 'Gamma', 'Theta', 'Rho',
                   'Vega']
@@ -265,7 +265,7 @@ cdef void greeks_default_listener(int event_type,
                               theta=greeks[i].theta,
                               rho=greeks[i].rho,
                               vega=greeks[i].vega)
-            py_data.__update(greek_event)
+            py_data.cython_internal_update_method(greek_event)
 
 THEO_PRICE_COLUMNS = ['Symbol', 'Time', 'Price', 'UnderlyingPrice', 'Delta', 'Gamma', 'Dividend', 'Interest']
 TheoPriceTuple = namedtuple('TheoPrice', ['symbol', 'time', 'price', 'underlying_price', 'delta', 'gamma', 'dividend',
@@ -287,7 +287,7 @@ cdef void theo_price_default_listener(int event_type,
                                               gamma=theo_price[i].gamma,
                                               dividend=theo_price[i].dividend,
                                               interest=theo_price[i].interest)
-            py_data.__update(theo_price_event)
+            py_data.cython_internal_update_method(theo_price_event)
 
 UNDERLYING_COLUMNS = ['Symbol', 'Volatility', 'FrontVolatility', 'BackVolatility', 'PutCallRatio']
 UnderlyingTuple = namedtuple('Underlying', ['symbol', 'volatility', 'front_volatility', 'back_volatility',
@@ -306,7 +306,7 @@ cdef void underlying_default_listener(int event_type,
                                                front_volatility=underlying[i].front_volatility,
                                                back_volatility=underlying[i].back_volatility,
                                                put_call_ratio=underlying[i].put_call_ratio)
-            py_data.__update(underlying_event)
+            py_data.cython_internal_update_method(underlying_event)
 
 SERIES_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Expiration', 'Volatility',
                   'PutCallRatio', 'ForwardPrice', 'Dividend', 'Interest']
@@ -332,7 +332,7 @@ cdef void series_default_listener(int event_type,
                                        forward_price=series[i].forward_price,
                                        dividend=series[i].dividend,
                                        interest=series[i].interest)
-            py_data.__update(series_event)
+            py_data.cython_internal_update_method(series_event)
 
 CONFIGURATION_COLUMNS = ['Symbol', 'Version', 'Object']
 ConfigurationTuple = namedtuple('Configuration', ['symbol', 'version', 'object'])
@@ -348,4 +348,4 @@ cdef void configuration_default_listener(int event_type,
             configuration_event = ConfigurationTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
                                                      version=config[i].version,
                                                      object=unicode_from_dxf_const_string_t(config[i].object))
-            py_data.__update(configuration_event)
+            py_data.cython_internal_update_method(configuration_event)

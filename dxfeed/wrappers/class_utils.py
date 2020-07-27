@@ -25,17 +25,34 @@ def to_iterable(value: Union[str, Iterable[str]]) -> Iterable[str]:
     return value
 
 
-def handle_datetime(date_time: Union[str, datetime], fmt: str = '%Y-%m-%d %H:%M:%S.%f'):
+def handle_datetime(date_time: Union[str, datetime], fmt: str = '%Y-%m-%d %H:%M:%S.%f', exact_format: bool = True):
+    """
+    Function to convert string of date and time to datetime object.
+
+    Parameters
+    ----------
+    date_time: str, datetime.datetime
+        Datetime to convert
+    fmt: str
+        Format of expected datetime
+    exact_format: bool
+        If False no warning will be thrown in case of incomplete date_time parameter. Default - True
+
+    Returns
+    -------
+    date_time: datetime.datetime
+        date_time argument converted to datetime.datetime object.
+    """
     if isinstance(date_time, str):
         try:
             date_time = datetime.strptime(date_time, fmt)
         except ValueError:
             try:
                 date_time = pd.to_datetime(date_time, format=fmt, infer_datetime_format=True)
-                warn_message = f'Datetime argument does not exactly match {fmt} format,' + \
-                               ' date was parsed automatically as ' + \
-                               date_time.strftime(format=fmt)
-                warn(warn_message, UserWarning)
+                if exact_format:
+                    warn(Warning(f'Datetime argument does not exactly match {fmt} format,' +
+                                 ' date was parsed automatically as ' +
+                                 date_time.strftime(format=fmt)))
             except ValueError:
                 raise ValueError(f'Datetime should use {fmt} format!')
     if not isinstance(date_time, datetime):

@@ -12,27 +12,39 @@ class Subscription(object):
 
     Attributes
     ----------
-    connection: dxfeed.core.DXFeedPy.ConnectionClass
-        Core class written in cython, that handle connection related details on the low level
     event_type: str
         One of possible event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle',
         'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
-    date_time: str or datetime.datetime
-        If present timed subscription will be created (conflated stream). For sting date format is following:
-        %Y-%m-%d %H:%M:%S.%f. If None - stream subscription will be created (non-conflated). Default - None.
+    symbols: Iterable
+        Symbols of current subscription.
 
     Note
     ----
     Some event types (e.g. Candle) support only timed subscription.
 
     """
-    def __init__(self, connection, event_type: str, date_time: Union[str, datetime]):
+    def __init__(self, connection, event_type: str, date_time: Union[str, datetime], exact_format: bool = True):
+        """
+
+        Parameters
+        ----------
+        connection: dxfeed.core.DXFeedPy.ConnectionClass
+            Core class written in cython, that handle connection related details on the low level
+        event_type: str
+            One of possible event types: 'Trade', 'Quote', 'Summary', 'Profile', 'Order', 'TimeAndSale', 'Candle',
+            'TradeETH', 'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration' or ''
+        date_time: str or datetime.datetime
+            If present timed subscription will be created (conflated stream). For sting date format is following:
+            %Y-%m-%d %H:%M:%S.%f. If None - stream subscription will be created (non-conflated). Default - None.
+        exact_format: bool
+            If False no warning will be thrown in case of incomplete date_time parameter. Default - True
+        """
         self.__event_type = event_type
         if date_time is None:
             self.__sub = dxf_create_subscription(cc=connection,
                                                  event_type=event_type)
         else:
-            date_time = cu.handle_datetime(date_time, fmt='%Y-%m-%d %H:%M:%S.%f')
+            date_time = cu.handle_datetime(date_time, fmt='%Y-%m-%d %H:%M:%S.%f', exact_format=exact_format)
             timestamp = int(date_time.timestamp() * 1000)
             self.__sub = dxf_create_subscription_timed(cc=connection,
                                                        event_type=event_type,
@@ -63,7 +75,7 @@ class Subscription(object):
         -------
         self: Subscription
         """
-        self.attach_default_listener()
+        self._attach_default_listener()
         dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
         return self
 
@@ -92,7 +104,7 @@ class Subscription(object):
         """
         dxf_close_subscription(sc=self.__sub)
 
-    def attach_default_listener(self):
+    def _attach_default_listener(self):
         """
         Method to attach default listener. If event handler was not previously set, DefaultHandler will be initialized.
 
@@ -105,7 +117,7 @@ class Subscription(object):
         dxf_attach_listener(self.__sub)
         return self
 
-    def detach_listener(self):
+    def _detach_listener(self):
         """
         Removes listener so new events won't be received
 

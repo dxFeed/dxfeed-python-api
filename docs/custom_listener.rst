@@ -25,13 +25,13 @@ package**
 
 .. code:: bash
 
-    %%bash
     rm custom_listener -rf
     mkdir custom_listener
 
-.. code:: python3
+.. code:: bash
 
-    %cd custom_listener
+    cd custom_listener
+    pwd
 
 
 .. code:: text
@@ -43,11 +43,10 @@ Create .pyx file with the whole logic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Here we will write listener for Trade event type that will store only
-price and ticker
+price and ticker. Save in cust.pyx file
 
 .. code:: python3
 
-    %%writefile cust.pyx
     from dxfeed.core.listeners.listener cimport *
     from dxfeed.core.utils.helpers cimport unicode_from_dxf_const_string_t
     from dxfeed.core.utils.handler cimport EventHandler
@@ -61,20 +60,15 @@ price and ticker
             py_data = <EventHandler> user_data
     
             for i in range(data_count):
-                py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                                  trades[i].price])
+                py_data.cython_internal_update_method([unicode_from_dxf_const_string_t(symbol_name),
+                                                       trades[i].price])
     
     tc = FuncWrapper.make_from_ptr(trade_custom_listener)
 
 
-.. code:: text
+.. code:: bash
 
-    Writing cust.pyx
-    
-
-.. code:: ipython3
-
-    !ls
+    ls
 
 
 .. code:: text
@@ -101,9 +95,10 @@ price and ticker
 Create setup.py to build the binary file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+setup.py contents:
+
 .. code:: python3
 
-    %%writefile setup.py
     from Cython.Build import cythonize
     from setuptools import setup, Extension
     from dxfeed.core.utils.helpers import get_include
@@ -117,10 +112,6 @@ Create setup.py to build the binary file
         ext_modules=cythonize([ext], language_level=3)
     )
 
-
-.. code:: text
-
-    Writing setup.py
     
 
 -  Line 4 imports dxfeed to get access to ``get_include`` function,
@@ -129,9 +120,9 @@ Create setup.py to build the binary file
 Build the binary file
 ^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code:: bash
 
-    !python setup.py build_ext --inplace
+    python setup.py build_ext --inplace
 
 
 .. code:: text
@@ -140,16 +131,15 @@ Build the binary file
     [1/1] Cythonizing cust.pyx
     running build_ext
     building 'cust' extension
-    creating build
     ...
     Generating code
     Finished generating code
     copying build\lib.win-amd64-3.7\cust.cp37-win_amd64.pyd -> 
     
 
-.. code:: ipython3
+.. code:: bash
 
-    !ls
+    ls
 
 
 .. code:: text
@@ -197,31 +187,28 @@ Attach custom handler
 .. code:: python3
 
     handler = CustomHandler()
+    handler.columns = ['Symbol', 'Price']
     sub.set_event_handler(handler)
 
 Attach custom listener
 
 .. code:: python3
 
-    dxc.dxf_attach_custom_listener(sub, cust.tc, ['Symbol', 'Price'])
+    dxc.dxf_attach_custom_listener(sub, cust.tc)
     dxc.dxf_add_symbols(sub, ['AAPL', 'MSFT'])
 
 Get data
 
 .. code:: python3
 
-    handler.get_data()[-5:]
+    handler.get_data()[-3:]
 
 
 
 
 .. code:: text
 
-    [['AAPL', 335.23],
-     ['AAPL', 335.23],
-     ['AAPL', 335.23],
-     ['MSFT', 186.71],
-     ['MSFT', 186.71]]
+    [['MSFT', 196.14], ['MSFT', 196.27], ['MSFT', 196.33]]
 
 
 

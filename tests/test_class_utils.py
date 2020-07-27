@@ -41,7 +41,7 @@ def test_handle_datetime_with_complete_string_format(dt_fmt):
     assert expected_date_time == actual_datetime
 
 
-@pytest.mark.filterwarnings('ignore::UserWarning')
+@pytest.mark.filterwarnings('ignore::Warning')
 @pytest.mark.parametrize('dt_fmt', ValueStorage.dt_formats)
 def test_handle_datetime_with_no_seconds_string_format(dt_fmt):
     fmt = dt_fmt[:dt_fmt.rfind('%S')-1]
@@ -51,7 +51,7 @@ def test_handle_datetime_with_no_seconds_string_format(dt_fmt):
     assert actual_datetime == expected_datetime
 
 
-@pytest.mark.filterwarnings('ignore::UserWarning')
+@pytest.mark.filterwarnings('ignore::Warning')
 @pytest.mark.parametrize('dt_fmt', ValueStorage.dt_formats)
 def test_handle_datetime_with_no_mins_string_format(dt_fmt):
     fmt = dt_fmt[:dt_fmt.rfind('%M')-1]
@@ -61,7 +61,7 @@ def test_handle_datetime_with_no_mins_string_format(dt_fmt):
     assert actual_datetime == expected_datetime
 
 
-@pytest.mark.filterwarnings('ignore::UserWarning')
+@pytest.mark.filterwarnings('ignore::Warning')
 @pytest.mark.parametrize('dt_fmt', ValueStorage.dt_formats)
 def test_handle_datetime_with_no_hours_string_format(dt_fmt):
     fmt = dt_fmt[:dt_fmt.rfind('%H')-1]
