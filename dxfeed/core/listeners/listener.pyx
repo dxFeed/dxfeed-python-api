@@ -310,6 +310,8 @@ cdef void underlying_default_listener(int event_type,
 
 SERIES_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Expiration', 'Volatility',
                   'PutCallRatio', 'ForwardPrice', 'Dividend', 'Interest']
+SeriesTuple = namedtuple('Series', ['symbol', 'event_flags', 'index', 'time', 'sequence', 'expiration', 'volatility',
+                                    'put_call_ratio', 'forward_price', 'dividend', 'interest'])
 cdef void series_default_listener(int event_type,
                                   dxf_const_string_t symbol_name,
                                   const dxf_event_data_t*data,
@@ -319,17 +321,18 @@ cdef void series_default_listener(int event_type,
     with gil:
         py_data = <EventHandler> user_data
         for i in range(data_count):
-            py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                              series[i].event_flags,
-                              series[i].index,
-                              series[i].time,
-                              series[i].sequence,
-                              series[i].expiration,
-                              series[i].volatility,
-                              series[i].put_call_ratio,
-                              series[i].forward_price,
-                              series[i].dividend,
-                              series[i].interest])
+            series_event = SeriesTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                                       event_flags=series[i].event_flags,
+                                       index=series[i].index,
+                                       time=series[i].time,
+                                       sequence=series[i].sequence,
+                                       expiration=series[i].expiration,
+                                       volatility=series[i].volatility,
+                                       put_call_ratio=series[i].put_call_ratio,
+                                       forward_price=series[i].forward_price,
+                                       dividend=series[i].dividend,
+                                       interest=series[i].interest)
+            py_data.__update(series_event)
 
 CONFIGURATION_COLUMNS = ['Symbol', 'Version', 'Object']
 cdef void configuration_default_listener(int event_type,
