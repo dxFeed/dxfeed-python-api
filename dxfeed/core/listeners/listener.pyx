@@ -46,7 +46,9 @@ cdef void trade_default_listener(int event_type,
 
 QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'Nanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime',
                  'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
-QuoteTuple = namedtuple('Quote', ['symbol', 'sequence', 'time', 'time_nanos', 'bid_time'])
+QuoteTuple = namedtuple('Quote', ['symbol', 'sequence', 'time', 'time_nanos', 'bid_time', 'bid_exchange_code',
+                                  'bid_price', 'bid_size', 'ask_time', 'ask_exchange_code', 'ask_price', 'ask_size',
+                                  'scope'])
 cdef void quote_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -57,19 +59,20 @@ cdef void quote_default_listener(int event_type,
         py_data = <EventHandler> user_data
 
         for i in range(data_count):
-            py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                              quotes[i].sequence,
-                              quotes[i].time,
-                              quotes[i].time_nanos,
-                              quotes[i].bid_time,
-                              unicode_from_dxf_const_string_t(&quotes[i].bid_exchange_code),
-                              quotes[i].bid_price,
-                              quotes[i].bid_size,
-                              quotes[i].ask_time,
-                              unicode_from_dxf_const_string_t(&quotes[i].ask_exchange_code),
-                              quotes[i].ask_price,
-                              quotes[i].ask_size,
-                              <int> quotes[i].scope])
+            quote_event = QuoteTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                                     sequence=quotes[i].sequence,
+                                     time=quotes[i].time,
+                                     time_nanos=quotes[i].time_nanos,
+                                     bid_time=quotes[i].bid_time,
+                                     bid_exchange_code=unicode_from_dxf_const_string_t(&quotes[i].bid_exchange_code),
+                                     bid_price=quotes[i].bid_price,
+                                     bid_size=quotes[i].bid_size,
+                                     ask_time=quotes[i].ask_time,
+                                     ask_exchange_code=unicode_from_dxf_const_string_t(&quotes[i].ask_exchange_code),
+                                     ask_price=quotes[i].ask_price,
+                                     ask_size=quotes[i].ask_size,
+                                     scope=<int> quotes[i].scope)
+            py_data.__update(quote_event)
 
 SUMMARY_COLUMNS = ['Symbol', 'DayId', 'DayOpenPrice', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice', 'PrevDayId',
                    'PrevDayClosePrice', 'PrevDayVolume', 'OpenInterest', 'RawFlags', 'ExchangeCode',
