@@ -335,6 +335,7 @@ cdef void series_default_listener(int event_type,
             py_data.__update(series_event)
 
 CONFIGURATION_COLUMNS = ['Symbol', 'Version', 'Object']
+ConfigurationTuple = namedtuple('Configuration', ['symbol', 'version', 'object'])
 cdef void configuration_default_listener(int event_type,
                                          dxf_const_string_t symbol_name,
                                          const dxf_event_data_t*data,
@@ -344,6 +345,7 @@ cdef void configuration_default_listener(int event_type,
     with gil:
         py_data = <EventHandler> user_data
         for i in range(data_count):
-            py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                              config[i].version,
-                              unicode_from_dxf_const_string_t(config[i].object)])
+            configuration_event = ConfigurationTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                                                     version=config[i].version,
+                                                     object=unicode_from_dxf_const_string_t(config[i].object))
+            py_data.__update(configuration_event)
