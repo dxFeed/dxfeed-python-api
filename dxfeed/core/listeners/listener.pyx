@@ -182,6 +182,9 @@ cdef void time_and_sale_default_listener(int event_type,
 
 CANDLE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close', 'Volume', 'VWap',
                   'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
+CandleTuple = namedtuple('Candle', ['symbol', 'event_flags', 'index', 'time', 'sequence', 'count', 'open', 'high',
+                                    'low', 'close', 'volume', 'vwap', 'bid_volume', 'ask_volume', 'open_interest',
+                                    'imp_volatility'])
 cdef void candle_default_listener(int event_type,
                                   dxf_const_string_t symbol_name,
                                   const dxf_event_data_t*data,
@@ -191,22 +194,23 @@ cdef void candle_default_listener(int event_type,
     with gil:
         py_data = <EventHandler> user_data
         for i in range(data_count):
-            py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                              candle[i].event_flags,
-                              candle[i].index,
-                              candle[i].time,
-                              candle[i].sequence,
-                              candle[i].count,
-                              candle[i].open,
-                              candle[i].high,
-                              candle[i].low,
-                              candle[i].close,
-                              candle[i].volume,
-                              candle[i].vwap,
-                              candle[i].bid_volume,
-                              candle[i].ask_volume,
-                              candle[i].open_interest,
-                              candle[i].imp_volatility])
+            candle_event = CandleTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                                       event_flags=candle[i].event_flags,
+                                       index=candle[i].index,
+                                       time=candle[i].time,
+                                       sequence=candle[i].sequence,
+                                       count=candle[i].count,
+                                       open=candle[i].open,
+                                       high=candle[i].high,
+                                       low=candle[i].low,
+                                       close=candle[i].close,
+                                       volume=candle[i].volume,
+                                       vwap=candle[i].vwap,
+                                       bid_volume=candle[i].bid_volume,
+                                       ask_volume=candle[i].ask_volume,
+                                       open_interest=candle[i].open_interest,
+                                       imp_volatility=candle[i].imp_volatility)
+            py_data.__update(candle_event)
 
 ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Nanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
                  'Side', 'ExchangeCode', 'MarketMaker', 'SpreadSymbol']
