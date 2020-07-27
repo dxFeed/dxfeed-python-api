@@ -243,6 +243,8 @@ cdef void order_default_listener(int event_type,
 
 GREEKS_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Price', 'Volatility', 'Delta', 'Gamma', 'Theta', 'Rho',
                   'Vega']
+GreekTuple = namedtuple('Greek', ['symbol', 'event_flags', 'index', 'time', 'price', 'volatility', 'delta', 'gamma',
+                                  'theta', 'rho', 'vega'])
 cdef void greeks_default_listener(int event_type,
                                   dxf_const_string_t symbol_name,
                                   const dxf_event_data_t*data,
@@ -252,17 +254,18 @@ cdef void greeks_default_listener(int event_type,
     with gil:
         py_data = <EventHandler> user_data
         for i in range(data_count):
-            py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                              greeks[i].event_flags,
-                              greeks[i].index,
-                              greeks[i].time,
-                              greeks[i].price,
-                              greeks[i].volatility,
-                              greeks[i].delta,
-                              greeks[i].gamma,
-                              greeks[i].theta,
-                              greeks[i].rho,
-                              greeks[i].vega])
+            greek_event = GreekTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                              event_flags=greeks[i].event_flags,
+                              index=greeks[i].index,
+                              time=greeks[i].time,
+                              price=greeks[i].price,
+                              volatility=greeks[i].volatility,
+                              delta=greeks[i].delta,
+                              gamma=greeks[i].gamma,
+                              theta=greeks[i].theta,
+                              rho=greeks[i].rho,
+                              vega=greeks[i].vega])
+            py_data.__update(greek_event)
 
 THEO_PRICE_COLUMNS = ['Symbol', 'Time', 'Price', 'UnderlyingPrice', 'Delta', 'Gamma', 'Dividend', 'Interest']
 cdef void theo_price_default_listener(int event_type,
