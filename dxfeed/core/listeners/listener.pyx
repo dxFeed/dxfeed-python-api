@@ -77,6 +77,10 @@ cdef void quote_default_listener(int event_type,
 SUMMARY_COLUMNS = ['Symbol', 'DayId', 'DayOpenPrice', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice', 'PrevDayId',
                    'PrevDayClosePrice', 'PrevDayVolume', 'OpenInterest', 'RawFlags', 'ExchangeCode',
                    'DayClosePriceType', 'PrevDayClosePriceType', 'Scope']
+SummaryTuple = namedtuple('Summary', ['symbol', 'day_id', 'day_open_price', 'day_high_price', 'day_low_price',
+                                      'day_close_price', 'prev_day_id', 'prev_day_close_price', 'prev_day_volume',
+                                      'open_interest', 'raw_flags', 'exchange_code', 'day_close_price_type',
+                                      'prev_day_close_price_type', 'scope'])
 cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_name,
                                    const dxf_event_data_t*data, int data_count, void*user_data) nogil:
     cdef dxf_summary_t*summary = <dxf_summary_t*> data
@@ -84,21 +88,22 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
     with gil:
         py_data = <EventHandler> user_data
         for i in range(data_count):
-            py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                              summary[i].day_id,
-                              summary[i].day_open_price,
-                              summary[i].day_high_price,
-                              summary[i].day_low_price,
-                              summary[i].day_close_price,
-                              summary[i].prev_day_id,
-                              summary[i].prev_day_close_price,
-                              summary[i].prev_day_volume,
-                              summary[i].open_interest,
-                              summary[i].raw_flags,
-                              unicode_from_dxf_const_string_t(&summary[i].exchange_code),
-                              summary[i].day_close_price_type,
-                              summary[i].prev_day_close_price_type,
-                              summary[i].scope])
+            summary_event = SummaryTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                              day_id=summary[i].day_id,
+                              day_open_price=summary[i].day_open_price,
+                              day_high_price=summary[i].day_high_price,
+                              day_low_price=summary[i].day_low_price,
+                              day_close_price=summary[i].day_close_price,
+                              prev_day_id=summary[i].prev_day_id,
+                              prev_day_close_price=summary[i].prev_day_close_price,
+                              prev_day_volume=summary[i].prev_day_volume,
+                              open_interest=summary[i].open_interest,
+                              raw_flags=summary[i].raw_flags,
+                              exchange_code=unicode_from_dxf_const_string_t(&summary[i].exchange_code),
+                              day_close_price_type=summary[i].day_close_price_type,
+                              prev_day_close_price_type=summary[i].prev_day_close_price_type,
+                              scope=summary[i].scope)
+            py_data.__update(summary_event)
 
 PROFILE_COLUMNS = ['Symbol', 'Beta', 'EPS', 'DivFreq', 'ExdDivAmount', 'ExdDivDate', '52HighPrice', '52LowPrice',
                    'Shares', 'FreeFloat', 'HighLimitPrice', 'LowLimitPrice', 'HaltStartTime', 'HaltEndTime',
