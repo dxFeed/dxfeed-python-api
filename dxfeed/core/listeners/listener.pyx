@@ -145,6 +145,9 @@ cdef void profile_default_listener(int event_type,
 TIME_AND_SALE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'ExchangeCode', 'Price', 'Size', 'BidPrice',
                          'AskPrice', 'ExchangeSaleConditions', 'RawFlags', 'Buyer', 'Seller', 'Side', 'Type',
                          'IsValidTick', 'IsEthTrade', 'TradeThroughExempt', 'IsSpreadLeg', 'Scope']
+TnSTuple = namedtuple('TnS', ['symbol', 'event_flags', 'index', 'time', 'exchange_code', 'price', 'size', 'bid_price',
+                              'ask_price', 'exchange_sale_conditions', 'raw_flags', 'buyer', 'seller', 'side', 'type',
+                              'is_valid_tick', 'is_eth_trade', 'trade_through_exempt', 'is_spread_leg', 'scope'])
 cdef void time_and_sale_default_listener(int event_type,
                                          dxf_const_string_t symbol_name,
                                          const dxf_event_data_t*data,
@@ -154,26 +157,28 @@ cdef void time_and_sale_default_listener(int event_type,
     with gil:
         py_data = <EventHandler> user_data
         for i in range(data_count):
-            py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                              tns[i].event_flags,
-                              tns[i].index,
-                              tns[i].time,
-                              unicode_from_dxf_const_string_t(&tns[i].exchange_code),
-                              tns[i].price,
-                              tns[i].size,
-                              tns[i].bid_price,
-                              tns[i].ask_price,
-                              unicode_from_dxf_const_string_t(tns[i].exchange_sale_conditions),
-                              tns[i].raw_flags,
-                              unicode_from_dxf_const_string_t(tns[i].buyer),
-                              unicode_from_dxf_const_string_t(tns[i].seller),
-                              tns[i].side,
-                              tns[i].type,
-                              tns[i].is_valid_tick,
-                              tns[i].is_eth_trade,
-                              tns[i].trade_through_exempt,
-                              tns[i].is_spread_leg,
-                              tns[i].scope])
+            tns_event = TnSTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                                 event_flags=tns[i].event_flags,
+                                 index=tns[i].index,
+                                 time=tns[i].time,
+                                 exchange_code=unicode_from_dxf_const_string_t(&tns[i].exchange_code),
+                                 price=tns[i].price,
+                                 size=tns[i].size,
+                                 bid_price=tns[i].bid_price,
+                                 ask_price=tns[i].ask_price,
+                                 exchange_sale_conditions= \
+                                     unicode_from_dxf_const_string_t(tns[i].exchange_sale_conditions),
+                                 raw_flags=tns[i].raw_flags,
+                                 buyer=unicode_from_dxf_const_string_t(tns[i].buyer),
+                                 seller=unicode_from_dxf_const_string_t(tns[i].seller),
+                                 side=tns[i].side,
+                                 type=tns[i].type,
+                                 is_valid_tick=tns[i].is_valid_tick,
+                                 is_eth_trade=tns[i].is_eth_trade,
+                                 trade_through_exempt=tns[i].trade_through_exempt,
+                                 is_spread_leg=tns[i].is_spread_leg,
+                                 scope=tns[i].scope)
+            py_data.__update(tns_event)
 
 CANDLE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close', 'Volume', 'VWap',
                   'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
