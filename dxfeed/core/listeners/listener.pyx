@@ -264,10 +264,12 @@ cdef void greeks_default_listener(int event_type,
                               gamma=greeks[i].gamma,
                               theta=greeks[i].theta,
                               rho=greeks[i].rho,
-                              vega=greeks[i].vega])
+                              vega=greeks[i].vega)
             py_data.__update(greek_event)
 
 THEO_PRICE_COLUMNS = ['Symbol', 'Time', 'Price', 'UnderlyingPrice', 'Delta', 'Gamma', 'Dividend', 'Interest']
+TheoPriceTuple = namedtuple('TheoPrice', ['symbol', 'time', 'price', 'underlying_price', 'delta', 'gamma', 'dividend',
+                                          'interest'])
 cdef void theo_price_default_listener(int event_type,
                                       dxf_const_string_t symbol_name,
                                       const dxf_event_data_t*data,
@@ -277,14 +279,15 @@ cdef void theo_price_default_listener(int event_type,
     with gil:
         py_data = <EventHandler> user_data
         for i in range(data_count):
-            py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                              theo_price[i].time,
-                              theo_price[i].price,
-                              theo_price[i].underlying_price,
-                              theo_price[i].delta,
-                              theo_price[i].gamma,
-                              theo_price[i].dividend,
-                              theo_price[i].interest])
+            theo_price_event = TheoPriceTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                                              time=theo_price[i].time,
+                                              price=theo_price[i].price,
+                                              underlying_price=theo_price[i].underlying_price,
+                                              delta=theo_price[i].delta,
+                                              gamma=theo_price[i].gamma,
+                                              dividend=theo_price[i].dividend,
+                                              interest=theo_price[i].interest)
+            py_data.__update(theo_price_event)
 
 UNDERLYING_COLUMNS = ['Symbol', 'Volatility', 'FrontVolatility', 'BackVolatility', 'PutCallRatio']
 cdef void underlying_default_listener(int event_type,
