@@ -290,6 +290,8 @@ cdef void theo_price_default_listener(int event_type,
             py_data.__update(theo_price_event)
 
 UNDERLYING_COLUMNS = ['Symbol', 'Volatility', 'FrontVolatility', 'BackVolatility', 'PutCallRatio']
+UnderlyingTuple = namedtuple('Underlying', ['symbol', 'volatility', 'front_volatility', 'back_volatility',
+                                            'put_call_ratio'])
 cdef void underlying_default_listener(int event_type,
                                       dxf_const_string_t symbol_name,
                                       const dxf_event_data_t*data,
@@ -299,11 +301,12 @@ cdef void underlying_default_listener(int event_type,
     with gil:
         py_data = <EventHandler> user_data
         for i in range(data_count):
-            py_data.__update([unicode_from_dxf_const_string_t(symbol_name),
-                              underlying[i].volatility,
-                              underlying[i].front_volatility,
-                              underlying[i].back_volatility,
-                              underlying[i].put_call_ratio])
+            underlying_event = UnderlyingTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                                               volatility=underlying[i].volatility,
+                                               front_volatility=underlying[i].front_volatility,
+                                               back_volatility=underlying[i].back_volatility,
+                                               put_call_ratio=underlying[i].put_call_ratio)
+            py_data.__update(underlying_event)
 
 SERIES_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Expiration', 'Volatility',
                   'PutCallRatio', 'ForwardPrice', 'Dividend', 'Interest']
