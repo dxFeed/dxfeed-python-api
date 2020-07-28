@@ -37,3 +37,6 @@ Utils functions
 	:members:
 	:inherited-members:
 
+.. automodule:: dxfeed.core.utils.data_class
+	:members:
+	:inherited-members:

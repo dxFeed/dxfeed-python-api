@@ -10,18 +10,27 @@ class Endpoint(object):
 
     Attributes
     ----------
-    connection_address: str
-        One of possible connection addresses:
-        
-        - the single address: `host:port` or just `host`
-        - address with credentials: `host:port[username=xxx,password=yyy]`
-        - multiple addresses: `(host1:port1)(host2)(host3:port3[username=xxx,password=yyy])`
-        
-        Default: demo.dxfeed.com:7300
-    connect: bool
-        When True `connect` method  is called during instance creation. Default - True
+    connection_status: str
+        Status of current connection
+    address: str
+        Current connection endpoint address
+
     """
     def __init__(self, connection_address: str = 'demo.dxfeed.com:7300', connect: bool = True):
+        """
+        Parameters
+        ----------
+        connection_address: str
+            One of possible connection addresses:
+
+            - the single address: `host:port` or just `host`
+            - address with credentials: `host:port[username=xxx,password=yyy]`
+            - multiple addresses: `(host1:port1)(host2)(host3:port3[username=xxx,password=yyy])`
+
+            Default: demo.dxfeed.com:7300
+        connect: bool
+            When True `connect` method  is called during instance creation. Default - True
+        """
         self.__con_address = connection_address
         self.__connection = ConnectionClass()
         if connect:

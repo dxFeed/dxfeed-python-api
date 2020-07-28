@@ -96,12 +96,6 @@ cdef class SubscriptionClass:
     cdef void *u_data
 
     def __init__(self):
-        """
-        Parameters
-        ----------
-        data_len: int
-            Sets maximum amount of events, that are kept in Subscription class
-        """
         self.subscription = NULL
         self.__event_handler = None
 
@@ -128,16 +122,12 @@ cdef class SubscriptionClass:
             if event_handler is not self.__event_handler:
                 # saving current listener - related data
                 warn(Warning('Handler replacing'))
-                try:
-                    tmp_columns = self.__event_handler.columns
-                except ValueError:
-                    tmp_columns = list()
                 tmp_listener = lis.FuncWrapper.make_from_ptr(self.listener)
                 # reattaching listener
                 dxf_detach_listener(self)
                 self.__event_handler = event_handler
                 self.u_data = <void *> self.__event_handler
-                dxf_attach_custom_listener(self, tmp_listener, tmp_columns)
+                dxf_attach_custom_listener(self, tmp_listener)
         else:
             self.__event_handler = event_handler
             self.u_data = <void *> self.__event_handler
@@ -203,7 +193,7 @@ def dxf_create_connection_auth_bearer(address: Union[str, unicode, bytes],
         raise RuntimeError(f"In underlying C-API library error {error_code} occurred!")
     return cc
 
-def dxf_create_subscription(ConnectionClass cc, event_type: str, data_len: int = 100000):
+def dxf_create_subscription(ConnectionClass cc, event_type: str):
     """
     Function creates subscription and writes all relevant information to SubscriptionClass.
 
@@ -268,7 +258,7 @@ def dxf_create_subscription_timed(ConnectionClass cc, event_type: str, time: int
                           'SpreadOrder', 'Greeks', 'TheoPrice', 'Underlying', 'Series', 'Configuration', ]:
         raise ValueError('Incorrect event type!')
     if time < 0 or not isinstance(time, int):
-        raise ValueError('time argument should be non-negative integer!')
+        raise ValueError('Time argument should be non-negative integer!')
 
     sc = SubscriptionClass()
     cc.add_weakref(sc)
@@ -313,50 +303,51 @@ def dxf_attach_listener(SubscriptionClass sc):
     """
     if not sc.subscription:
         raise ValueError('Subscription is not valid')
-    if not sc.__event_handler:
+    event_handler = sc.get_event_handler()
+    if not event_handler:
         raise ValueError('Event handler is not defined!')
 
     if sc.event_type_str == 'Trade':
-        sc.__event_handler.columns = lis.TRADE_COLUMNS
+        event_handler.columns = lis.TRADE_COLUMNS
         sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'Quote':
-        sc.__event_handler.columns = lis.QUOTE_COLUMNS
+        event_handler.columns = lis.QUOTE_COLUMNS
         sc.listener = lis.quote_default_listener
     elif sc.event_type_str == 'Summary':
-        sc.__event_handler.columns = lis.SUMMARY_COLUMNS
+        event_handler.columns = lis.SUMMARY_COLUMNS
         sc.listener = lis.summary_default_listener
     elif sc.event_type_str == 'Profile':
-        sc.__event_handler.columns = lis.PROFILE_COLUMNS
+        event_handler.columns = lis.PROFILE_COLUMNS
         sc.listener = lis.profile_default_listener
     elif sc.event_type_str == 'TimeAndSale':
-        sc.__event_handler.columns = lis.TIME_AND_SALE_COLUMNS
+        event_handler.columns = lis.TIME_AND_SALE_COLUMNS
         sc.listener = lis.time_and_sale_default_listener
     elif sc.event_type_str == 'Candle':
-        sc.__event_handler.columns = lis.CANDLE_COLUMNS
+        event_handler.columns = lis.CANDLE_COLUMNS
         sc.listener = lis.candle_default_listener
     elif sc.event_type_str == 'Order':
-        sc.__event_handler.columns = lis.ORDER_COLUMNS
+        event_handler.columns = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
     elif sc.event_type_str == 'TradeETH':
-        sc.__event_handler.columns = lis.TRADE_COLUMNS
+        event_handler.columns = lis.TRADE_COLUMNS
         sc.listener = lis.trade_default_listener
     elif sc.event_type_str == 'SpreadOrder':
-        sc.__event_handler.columns = lis.ORDER_COLUMNS
+        event_handler.columns = lis.ORDER_COLUMNS
         sc.listener = lis.order_default_listener
     elif sc.event_type_str == 'Greeks':
-        sc.__event_handler.columns = lis.GREEKS_COLUMNS
+        event_handler.columns = lis.GREEKS_COLUMNS
         sc.listener = lis.greeks_default_listener
     elif sc.event_type_str == 'TheoPrice':
-        sc.__event_handler.columns = lis.THEO_PRICE_COLUMNS
+        event_handler.columns = lis.THEO_PRICE_COLUMNS
         sc.listener = lis.theo_price_default_listener
     elif sc.event_type_str == 'Underlying':
-        sc.__event_handler.columns = lis.UNDERLYING_COLUMNS
+        event_handler.columns = lis.UNDERLYING_COLUMNS
         sc.listener = lis.underlying_default_listener
     elif sc.event_type_str == 'Series':
-        sc.__event_handler.columns = lis.SERIES_COLUMNS
+        event_handler.columns = lis.SERIES_COLUMNS
         sc.listener = lis.series_default_listener
     elif sc.event_type_str == 'Configuration':
-        sc.__event_handler.columns = lis.CONFIGURATION_COLUMNS
+        event_handler.columns = lis.CONFIGURATION_COLUMNS
         sc.listener = lis.configuration_default_listener
     else:
         raise Exception(f'No default listener for {sc.event_type_str} event type')
@@ -364,7 +355,7 @@ def dxf_attach_listener(SubscriptionClass sc):
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
 
-def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns: Iterable[str]):
+def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw):
     """
     Attaches custom listener
 
@@ -374,18 +365,13 @@ def dxf_attach_custom_listener(SubscriptionClass sc, lis.FuncWrapper fw, columns
         SubscriptionClass with information about subscription
     fw: FuncWrapper
         c function wrapped in FuncWrapper class with Cython
-    columns: list
-        Columns for internal data of SubscriptionClass
     """
     if not sc.subscription:
         raise ValueError('Subscription is not valid')
-    if not sc.__event_handler:
+    event_handler = sc.get_event_handler()
+    if not event_handler:
         raise ValueError('Event handler is not defined!')
 
-    try:
-        sc.__event_handler.columns = columns
-    except ValueError:
-        warn(Warning('Event handler does not have columns attribute!'))
     sc.listener = fw.func
     if not clib.dxf_attach_event_listener(sc.subscription, sc.listener, sc.u_data):
         process_last_error()
@@ -415,8 +401,7 @@ def dxf_close_connection(ConnectionClass cc):
         Variable with connection information
     """
     if cc.connection:
-        con_dependants = cc.get_weakrefs()
-        for dependant in con_dependants:
+        for dependant in cc.get_weakrefs():
             dependant.__close()
 
         clib.dxf_close_connection(cc.connection)
