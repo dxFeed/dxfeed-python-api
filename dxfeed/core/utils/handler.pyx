@@ -60,7 +60,7 @@ cdef class DefaultHandler(EventHandler):
         event: list
             List of various data specific to certain event type.
         """
-        self.__data.safe_append(event)
+        self.__data.safe_append(*event)
 
     def get_list(self, keep: bool=True):
         """
