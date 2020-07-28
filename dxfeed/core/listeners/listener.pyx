@@ -1,6 +1,7 @@
 from dxfeed.core.utils.helpers cimport *
 from dxfeed.core.utils.handler cimport EventHandler
 from collections import namedtuple
+cimport cython
 
 cdef class FuncWrapper:
     def __cinit__(self):
@@ -18,31 +19,35 @@ TRADE_COLUMNS = ['Symbol', 'Sequence', 'Price', 'ExchangeCode', 'Size', 'Tick', 
 TradeTuple = namedtuple('Trade', ['symbol', 'sequence', 'price', 'exchange_code', 'size', 'tick', 'change',
                                   'day_volume', 'day_turnover', 'direction', 'time', 'time_nanos', 'raw_flags',
                                   'is_eth', 'scope'])
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef void trade_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
                                  int data_count, void*user_data) nogil:
     cdef dxf_trade_t* trades = <dxf_trade_t*> data
+
     with gil:
         py_data = <EventHandler> user_data
-
+        events = [None] * data_count
         for i in range(data_count):
-            trade_event = TradeTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
-                                     sequence=trades[i].sequence,
-                                     price=trades[i].price,
-                                     exchange_code=unicode_from_dxf_const_string_t(&trades[i].exchange_code),
-                                     size=trades[i].size,
-                                     tick=trades[i].tick,
-                                     change=trades[i].change,
-                                     day_volume=trades[i].day_volume,
-                                     day_turnover=trades[i].day_turnover,
-                                     direction=trades[i].direction,
-                                     time=trades[i].time,
-                                     time_nanos=trades[i].time_nanos,
-                                     raw_flags=trades[i].raw_flags,
-                                     is_eth=trades[i].is_eth,
-                                     scope=trades[i].scope)
-            py_data.cython_internal_update_method(trade_event)
+            events[i] = TradeTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
+                                   sequence=trades[i].sequence,
+                                   price=trades[i].price,
+                                   exchange_code=unicode_from_dxf_const_string_t(&trades[i].exchange_code),
+                                   size=trades[i].size,
+                                   tick=trades[i].tick,
+                                   change=trades[i].change,
+                                   day_volume=trades[i].day_volume,
+                                   day_turnover=trades[i].day_turnover,
+                                   direction=trades[i].direction,
+                                   time=trades[i].time,
+                                   time_nanos=trades[i].time_nanos,
+                                   raw_flags=trades[i].raw_flags,
+                                   is_eth=trades[i].is_eth,
+                                   scope=trades[i].scope)
+
+        py_data.cython_internal_update_method(events)
 
 QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'Nanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime',
                  'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
