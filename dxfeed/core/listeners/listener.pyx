@@ -158,8 +158,8 @@ cdef void time_and_sale_default_listener(int event_type,
                                                    tns[i].is_spread_leg,
                                                    tns[i].scope])
 
-CANDLE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close', 'Volume', 'VWap',
-                  'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
+CANDLE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close',
+                  'Volume', 'VWap', 'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
 cdef void candle_default_listener(int event_type,
                                   dxf_const_string_t symbol_name,
                                   const dxf_event_data_t*data,
