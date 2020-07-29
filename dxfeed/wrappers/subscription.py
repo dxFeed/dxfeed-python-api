@@ -1,4 +1,4 @@
-from dxfeed.core.DXFeedPy import *
+from dxfeed.core import DXFeedPy as dxp
 from dxfeed.core.utils.handler import DefaultHandler
 from typing import Iterable, Union, Optional
 from datetime import datetime
@@ -41,14 +41,14 @@ class Subscription(object):
         """
         self.__event_type = event_type
         if date_time is None:
-            self.__sub = dxf_create_subscription(cc=connection,
-                                                 event_type=event_type)
+            self.__sub = dxp.dxf_create_subscription(cc=connection,
+                                                     event_type=event_type)
         else:
             date_time = cu.handle_datetime(date_time, fmt='%Y-%m-%d %H:%M:%S.%f', exact_format=exact_format)
             timestamp = int(date_time.timestamp() * 1000)
-            self.__sub = dxf_create_subscription_timed(cc=connection,
-                                                       event_type=event_type,
-                                                       time=timestamp)
+            self.__sub = dxp.dxf_create_subscription_timed(cc=connection,
+                                                           event_type=event_type,
+                                                           time=timestamp)
 
     def __del__(self):
         self.close_subscription()
@@ -76,7 +76,7 @@ class Subscription(object):
         self: Subscription
         """
         self._attach_default_listener()
-        dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
+        dxp.dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
         return self
 
     def remove_symbols(self, symbols: Optional[Union[str, Iterable[str]]] = None):
@@ -93,16 +93,16 @@ class Subscription(object):
         self: Subscription
         """
         if symbols:
-            dxf_remove_symbols(self.__sub, symbols=cu.to_iterable(symbols))
+            dxp.dxf_remove_symbols(self.__sub, symbols=cu.to_iterable(symbols))
         else:
-            dxf_clear_symbols(self.__sub)
+            dxp.dxf_clear_symbols(self.__sub)
         return self
 
     def close_subscription(self):
         """
         Method to close subscription. All received data will remain in the object.
         """
-        dxf_close_subscription(sc=self.__sub)
+        dxp.dxf_close_subscription(sc=self.__sub)
 
     def _attach_default_listener(self):
         """
@@ -114,7 +114,7 @@ class Subscription(object):
         """
         if not self.get_event_handler():
             self.set_event_handler(DefaultHandler())
-        dxf_attach_listener(self.__sub)
+        dxp.dxf_attach_listener(self.__sub)
         return self
 
     def _detach_listener(self):
@@ -125,7 +125,7 @@ class Subscription(object):
         -------
         self: Subscription
         """
-        dxf_detach_listener(self.__sub)
+        dxp.dxf_detach_listener(self.__sub)
         return self
 
     def get_event_handler(self):
@@ -138,7 +138,7 @@ class Subscription(object):
         """
         return self.__sub.get_event_handler()
 
-    def set_event_handler(self, handler: EventHandler):
+    def set_event_handler(self, handler: dxp.EventHandler):
         """
         Method to set the handler.
 
