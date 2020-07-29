@@ -4,8 +4,8 @@
 #define EVENT_DATA_H_INCLUDED
 
 #pxd_include "RecordData.h"
-# from dxfeed.core.pxd_include cimport RecordData as rd
-from dxfeed.core.pxd_include.RecordData cimport *
+from dxfeed.core.pxd_include cimport RecordData as rd
+# from dxfeed.core.pxd_include.RecordData cimport *
 from dxfeed.core.pxd_include cimport DXTypes as dxt
 #ifndef OUT
     #define OUT
@@ -215,7 +215,7 @@ cdef extern from "EventData.h":
 
 
     ctypedef struct dxf_order_t:
-        dxf_event_flags_t event_flags,
+        dxt.dxf_event_flags_t event_flags,
         dxt.dxf_long_t index,
         dxt.dxf_long_t time,
         dxt.dxf_int_t time_nanos,
@@ -240,7 +240,7 @@ cdef extern from "EventData.h":
 
 
     ctypedef struct dxf_time_and_sale_t:
-        dxf_event_flags_t event_flags,
+        dxt.dxf_event_flags_t event_flags,
         dxt.dxf_long_t index,
         dxt.dxf_long_t time,
         dxt.dxf_char_t exchange_code,
@@ -263,7 +263,7 @@ cdef extern from "EventData.h":
 
 # /* Candle ------------------------------------------------------------------- */
     ctypedef struct dxf_candle_t:
-        dxf_event_flags_t event_flags,
+        dxt.dxf_event_flags_t event_flags,
         dxt.dxf_long_t index,
         dxt.dxf_long_t time,
         dxt.dxf_int_t sequence,
@@ -282,7 +282,7 @@ cdef extern from "EventData.h":
 
 # /* Greeks ------------------------------------------------------------------- */
     ctypedef struct dxf_greeks_t:
-        dxf_event_flags_t event_flags,
+        dxt.dxf_event_flags_t event_flags,
         dxt.dxf_long_t index,
         dxt.dxf_long_t time,
         dxt.dxf_double_t price,
@@ -295,15 +295,15 @@ cdef extern from "EventData.h":
 
 # /* TheoPrice ---------------------------------------------------------------- */
 # /* Event and record are the same */
-    ctypedef dx_theo_price_t dxf_theo_price_t
+    ctypedef rd.dx_theo_price_t dxf_theo_price_t
 
 # /* Underlying --------------------------------------------------------------- */
 # /* Event and record are the same */
-    ctypedef dx_underlying_t dxf_underlying_t
+    ctypedef rd.dx_underlying_t dxf_underlying_t
 
 # /* Series ------------------------------------------------------------------- */
     ctypedef struct dxf_series_t:
-        dxf_event_flags_t event_flags,
+        dxt.dxf_event_flags_t event_flags,
         dxt.dxf_long_t index,
         dxt.dxf_long_t time,
         dxt.dxf_int_t sequence,
@@ -419,7 +419,7 @@ cdef extern from "EventData.h":
     ctypedef dxt.dxf_ulong_t dxf_time_int_field_t
 
     ctypedef struct dxf_event_params_t:
-        dxf_event_flags_t flags,
+        dxt.dxf_event_flags_t flags,
         dxf_time_int_field_t time_int_field,
         dxt.dxf_ulong_t snapshot_key
 
@@ -471,7 +471,7 @@ cdef extern from "EventData.h":
 
 
     ctypedef struct dx_event_subscription_param_t:
-        dx_record_id_t record_id,
+        rd.dx_record_id_t record_id,
         dx_subscription_type_t subscription_type
 
 
@@ -486,7 +486,7 @@ cdef extern from "EventData.h":
 #  *
 #  * You need to call dx_free(params.elements) to free resources.
 #  */
-    cdef size_t dx_get_event_subscription_params(dxf_connection_t connection, dx_order_source_array_ptr_t order_source, dx_event_id_t event_id,
+    cdef size_t dx_get_event_subscription_params(dxt.dxf_connection_t connection, dx_order_source_array_ptr_t order_source, dx_event_id_t event_id,
                                         dxt.dxf_uint_t subscr_flags, dx_event_subscription_param_list_t* params)
 
 # /* -------------------------------------------------------------------------- */
