@@ -187,7 +187,7 @@ cdef void candle_default_listener(int event_type,
                                                    candle[i].imp_volatility])
 
 ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Nanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
-                 'Side', 'ExchangeCode', 'MarketMaker', 'SpreadSymbol']
+                 'Side', 'ExchangeCode', 'Source', 'MarketMaker', 'SpreadSymbol']
 cdef void order_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -209,6 +209,8 @@ cdef void order_default_listener(int event_type,
                                                    order[i].scope,
                                                    order[i].side,
                                                    unicode_from_dxf_const_string_t(&order[i].exchange_code),
+                                                   unicode_from_dxf_const_string_t(
+                                                       &order[i].source[DXF_RECORD_SUFFIX_SIZE]),
                                                    unicode_from_dxf_const_string_t(order[i].market_maker),
                                                    unicode_from_dxf_const_string_t(order[i].spread_symbol)])
 

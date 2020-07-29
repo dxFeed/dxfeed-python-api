@@ -66,6 +66,7 @@ DEF DXF_RECORD_SUFFIX_SIZE = 5
 # */
 # /* -------------------------------------------------------------------------- */
 cdef extern from "EventData.h":
+    cdef int DXF_RECORD_SUFFIX_SIZE = DXF_RECORD_SUFFIX_SIZE
     struct dx_suffix_t:
         dxt.dxf_char_t suffix[DXF_RECORD_SUFFIX_SIZE]
 
