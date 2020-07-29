@@ -5,7 +5,6 @@
 
 #pxd_include "RecordData.h"
 from dxfeed.core.pxd_include cimport RecordData as rd
-# from dxfeed.core.pxd_include.RecordData cimport *
 from dxfeed.core.pxd_include cimport DXTypes as dxt
 #ifndef OUT
     #define OUT
