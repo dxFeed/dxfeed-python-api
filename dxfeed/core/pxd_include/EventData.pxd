@@ -5,8 +5,7 @@
 
 #pxd_include "RecordData.h"
 from dxfeed.core.pxd_include.RecordData cimport *
-#pxd_include "DXTypes.h"
-from dxfeed.core.pxd_include.DXTypes cimport *
+
 #ifndef OUT
     #define OUT
 #endif /* OUT */
