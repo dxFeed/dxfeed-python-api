@@ -1,9 +1,6 @@
-# something about license
- 
 #ifndef EVENT_DATA_H_INCLUDED
 #define EVENT_DATA_H_INCLUDED
 
-#pxd_include "RecordData.h"
 from dxfeed.core.pxd_include cimport RecordData as rd
 from dxfeed.core.pxd_include cimport DXTypes as dxt
 #ifndef OUT
@@ -60,13 +57,14 @@ cdef extern from "EventData.h":
 # // The length of record suffix including including the terminating null character
 #define DXF_RECORD_SUFFIX_SIZE 5
 DEF DXF_RECORD_SUFFIX_SIZE = 5
+cdef extern from "EventData.h":
+    cdef int DXF_RECORD_SUFFIX_SIZE = DXF_RECORD_SUFFIX_SIZE
 # /* -------------------------------------------------------------------------- */
 # /*
 # *	Source suffix array
 # */
 # /* -------------------------------------------------------------------------- */
 cdef extern from "EventData.h":
-    cdef int DXF_RECORD_SUFFIX_SIZE = DXF_RECORD_SUFFIX_SIZE
     struct dx_suffix_t:
         dxt.dxf_char_t suffix[DXF_RECORD_SUFFIX_SIZE]
 
