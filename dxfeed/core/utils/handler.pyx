@@ -2,6 +2,7 @@ from warnings import warn
 from dxfeed.core.utils.data_class import DequeWithLock as deque_wl
 import pandas as pd
 from typing import Iterable
+from dateutil.relativedelta import relativedelta
 
 
 cdef class EventHandler:
@@ -102,7 +103,10 @@ cdef class DefaultHandler(EventHandler):
 
 
         df = pd.DataFrame(df_data, columns=self.columns)
-        time_columns = df.columns[df.columns.str.contains('Time')]
+        time_columns = df.columns[df.columns.str.contains('Time')].tolist()
+        nanos = time_columns.pop(time_columns.index('TimeNanos')) if 'TimeNanos' in time_columns else None
         for column in time_columns:
-            df.loc[:, column] = df.loc[:, column].astype('<M8[ms]')
+            df.loc[:, column] = df.loc[:, column].astype('M8[ms]')
+        if nanos and 'Time' in time_columns:
+            df.loc[:, 'Time'] += df.loc[:, nanos].values.astype('timedelta64[ns]')
         return df

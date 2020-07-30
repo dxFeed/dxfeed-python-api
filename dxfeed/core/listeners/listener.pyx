@@ -14,7 +14,7 @@ cdef class FuncWrapper:
 
 
 TRADE_COLUMNS = ['Symbol', 'Sequence', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume',
-                 'DayTurnover', 'Direction', 'Time', 'Nanos', 'RawFlags', 'IsETH', 'Scope']
+                 'DayTurnover', 'Direction', 'Time', 'TimeNanos', 'RawFlags', 'IsETH', 'Scope']
 cdef void trade_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -41,8 +41,8 @@ cdef void trade_default_listener(int event_type,
                                                    trades[i].is_eth,
                                                    trades[i].scope])
 
-QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'Nanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime',
-                 'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
+QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'TimeNanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize',
+                 'AskTime', 'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
 cdef void quote_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -186,7 +186,7 @@ cdef void candle_default_listener(int event_type,
                                                    candle[i].open_interest,
                                                    candle[i].imp_volatility])
 
-ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Nanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
+ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'TimeNanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
                  'Side', 'ExchangeCode', 'Source', 'MarketMaker', 'SpreadSymbol']
 cdef void order_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
