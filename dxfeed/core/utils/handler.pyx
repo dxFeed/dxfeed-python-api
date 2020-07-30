@@ -103,10 +103,12 @@ cdef class DefaultHandler(EventHandler):
 
 
         df = pd.DataFrame(df_data, columns=self.columns)
-        time_columns = (column for column in df.columns if 'Time' in column and 'TimeNanos' not in column)
+        time_columns = (column for column in df.columns
+                        if 'Time' in column
+                        and 'TimeNanos' not in column)
         for column in time_columns:
-            df.loc[:, column] = df.loc[:, column].astype('datetime64[ms]')
+            df.loc[:, column] = df.loc[:, column].values.astype('datetime64[ms]')
         if 'TimeNanos' in df.columns and 'Time' in df.columns:
-            df.loc[:, 'Time'] += df.loc[:, 'TimeNanos'].astype('timedelta64[ns]')
+            df.loc[:, 'Time'] += df.loc[:, 'TimeNanos'].values.astype('timedelta64[ns]')
             df.drop(columns=['TimeNanos'], inplace=True)
         return df
