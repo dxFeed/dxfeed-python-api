@@ -59,7 +59,7 @@ class Subscription(object):
 
     @property
     def symbols(self):
-        return dxf_get_symbols(self.__sub)
+        return dxp.dxf_get_symbols(self.__sub)
 
     def add_symbols(self, symbols: Union[str, Iterable[str]]):
         """
