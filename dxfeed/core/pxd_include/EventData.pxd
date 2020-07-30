@@ -1,12 +1,8 @@
-# something about license
- 
 #ifndef EVENT_DATA_H_INCLUDED
 #define EVENT_DATA_H_INCLUDED
 
-#pxd_include "RecordData.h"
-from dxfeed.core.pxd_include.RecordData cimport *
-#pxd_include "DXTypes.h"
-from dxfeed.core.pxd_include.DXTypes cimport *
+from dxfeed.core.pxd_include cimport RecordData as rd
+from dxfeed.core.pxd_include cimport DXTypes as dxt
 #ifndef OUT
     #define OUT
 #endif /* OUT */
@@ -61,6 +57,8 @@ cdef extern from "EventData.h":
 # // The length of record suffix including including the terminating null character
 #define DXF_RECORD_SUFFIX_SIZE 5
 DEF DXF_RECORD_SUFFIX_SIZE = 5
+cdef extern from "EventData.h":
+    cdef int DXF_RECORD_SUFFIX_SIZE = DXF_RECORD_SUFFIX_SIZE
 # /* -------------------------------------------------------------------------- */
 # /*
 # *	Source suffix array
@@ -68,7 +66,7 @@ DEF DXF_RECORD_SUFFIX_SIZE = 5
 # /* -------------------------------------------------------------------------- */
 cdef extern from "EventData.h":
     struct dx_suffix_t:
-        dxf_char_t suffix[DXF_RECORD_SUFFIX_SIZE]
+        dxt.dxf_char_t suffix[DXF_RECORD_SUFFIX_SIZE]
 
 
     struct dx_order_source_array_t:
@@ -106,38 +104,38 @@ cdef extern from "EventData.h":
 
 
     ctypedef struct dxf_trade_t:
-        dxf_long_t time,
-        dxf_int_t sequence,
-        dxf_int_t time_nanos,
-        dxf_char_t exchange_code,
-        dxf_double_t price,
-        dxf_int_t size,
+        dxt.dxf_long_t time,
+        dxt.dxf_int_t sequence,
+        dxt.dxf_int_t time_nanos,
+        dxt.dxf_char_t exchange_code,
+        dxt.dxf_double_t price,
+        dxt.dxf_int_t size,
         # /* This field is absent in TradeETH */
-        dxf_int_t tick,
+        dxt.dxf_int_t tick,
         # /* This field is absent in TradeETH */
-        dxf_double_t change,
-        dxf_int_t raw_flags,
-        dxf_double_t day_volume,
-        dxf_double_t day_turnover,
+        dxt.dxf_double_t change,
+        dxt.dxf_int_t raw_flags,
+        dxt.dxf_double_t day_volume,
+        dxt.dxf_double_t day_turnover,
         dxf_direction_t direction,
-        dxf_bool_t is_eth,
+        dxt.dxf_bool_t is_eth,
         dxf_order_scope_t scope
 
 
 # /* Quote -------------------------------------------------------------------- */
 
     ctypedef struct dxf_quote_t:
-        dxf_long_t time,
-        dxf_int_t sequence,
-        dxf_int_t time_nanos,
-        dxf_long_t bid_time,
-        dxf_char_t bid_exchange_code,
-        dxf_double_t bid_price,
-        dxf_int_t bid_size,
-        dxf_long_t ask_time,
-        dxf_char_t ask_exchange_code,
-        dxf_double_t ask_price,
-        dxf_int_t ask_size,
+        dxt.dxf_long_t time,
+        dxt.dxf_int_t sequence,
+        dxt.dxf_int_t time_nanos,
+        dxt.dxf_long_t bid_time,
+        dxt.dxf_char_t bid_exchange_code,
+        dxt.dxf_double_t bid_price,
+        dxt.dxf_int_t bid_size,
+        dxt.dxf_long_t ask_time,
+        dxt.dxf_char_t ask_exchange_code,
+        dxt.dxf_double_t ask_price,
+        dxt.dxf_int_t ask_size,
         dxf_order_scope_t scope
 
 
@@ -151,19 +149,20 @@ cdef extern from "EventData.h":
 
 
     ctypedef struct dxf_summary_t:
-        dxf_dayid_t day_id,
-        dxf_double_t day_open_price,
-        dxf_double_t day_high_price,
-        dxf_double_t day_low_price,
-        dxf_double_t day_close_price,
-        dxf_dayid_t prev_day_id,
-        dxf_double_t prev_day_close_price,
-        dxf_double_t prev_day_volume,
-        dxf_int_t open_interest,
-        dxf_int_t raw_flags,
-        dxf_char_t exchange_code,
+        dxt.dxf_dayid_t day_id,
+        dxt.dxf_double_t day_open_price,
+        dxt.dxf_double_t day_high_price,
+        dxt.dxf_double_t day_low_price,
+        dxt.dxf_double_t day_close_price,
+        dxt.dxf_dayid_t prev_day_id,
+        dxt.dxf_double_t prev_day_close_price,
+        dxt.dxf_double_t prev_day_volume,
+        dxt.dxf_int_t open_interest,
+        dxt.dxf_int_t raw_flags,
+        dxt.dxf_char_t exchange_code,
         dxf_price_type_t day_close_price_type,
-        dxf_price_type_t prev_day_close_price_type
+        dxf_price_type_t prev_day_close_price_type,
+        dxf_order_scope_t scope
 
 
 # /* Profile ------------------------------------------------------------------ */
@@ -181,22 +180,22 @@ cdef extern from "EventData.h":
 
 
     ctypedef struct dxf_profile_t:
-        dxf_double_t beta,
-        dxf_double_t eps,
-        dxf_int_t div_freq,
-        dxf_double_t exd_div_amount,
-        dxf_dayid_t exd_div_date,
-        dxf_double_t _52_high_price,
-        dxf_double_t _52_low_price,
-        dxf_double_t shares,
-        dxf_double_t free_float,
-        dxf_double_t high_limit_price,
-        dxf_double_t low_limit_price,
-        dxf_long_t halt_start_time,
-        dxf_long_t halt_end_time,
-        dxf_int_t raw_flags,
-        dxf_const_string_t description,
-        dxf_const_string_t status_reason,
+        dxt.dxf_double_t beta,
+        dxt.dxf_double_t eps,
+        dxt.dxf_int_t div_freq,
+        dxt.dxf_double_t exd_div_amount,
+        dxt.dxf_dayid_t exd_div_date,
+        dxt.dxf_double_t _52_high_price,
+        dxt.dxf_double_t _52_low_price,
+        dxt.dxf_double_t shares,
+        dxt.dxf_double_t free_float,
+        dxt.dxf_double_t high_limit_price,
+        dxt.dxf_double_t low_limit_price,
+        dxt.dxf_long_t halt_start_time,
+        dxt.dxf_long_t halt_end_time,
+        dxt.dxf_int_t raw_flags,
+        dxt.dxf_const_string_t description,
+        dxt.dxf_const_string_t status_reason,
         dxf_trading_status_t trading_status,
         dxf_short_sale_restriction_t ssr
 
@@ -209,26 +208,26 @@ cdef extern from "EventData.h":
         dxf_osd_sell = 2
 
     # union _inner_oso:
-    #     dxf_const_string_t market_maker,
-    #     dxf_const_string_t spread_symbol
+    #     dxt.dxf_const_string_t market_maker,
+    #     dxt.dxf_const_string_t spread_symbol
 
 
     ctypedef struct dxf_order_t:
-        dxf_event_flags_t event_flags,
-        dxf_long_t index,
-        dxf_long_t time,
-        dxf_int_t time_nanos,
-        dxf_int_t sequence,
-        dxf_double_t price,
-        dxf_int_t size,
-        dxf_int_t count,
+        dxt.dxf_event_flags_t event_flags,
+        dxt.dxf_long_t index,
+        dxt.dxf_long_t time,
+        dxt.dxf_int_t time_nanos,
+        dxt.dxf_int_t sequence,
+        dxt.dxf_double_t price,
+        dxt.dxf_int_t size,
+        dxt.dxf_int_t count,
         dxf_order_scope_t scope,
         dxf_order_side_t side,
-        dxf_char_t exchange_code,
-        dxf_char_t source[DXF_RECORD_SUFFIX_SIZE],
+        dxt.dxf_char_t exchange_code,
+        dxt.dxf_char_t source[DXF_RECORD_SUFFIX_SIZE],
         # _inner_oso # probably there should be some name (p58 of cython book)
-        dxf_const_string_t market_maker,
-        dxf_const_string_t spread_symbol
+        dxt.dxf_const_string_t market_maker,
+        dxt.dxf_const_string_t spread_symbol
 
 # /* Time And Sale ------------------------------------------------------------ */
 
@@ -239,83 +238,84 @@ cdef extern from "EventData.h":
 
 
     ctypedef struct dxf_time_and_sale_t:
-        dxf_event_flags_t event_flags,
-        dxf_long_t index,
-        dxf_long_t time,
-        dxf_char_t exchange_code,
-        dxf_double_t price,
-        dxf_int_t size,
-        dxf_double_t bid_price,
-        dxf_double_t ask_price,
-        dxf_const_string_t exchange_sale_conditions,
-        dxf_int_t raw_flags,
-        dxf_const_string_t buyer,
-        dxf_const_string_t seller,
+        dxt.dxf_event_flags_t event_flags,
+        dxt.dxf_long_t index,
+        dxt.dxf_long_t time,
+        dxt.dxf_char_t exchange_code,
+        dxt.dxf_double_t price,
+        dxt.dxf_int_t size,
+        dxt.dxf_double_t bid_price,
+        dxt.dxf_double_t ask_price,
+        dxt.dxf_const_string_t exchange_sale_conditions,
+        dxt.dxf_int_t raw_flags,
+        dxt.dxf_const_string_t buyer,
+        dxt.dxf_const_string_t seller,
         dxf_order_side_t side,
         dxf_tns_type_t type,
-        dxf_bool_t is_valid_tick,
-        dxf_bool_t is_eth_trade,
-        dxf_char_t trade_through_exempt,
-        dxf_bool_t is_spread_leg
+        dxt.dxf_bool_t is_valid_tick,
+        dxt.dxf_bool_t is_eth_trade,
+        dxt.dxf_char_t trade_through_exempt,
+        dxt.dxf_bool_t is_spread_leg,
+        dxf_order_scope_t scope
 
 
 # /* Candle ------------------------------------------------------------------- */
     ctypedef struct dxf_candle_t:
-        dxf_event_flags_t event_flags,
-        dxf_long_t index,
-        dxf_long_t time,
-        dxf_int_t sequence,
-        dxf_double_t count,
-        dxf_double_t open,
-        dxf_double_t high,
-        dxf_double_t low,
-        dxf_double_t close,
-        dxf_double_t volume,
-        dxf_double_t vwap,
-        dxf_double_t bid_volume,
-        dxf_double_t ask_volume,
-        dxf_int_t open_interest,
-        dxf_double_t imp_volatility
+        dxt.dxf_event_flags_t event_flags,
+        dxt.dxf_long_t index,
+        dxt.dxf_long_t time,
+        dxt.dxf_int_t sequence,
+        dxt.dxf_double_t count,
+        dxt.dxf_double_t open,
+        dxt.dxf_double_t high,
+        dxt.dxf_double_t low,
+        dxt.dxf_double_t close,
+        dxt.dxf_double_t volume,
+        dxt.dxf_double_t vwap,
+        dxt.dxf_double_t bid_volume,
+        dxt.dxf_double_t ask_volume,
+        dxt.dxf_int_t open_interest,
+        dxt.dxf_double_t imp_volatility
 
 
 # /* Greeks ------------------------------------------------------------------- */
     ctypedef struct dxf_greeks_t:
-        dxf_event_flags_t event_flags,
-        dxf_long_t index,
-        dxf_long_t time,
-        dxf_double_t price,
-        dxf_double_t volatility,
-        dxf_double_t delta,
-        dxf_double_t gamma,
-        dxf_double_t theta,
-        dxf_double_t rho,
-        dxf_double_t vega
+        dxt.dxf_event_flags_t event_flags,
+        dxt.dxf_long_t index,
+        dxt.dxf_long_t time,
+        dxt.dxf_double_t price,
+        dxt.dxf_double_t volatility,
+        dxt.dxf_double_t delta,
+        dxt.dxf_double_t gamma,
+        dxt.dxf_double_t theta,
+        dxt.dxf_double_t rho,
+        dxt.dxf_double_t vega
 
 # /* TheoPrice ---------------------------------------------------------------- */
 # /* Event and record are the same */
-    ctypedef dx_theo_price_t dxf_theo_price_t
+    ctypedef rd.dx_theo_price_t dxf_theo_price_t
 
 # /* Underlying --------------------------------------------------------------- */
 # /* Event and record are the same */
-    ctypedef dx_underlying_t dxf_underlying_t
+    ctypedef rd.dx_underlying_t dxf_underlying_t
 
 # /* Series ------------------------------------------------------------------- */
     ctypedef struct dxf_series_t:
-        dxf_event_flags_t event_flags,
-        dxf_long_t index,
-        dxf_long_t time,
-        dxf_int_t sequence,
-        dxf_dayid_t expiration,
-        dxf_double_t volatility,
-        dxf_double_t put_call_ratio,
-        dxf_double_t forward_price,
-        dxf_double_t dividend,
-        dxf_double_t interest
+        dxt.dxf_event_flags_t event_flags,
+        dxt.dxf_long_t index,
+        dxt.dxf_long_t time,
+        dxt.dxf_int_t sequence,
+        dxt.dxf_dayid_t expiration,
+        dxt.dxf_double_t volatility,
+        dxt.dxf_double_t put_call_ratio,
+        dxt.dxf_double_t forward_price,
+        dxt.dxf_double_t dividend,
+        dxt.dxf_double_t interest
 
 
     ctypedef struct dxf_configuration_t:
-        dxf_int_t version,
-        dxf_string_t object
+        dxt.dxf_int_t version,
+        dxt.dxf_string_t object
 
 
 # /* -------------------------------------------------------------------------- */
@@ -324,14 +324,14 @@ cdef extern from "EventData.h":
 #  */
 # /* -------------------------------------------------------------------------- */
 
-    # ctypedef static dxf_const_string_t DXF_ORDER_COMPOSITE_BID_STR = L"COMPOSITE_BID"
-    # ctypedef static dxf_const_string_t DXF_ORDER_COMPOSITE_ASK_STR = L"COMPOSITE_ASK"
+    # ctypedef static dxt.dxf_const_string_t DXF_ORDER_COMPOSITE_BID_STR = L"COMPOSITE_BID"
+    # ctypedef static dxt.dxf_const_string_t DXF_ORDER_COMPOSITE_ASK_STR = L"COMPOSITE_ASK"
 
-    # cdef static dxf_const_string_t DXF_ORDER_COMPOSITE_BID_STR = "COMPOSITE_BID"
-    # cdef static dxf_const_string_t DXF_ORDER_COMPOSITE_ASK_STR = "COMPOSITE_ASK"
+    # cdef static dxt.dxf_const_string_t DXF_ORDER_COMPOSITE_BID_STR = "COMPOSITE_BID"
+    # cdef static dxt.dxf_const_string_t DXF_ORDER_COMPOSITE_ASK_STR = "COMPOSITE_ASK"
 
-    cdef dxf_const_string_t DXF_ORDER_COMPOSITE_BID_STR = "COMPOSITE_BID"
-    cdef dxf_const_string_t DXF_ORDER_COMPOSITE_ASK_STR = "COMPOSITE_ASK"
+    cdef dxt.dxf_const_string_t DXF_ORDER_COMPOSITE_BID_STR = "COMPOSITE_BID"
+    cdef dxt.dxf_const_string_t DXF_ORDER_COMPOSITE_ASK_STR = "COMPOSITE_ASK"
 
 # /* -------------------------------------------------------------------------- */
 # /*
@@ -414,12 +414,12 @@ cdef extern from "EventData.h":
 # */
 # /* -------------------------------------------------------------------------- */
 
-    ctypedef dxf_ulong_t dxf_time_int_field_t
+    ctypedef dxt.dxf_ulong_t dxf_time_int_field_t
 
     ctypedef struct dxf_event_params_t:
-        dxf_event_flags_t flags,
+        dxt.dxf_event_flags_t flags,
         dxf_time_int_field_t time_int_field,
-        dxf_ulong_t snapshot_key
+        dxt.dxf_ulong_t snapshot_key
 
 
 # /* -------------------------------------------------------------------------- */
@@ -432,11 +432,11 @@ cdef extern from "EventData.h":
 # /* -------------------------------------------------------------------------- */
 
 
-    ctypedef void (*dxf_event_listener_t) (int event_type, dxf_const_string_t symbol_name,
+    ctypedef void (*dxf_event_listener_t) (int event_type, dxt.dxf_const_string_t symbol_name,
                                           const dxf_event_data_t* data, int data_count,
                                           void* user_data)
 
-    ctypedef void (*dxf_event_listener_v2_t) (int event_type, dxf_const_string_t symbol_name,
+    ctypedef void (*dxf_event_listener_v2_t) (int event_type, dxt.dxf_const_string_t symbol_name,
                                           const dxf_event_data_t* data, int data_count,
                                           const dxf_event_params_t* event_params, void* user_data)
 
@@ -446,7 +446,7 @@ cdef extern from "EventData.h":
 #  */
 # /* -------------------------------------------------------------------------- */
 cdef extern from "EventData.h":
-    cdef dxf_const_string_t dx_event_type_to_string (int event_type)
+    cdef dxt.dxf_const_string_t dx_event_type_to_string (int event_type)
     cdef int dx_get_event_data_struct_size (int event_id)
     cdef dx_event_id_t dx_get_event_id_by_bitmask (int event_bitmask)
 
@@ -469,7 +469,7 @@ cdef extern from "EventData.h":
 
 
     ctypedef struct dx_event_subscription_param_t:
-        dx_record_id_t record_id,
+        rd.dx_record_id_t record_id,
         dx_subscription_type_t subscription_type
 
 
@@ -484,8 +484,8 @@ cdef extern from "EventData.h":
 #  *
 #  * You need to call dx_free(params.elements) to free resources.
 #  */
-    cdef size_t dx_get_event_subscription_params(dxf_connection_t connection, dx_order_source_array_ptr_t order_source, dx_event_id_t event_id,
-                                        dxf_uint_t subscr_flags, dx_event_subscription_param_list_t* params)
+    cdef size_t dx_get_event_subscription_params(dxt.dxf_connection_t connection, dx_order_source_array_ptr_t order_source, dx_event_id_t event_id,
+                                        dxt.dxf_uint_t subscr_flags, dx_event_subscription_param_list_t* params)
 
 # /* -------------------------------------------------------------------------- */
 # /*
@@ -495,7 +495,7 @@ cdef extern from "EventData.h":
     #Not sure if it will go
     ctypedef struct dxf_snapshot_data_t:
         int event_type,
-        dxf_string_t symbol,
+        dxt.dxf_string_t symbol,
 
         size_t records_count,
         const dxf_event_data_t* records
@@ -537,14 +537,14 @@ cdef extern from "EventData.h":
 # */
 # /* -------------------------------------------------------------------------- */
     ctypedef struct dxf_price_level_element_t:
-        dxf_double_t price
-        dxf_long_t size
-        dxf_long_t time
+        dxt.dxf_double_t price
+        dxt.dxf_long_t size
+        dxt.dxf_long_t time
 
 
 
     ctypedef struct dxf_price_level_book_data_t:
-        dxf_const_string_t symbol
+        dxt.dxf_const_string_t symbol
 
         size_t bids_count
         const dxf_price_level_element_t *bids
@@ -578,7 +578,7 @@ cdef extern from "EventData.h":
 # */
 # /* -------------------------------------------------------------------------- */
 #
-    ctypedef void(*dxf_regional_quote_listener_t) (dxf_const_string_t symbol, const dxf_quote_t* quotes, int count, void* user_data)
+    ctypedef void(*dxf_regional_quote_listener_t) (dxt.dxf_const_string_t symbol, const dxf_quote_t* quotes, int count, void* user_data)
 #
 # /* -------------------------------------------------------------------------- */
 # /*

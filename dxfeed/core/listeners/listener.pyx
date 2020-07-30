@@ -13,7 +13,8 @@ cdef class FuncWrapper:
         return out
 
 
-TRADE_COLUMNS = ['Symbol', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume', 'Time', 'IsETH']
+TRADE_COLUMNS = ['Symbol', 'Sequence', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume',
+                 'DayTurnover', 'Direction', 'Time', 'TimeNanos', 'RawFlags', 'IsETH', 'Scope']
 cdef void trade_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -25,17 +26,23 @@ cdef void trade_default_listener(int event_type,
         for i in range(data_count):
 
             py_data.cython_internal_update_method([unicode_from_dxf_const_string_t(symbol_name),
+                                                   trades[i].sequence,
                                                    trades[i].price,
                                                    unicode_from_dxf_const_string_t(&trades[i].exchange_code),
                                                    trades[i].size,
                                                    trades[i].tick,
                                                    trades[i].change,
                                                    trades[i].day_volume,
+                                                   trades[i].day_turnover,
+                                                   trades[i].direction,
                                                    trades[i].time,
-                                                   trades[i].is_eth])
+                                                   trades[i].time_nanos,
+                                                   trades[i].raw_flags,
+                                                   trades[i].is_eth,
+                                                   trades[i].scope])
 
-QUOTE_COLUMNS = ['Symbol', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime', 'AskExchangeCode',
-                 'AskPrice', 'AskSize', 'Scope']
+QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'TimeNanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize',
+                 'AskTime', 'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
 cdef void quote_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -47,6 +54,9 @@ cdef void quote_default_listener(int event_type,
 
         for i in range(data_count):
             py_data.cython_internal_update_method([unicode_from_dxf_const_string_t(symbol_name),
+                                                   quotes[i].sequence,
+                                                   quotes[i].time,
+                                                   quotes[i].time_nanos,
                                                    quotes[i].bid_time,
                                                    unicode_from_dxf_const_string_t(&quotes[i].bid_exchange_code),
                                                    quotes[i].bid_price,
@@ -57,8 +67,9 @@ cdef void quote_default_listener(int event_type,
                                                    quotes[i].ask_size,
                                                    <int> quotes[i].scope])
 
-SUMMARY_COLUMNS = ['Symbol', 'DayId', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice', 'PrevDayId', 'PrevDayClosePrice',
-                   'PrevDayVolume', 'OpenInterest', 'ExchangeCode']
+SUMMARY_COLUMNS = ['Symbol', 'DayId', 'DayOpenPrice', 'DayHighPrice', 'DayLowPrice', 'DayClosePrice', 'PrevDayId',
+                   'PrevDayClosePrice', 'PrevDayVolume', 'OpenInterest', 'RawFlags', 'ExchangeCode',
+                   'DayClosePriceType', 'PrevDayClosePriceType', 'Scope']
 cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_name,
                                    const dxf_event_data_t*data, int data_count, void*user_data) nogil:
     cdef dxf_summary_t*summary = <dxf_summary_t*> data
@@ -68,6 +79,7 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
         for i in range(data_count):
             py_data.cython_internal_update_method([unicode_from_dxf_const_string_t(symbol_name),
                                                    summary[i].day_id,
+                                                   summary[i].day_open_price,
                                                    summary[i].day_high_price,
                                                    summary[i].day_low_price,
                                                    summary[i].day_close_price,
@@ -75,10 +87,15 @@ cdef void summary_default_listener(int event_type, dxf_const_string_t symbol_nam
                                                    summary[i].prev_day_close_price,
                                                    summary[i].prev_day_volume,
                                                    summary[i].open_interest,
-                                                   unicode_from_dxf_const_string_t(&summary[i].exchange_code)])
+                                                   summary[i].raw_flags,
+                                                   unicode_from_dxf_const_string_t(&summary[i].exchange_code),
+                                                   summary[i].day_close_price_type,
+                                                   summary[i].prev_day_close_price_type,
+                                                   summary[i].scope])
 
 PROFILE_COLUMNS = ['Symbol', 'Beta', 'EPS', 'DivFreq', 'ExdDivAmount', 'ExdDivDate', '52HighPrice', '52LowPrice',
-                   'Shares', 'Description', 'RawFlags', 'StatusReason']
+                   'Shares', 'FreeFloat', 'HighLimitPrice', 'LowLimitPrice', 'HaltStartTime', 'HaltEndTime',
+                   'Description', 'RawFlags', 'StatusReason', 'TradingStatus', 'ShortSaleRestriction']
 cdef void profile_default_listener(int event_type,
                                    dxf_const_string_t symbol_name,
                                    const dxf_event_data_t*data,
@@ -97,13 +114,20 @@ cdef void profile_default_listener(int event_type,
                                                    p[i]._52_high_price,
                                                    p[i]._52_low_price,
                                                    p[i].shares,
+                                                   p[i].free_float,
+                                                   p[i].high_limit_price,
+                                                   p[i].low_limit_price,
+                                                   p[i].halt_start_time,
+                                                   p[i].halt_end_time,
                                                    unicode_from_dxf_const_string_t(p[i].description),
                                                    p[i].raw_flags,
-                                                   unicode_from_dxf_const_string_t(p[i].status_reason)])
+                                                   unicode_from_dxf_const_string_t(p[i].status_reason),
+                                                   p[i].trading_status,
+                                                   p[i].ssr])
 
 TIME_AND_SALE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'ExchangeCode', 'Price', 'Size', 'BidPrice',
                          'AskPrice', 'ExchangeSaleConditions', 'RawFlags', 'Buyer', 'Seller', 'Side', 'Type',
-                         'IsValidTick', 'IsEthTrade', 'TradeThroughExempt', 'IsSpreadLeg']
+                         'IsValidTick', 'IsEthTrade', 'TradeThroughExempt', 'IsSpreadLeg', 'Scope']
 cdef void time_and_sale_default_listener(int event_type,
                                          dxf_const_string_t symbol_name,
                                          const dxf_event_data_t*data,
@@ -131,10 +155,11 @@ cdef void time_and_sale_default_listener(int event_type,
                                                    tns[i].is_valid_tick,
                                                    tns[i].is_eth_trade,
                                                    tns[i].trade_through_exempt,
-                                                   tns[i].is_spread_leg])
+                                                   tns[i].is_spread_leg,
+                                                   tns[i].scope])
 
-CANDLE_COLUMNS = ['Symbol', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close', 'Volume', 'VWap',
-                  'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
+CANDLE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close',
+                  'Volume', 'VWap', 'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
 cdef void candle_default_listener(int event_type,
                                   dxf_const_string_t symbol_name,
                                   const dxf_event_data_t*data,
@@ -145,6 +170,7 @@ cdef void candle_default_listener(int event_type,
         py_data = <EventHandler> user_data
         for i in range(data_count):
             py_data.cython_internal_update_method([unicode_from_dxf_const_string_t(symbol_name),
+                                                   candle[i].event_flags,
                                                    candle[i].index,
                                                    candle[i].time,
                                                    candle[i].sequence,
@@ -160,8 +186,8 @@ cdef void candle_default_listener(int event_type,
                                                    candle[i].open_interest,
                                                    candle[i].imp_volatility])
 
-ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Nanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
-                 'Side', 'ExchangeCode', 'MarketMaker', 'SpreadSymbol']
+ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'TimeNanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
+                 'Side', 'ExchangeCode', 'Source', 'MarketMaker', 'SpreadSymbol']
 cdef void order_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -183,6 +209,8 @@ cdef void order_default_listener(int event_type,
                                                    order[i].scope,
                                                    order[i].side,
                                                    unicode_from_dxf_const_string_t(&order[i].exchange_code),
+                                                   unicode_from_dxf_const_string_t(
+                                                       &order[i].source[DXF_RECORD_SUFFIX_SIZE]),
                                                    unicode_from_dxf_const_string_t(order[i].market_maker),
                                                    unicode_from_dxf_const_string_t(order[i].spread_symbol)])
 
@@ -244,7 +272,7 @@ cdef void underlying_default_listener(int event_type,
                                                    underlying[i].back_volatility,
                                                    underlying[i].put_call_ratio])
 
-SERIES_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Sequence', 'Expiration', 'Volatility',
+SERIES_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Expiration', 'Volatility',
                   'PutCallRatio', 'ForwardPrice', 'Dividend', 'Interest']
 cdef void series_default_listener(int event_type,
                                   dxf_const_string_t symbol_name,
@@ -259,7 +287,6 @@ cdef void series_default_listener(int event_type,
                                                    series[i].event_flags,
                                                    series[i].index,
                                                    series[i].time,
-                                                   series[i].sequence,
                                                    series[i].sequence,
                                                    series[i].expiration,
                                                    series[i].volatility,
