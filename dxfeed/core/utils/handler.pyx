@@ -106,8 +106,8 @@ cdef class DefaultHandler(EventHandler):
         time_columns = df.columns[df.columns.str.contains('Time')].tolist()
         nanos = time_columns.pop(time_columns.index('TimeNanos')) if 'TimeNanos' in time_columns else None
         for column in time_columns:
-            df.loc[:, column] = df.loc[:, column].astype('M8[ms]')
+            df.loc[:, column] = df.loc[:, column].astype('datetime64[ms]')
         if nanos and 'Time' in time_columns:
-            df.loc[:, 'Time'] += df.loc[:, nanos].values.astype('timedelta64[ns]')
+            df.loc[:, 'Time'] += df.loc[:, nanos].astype('timedelta64[ns]')
             df.drop(columns=[nanos], inplace=True)
         return df
