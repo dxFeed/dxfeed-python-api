@@ -14,7 +14,7 @@ cdef class FuncWrapper:
 
 
 TRADE_COLUMNS = ['Symbol', 'Sequence', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume',
-                 'DayTurnover', 'Direction', 'Time', 'Nanos', 'RawFlags', 'IsETH', 'Scope']
+                 'DayTurnover', 'Direction', 'Time', 'TimeNanos', 'RawFlags', 'IsETH', 'Scope']
 TradeTuple = namedtuple('Trade', ['symbol', 'sequence', 'price', 'exchange_code', 'size', 'tick', 'change',
                                   'day_volume', 'day_turnover', 'direction', 'time', 'time_nanos', 'raw_flags',
                                   'is_eth', 'scope'])
@@ -44,8 +44,8 @@ cdef void trade_default_listener(int event_type,
                                      scope=trades[i].scope)
             py_data.cython_internal_update_method(trade_event)
 
-QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'Nanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime',
-                 'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
+QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'TimeNanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize',
+                 'AskTime', 'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
 QuoteTuple = namedtuple('Quote', ['symbol', 'sequence', 'time', 'time_nanos', 'bid_time', 'bid_exchange_code',
                                   'bid_price', 'bid_size', 'ask_time', 'ask_exchange_code', 'ask_price', 'ask_size',
                                   'scope'])
@@ -122,24 +122,24 @@ cdef void profile_default_listener(int event_type,
         py_data = <EventHandler> user_data
         for i in range(data_count):
             profile_event = ProfileTuple(symbol=unicode_from_dxf_const_string_t(symbol_name),
-                              beta=p[i].beta,
-                              eps=p[i].eps,
-                              div_freq=p[i].div_freq,
-                              exd_div_amount=p[i].exd_div_amount,
-                              exd_div_date=p[i].exd_div_date,
-                              high_price=p[i]._52_high_price,
-                              low_price=p[i]._52_low_price,
-                              shares=p[i].shares,
-                              free_float=p[i].free_float,
-                              high_limit_price=p[i].high_limit_price,
-                              low_limit_price=p[i].low_limit_price,
-                              halt_start_time=p[i].halt_start_time,
-                              halt_end_time=p[i].halt_end_time,
-                              description=unicode_from_dxf_const_string_t(p[i].description),
-                              raw_flags=p[i].raw_flags,
-                              status_reason=unicode_from_dxf_const_string_t(p[i].status_reason),
-                              trading_status=p[i].trading_status,
-                              ssr=p[i].ssr)
+                                         beta=p[i].beta,
+                                         eps=p[i].eps,
+                                         div_freq=p[i].div_freq,
+                                         exd_div_amount=p[i].exd_div_amount,
+                                         exd_div_date=p[i].exd_div_date,
+                                         high_price=p[i]._52_high_price,
+                                         low_price=p[i]._52_low_price,
+                                         shares=p[i].shares,
+                                         free_float=p[i].free_float,
+                                         high_limit_price=p[i].high_limit_price,
+                                         low_limit_price=p[i].low_limit_price,
+                                         halt_start_time=p[i].halt_start_time,
+                                         halt_end_time=p[i].halt_end_time,
+                                         description=unicode_from_dxf_const_string_t(p[i].description),
+                                         raw_flags=p[i].raw_flags,
+                                         status_reason=unicode_from_dxf_const_string_t(p[i].status_reason),
+                                         trading_status=p[i].trading_status,
+                                         ssr=p[i].ssr)
             py_data.cython_internal_update_method(profile_event)
 
 TIME_AND_SALE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'ExchangeCode', 'Price', 'Size', 'BidPrice',
@@ -180,8 +180,8 @@ cdef void time_and_sale_default_listener(int event_type,
                                  scope=tns[i].scope)
             py_data.cython_internal_update_method(tns_event)
 
-CANDLE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close', 'Volume', 'VWap',
-                  'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
+CANDLE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close',
+                  'Volume', 'VWap', 'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
 CandleTuple = namedtuple('Candle', ['symbol', 'event_flags', 'index', 'time', 'sequence', 'count', 'open', 'high',
                                     'low', 'close', 'volume', 'vwap', 'bid_volume', 'ask_volume', 'open_interest',
                                     'imp_volatility'])
@@ -212,10 +212,10 @@ cdef void candle_default_listener(int event_type,
                                        imp_volatility=candle[i].imp_volatility)
             py_data.cython_internal_update_method(candle_event)
 
-ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Nanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
-                 'Side', 'ExchangeCode', 'MarketMaker', 'SpreadSymbol']
+ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'TimeNanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
+                 'Side', 'ExchangeCode', 'Source', 'MarketMaker', 'SpreadSymbol']
 OrderTuple = namedtuple('Order', ['symbol', 'event_flags', 'index', 'time', 'time_nanos', 'sequence', 'price', 'size',
-                                  'count', 'scope', 'side',  'exchange_code', 'market_maker', 'spread_symbol'])
+                                  'count', 'scope', 'side',  'exchange_code', 'source', 'market_maker', 'spread_symbol'])
 cdef void order_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -237,6 +237,7 @@ cdef void order_default_listener(int event_type,
                                      scope=order[i].scope,
                                      side=order[i].side,
                                      exchange_code=unicode_from_dxf_const_string_t(&order[i].exchange_code),
+                                     source=unicode_from_dxf_const_string_t(&order[i].source[DXF_RECORD_SUFFIX_SIZE]),
                                      market_maker=unicode_from_dxf_const_string_t(order[i].market_maker),
                                      spread_symbol=unicode_from_dxf_const_string_t(order[i].spread_symbol))
             py_data.cython_internal_update_method(order_event)

@@ -1,6 +1,7 @@
-from dxfeed.core.DXFeedPy import *
+from dxfeed.core import DXFeedPy as dxp
 from dxfeed.wrappers.subscription import Subscription
 from datetime import datetime
+from typing import Union
 
 
 class Endpoint(object):
@@ -32,7 +33,7 @@ class Endpoint(object):
             When True `connect` method  is called during instance creation. Default - True
         """
         self.__con_address = connection_address
-        self.__connection = ConnectionClass()
+        self.__connection = dxp.ConnectionClass()
         if connect:
             self.connect()
 
@@ -41,7 +42,7 @@ class Endpoint(object):
 
     @property
     def connection_status(self):
-        return dxf_get_current_connection_status(self.__connection, return_str=True)
+        return dxp.dxf_get_current_connection_status(self.__connection, return_str=True)
 
     @property
     def address(self):
@@ -61,12 +62,12 @@ class Endpoint(object):
         self: Endpoint
         """
         if reconnect:
-            dxf_close_connection(self.__connection)
+            dxp.dxf_close_connection(self.__connection)
 
-        con_status = dxf_get_current_connection_status(self.__connection, return_str=True)
+        con_status = dxp.dxf_get_current_connection_status(self.__connection, return_str=True)
 
         if con_status == 'Not connected':
-            self.__connection = dxf_create_connection(self.address)
+            self.__connection = dxp.dxf_create_connection(self.address)
 
         return self
 
@@ -92,7 +93,7 @@ class Endpoint(object):
         subscription: Subscription
             Subscription class related to current connection
         """
-        con_status = dxf_get_current_connection_status(self.__connection, return_str=False)
+        con_status = dxp.dxf_get_current_connection_status(self.__connection, return_str=False)
         if con_status == 0 or con_status == 2:
             raise ValueError('Connection is not established')
         subscription = Subscription(connection=self.__connection,
@@ -104,4 +105,4 @@ class Endpoint(object):
         """
         Method to close connections and all related subscriptions.
         """
-        dxf_close_connection(self.__connection)
+        dxp.dxf_close_connection(self.__connection)
