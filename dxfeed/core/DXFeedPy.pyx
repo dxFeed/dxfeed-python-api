@@ -306,6 +306,7 @@ def dxf_attach_listener(SubscriptionClass sc):
     event_handler = sc.get_event_handler()
     if not event_handler:
         raise ValueError('Event handler is not defined!')
+    warn(FutureWarning('New order in event fields will be introduced in dxfeed-0.6.0. Address event fields by name.'))
 
     if sc.event_type_str == 'Trade':
         event_handler.columns = lis.TRADE_COLUMNS

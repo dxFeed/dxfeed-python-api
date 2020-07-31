@@ -1,9 +1,6 @@
 from dxfeed.core.utils.helpers cimport *
 from dxfeed.core.utils.handler cimport EventHandler
-from logging import warning
 
-
-warning(FutureWarning('New order in event fields will be introduced in dxfeed-0.6.0. Address event fields by name.'))
 
 cdef class FuncWrapper:
     def __cinit__(self):
