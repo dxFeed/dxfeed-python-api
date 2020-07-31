@@ -1,7 +1,6 @@
 from dxfeed.core.utils.helpers cimport *
 from dxfeed.core.utils.handler cimport EventHandler
 from collections import namedtuple
-cimport cython
 
 cdef class FuncWrapper:
     def __cinit__(self):
@@ -15,12 +14,10 @@ cdef class FuncWrapper:
 
 
 TRADE_COLUMNS = ['Symbol', 'Sequence', 'Price', 'ExchangeCode', 'Size', 'Tick', 'Change', 'DayVolume',
-                 'DayTurnover', 'Direction', 'Time', 'Nanos', 'RawFlags', 'IsETH', 'Scope']
+                 'DayTurnover', 'Direction', 'Time', 'TimeNanos', 'RawFlags', 'IsETH', 'Scope']
 TradeTuple = namedtuple('Trade', ['symbol', 'sequence', 'price', 'exchange_code', 'size', 'tick', 'change',
                                   'day_volume', 'day_turnover', 'direction', 'time', 'time_nanos', 'raw_flags',
                                   'is_eth', 'scope'])
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cdef void trade_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -49,8 +46,8 @@ cdef void trade_default_listener(int event_type,
 
         py_data.cython_internal_update_method(events)
 
-QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'Nanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize', 'AskTime',
-                 'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
+QUOTE_COLUMNS = ['Symbol', 'Sequence', 'Time', 'TimeNanos', 'BidTime', 'BidExchangeCode', 'BidPrice', 'BidSize',
+                 'AskTime', 'AskExchangeCode', 'AskPrice', 'AskSize', 'Scope']
 QuoteTuple = namedtuple('Quote', ['symbol', 'sequence', 'time', 'time_nanos', 'bid_time', 'bid_exchange_code',
                                   'bid_price', 'bid_size', 'ask_time', 'ask_exchange_code', 'ask_price', 'ask_size',
                                   'scope'])
@@ -188,8 +185,8 @@ cdef void time_and_sale_default_listener(int event_type,
                                  scope=tns[i].scope)
         py_data.cython_internal_update_method(events)
 
-CANDLE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close', 'Volume', 'VWap',
-                  'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
+CANDLE_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Sequence', 'Count', 'Open', 'High', 'Low', 'Close',
+                  'Volume', 'VWap', 'BidVolume', 'AskVolume', 'OpenInterest', 'ImpVolatility']
 CandleTuple = namedtuple('Candle', ['symbol', 'event_flags', 'index', 'time', 'sequence', 'count', 'open', 'high',
                                     'low', 'close', 'volume', 'vwap', 'bid_volume', 'ask_volume', 'open_interest',
                                     'imp_volatility'])
@@ -221,10 +218,10 @@ cdef void candle_default_listener(int event_type,
                                     imp_volatility=candle[i].imp_volatility)
         py_data.cython_internal_update_method(events)
 
-ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'Nanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
-                 'Side', 'ExchangeCode', 'MarketMaker', 'SpreadSymbol']
+ORDER_COLUMNS = ['Symbol', 'EventFlags', 'Index', 'Time', 'TimeNanos', 'Sequence', 'Price', 'Size', 'Count', 'Scope',
+                 'Side', 'ExchangeCode', 'Source', 'MarketMaker', 'SpreadSymbol']
 OrderTuple = namedtuple('Order', ['symbol', 'event_flags', 'index', 'time', 'time_nanos', 'sequence', 'price', 'size',
-                                  'count', 'scope', 'side',  'exchange_code', 'market_maker', 'spread_symbol'])
+                                  'count', 'scope', 'side',  'exchange_code', 'source', 'market_maker', 'spread_symbol'])
 cdef void order_default_listener(int event_type,
                                  dxf_const_string_t symbol_name,
                                  const dxf_event_data_t*data,
@@ -247,6 +244,7 @@ cdef void order_default_listener(int event_type,
                                    scope=order[i].scope,
                                    side=order[i].side,
                                    exchange_code=unicode_from_dxf_const_string_t(&order[i].exchange_code),
+                                   source=unicode_from_dxf_const_string_t(&order[i].source[DXF_RECORD_SUFFIX_SIZE]),
                                    market_maker=unicode_from_dxf_const_string_t(order[i].market_maker),
                                    spread_symbol=unicode_from_dxf_const_string_t(order[i].spread_symbol))
         py_data.cython_internal_update_method(events)
