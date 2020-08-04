@@ -8,10 +8,9 @@ try:
 except ImportError:
     use_cython = False
     ext = 'c'
-    ext_pp = 'cpp'
 else:
     use_cython = True
-    ext = ext_pp = 'pyx'
+    ext = 'pyx'
 
 # Get all dxfeed c api c files to be compiled into separate lib
 root_path = Path(__file__).resolve().parent
@@ -41,7 +40,7 @@ extensions = [Extension('dxfeed.core.utils.helpers', ['dxfeed/core/utils/helpers
                         include_dirs=include_dirs),
               Extension('dxfeed.core.listeners.listener', ['dxfeed/core/listeners/listener.' + ext],
                         include_dirs=include_dirs),
-              Extension('dxfeed.core.DXFeedPy', ['dxfeed/core/DXFeedPy.' + ext_pp], libraries=libs,
+              Extension('dxfeed.core.DXFeedPy', ['dxfeed/core/DXFeedPy.' + ext], libraries=libs,
                         include_dirs=include_dirs)]
 
 if use_cython:

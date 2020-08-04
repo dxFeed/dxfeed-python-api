@@ -1,4 +1,3 @@
-# distutils: language = c++
 # cython: always_allow_keywords=True
 
 from dxfeed.core.utils.helpers cimport *
