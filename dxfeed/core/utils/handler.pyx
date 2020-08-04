@@ -2,7 +2,6 @@ from warnings import warn
 from dxfeed.core.utils.data_class import DequeWithLock as deque_wl
 import pandas as pd
 from typing import Iterable
-from dateutil.relativedelta import relativedelta
 
 
 cdef class EventHandler:
