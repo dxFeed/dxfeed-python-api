@@ -27,7 +27,7 @@ Package distribution: [pypi.org/project/dxfeed](https://pypi.org/project/dxfeed/
 **Requirements:** python >= 3.6, pandas
 
 ```python
-pip3 install pandas
+pip3 install pandas, toml
 ```
 
 Install package via PyPI
@@ -35,6 +35,39 @@ Install package via PyPI
 ```python
 pip3 install dxfeed
 ``` 
+
+## Installation from sources
+
+To install dxfeed from source you need Poetry, Cython and taskipy in addition to the normal dependencies above.
+Poetry provides a custom installer. This is the recommended way of installing poetry according to
+[documentation](https://python-poetry.org/docs/)
+
+For osx / linux / bashonwindows:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+```
+
+Cython and taskipy can be installed from pypi:
+
+```python
+pip3 install cython taskipy
+``` 
+
+In the project root directory (same one where you found this file after
+cloning the git repo), execute:
+
+```bash
+task build
+pip install dist/dxfeed-x.x.x.tar.gz
+```
+
+or for installing in [development mode](https://pip.pypa.io/en/latest/reference/pip_install.html#editable-installs):
+
+```bash
+task build_inplace
+pip install -e .
+```
 
 ## Basic usage
 
