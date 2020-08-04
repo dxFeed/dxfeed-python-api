@@ -1,7 +1,9 @@
-from dxfeed.core import DXFeedPy as dxp
-from dxfeed.core.utils.handler import DefaultHandler
 from typing import Iterable, Union, Optional
 from datetime import datetime
+from warnings import simplefilter
+
+from dxfeed.core import DXFeedPy as dxp
+from dxfeed.core.utils.handler import DefaultHandler
 import dxfeed.wrappers.class_utils as cu
 
 
@@ -114,7 +116,12 @@ class Subscription(object):
         """
         if not self.get_event_handler():
             self.set_event_handler(DefaultHandler())
+            simplefilter(action='ignore', category=FutureWarning)
+
         dxp.dxf_attach_listener(self.__sub)
+
+        simplefilter(action='default', category=FutureWarning)
+
         return self
 
     def _detach_listener(self):
