@@ -40,6 +40,7 @@ class Subscription(object):
             If False no warning will be thrown in case of incomplete date_time parameter. Default - True
         """
         self.__event_type = event_type
+        self.__listener_attached = False
         if date_time is None:
             self.__sub = dxp.dxf_create_subscription(cc=connection,
                                                      event_type=event_type)
@@ -75,7 +76,8 @@ class Subscription(object):
         -------
         self: Subscription
         """
-        self._attach_default_listener()
+        if not self.__listener_attached:
+            self._attach_default_listener()
         dxp.dxf_add_symbols(sc=self.__sub, symbols=cu.to_iterable(symbols))
         return self
 
@@ -115,6 +117,7 @@ class Subscription(object):
         if not self.get_event_handler():
             self.set_event_handler(DefaultHandler())
         dxp.dxf_attach_listener(self.__sub)
+        self.__listener_attached = True
         return self
 
     def _detach_listener(self):
@@ -126,6 +129,7 @@ class Subscription(object):
         self: Subscription
         """
         dxp.dxf_detach_listener(self.__sub)
+        self.__listener_attached = False
         return self
 
     def get_event_handler(self):
