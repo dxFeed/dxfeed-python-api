@@ -47,7 +47,7 @@ git submodule update
 To install dxfeed from source you need Poetry. It provides a custom installer.
 This is the recommended way of installing poetry according to [documentation](https://python-poetry.org/docs/)
 
-For osx / linux / windows (with bash):
+For macOS / Linux / Windows (with bash):
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
