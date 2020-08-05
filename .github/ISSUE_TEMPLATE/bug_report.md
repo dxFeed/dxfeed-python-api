@@ -8,14 +8,14 @@ assignees: ''
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
+- A clear and concise description of what the bug is.
 
 **To Reproduce**
-Please, provide reproducible code snippet
+- Please, provide reproducible code snippet
 
 **Behavior**
-Bug case: provide error traceback, please
-Unexpected behavior case: provide a clear and concise description of what you expected to happen, please.
+- Bug case: provide error traceback, please
+- Unexpected behavior case: provide a clear and concise description of what you expected to happen, please.
 
 
 **Environment:**
