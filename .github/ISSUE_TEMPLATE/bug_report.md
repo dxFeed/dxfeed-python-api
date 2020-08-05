@@ -8,15 +8,17 @@ assignees: ''
 ---
 
 **Describe the bug**
-- A clear and concise description of what the bug is.
+ - A clear and concise description of what the bug is.
 
 **To Reproduce**
-- Please, provide reproducible code snippet
+ - Provide reproducible code snippet, please.
 
 **Behavior**
-- Bug case: provide error traceback, please
-- Unexpected behavior case: provide a clear and concise description of what you expected to happen, please.
+ - Bug case: provide error traceback, please.
+ - Unexpected behavior case: describe the key points of behavior you face, please.
 
+**Expected behavior**
+ - Provide a clear and concise description of what you expected to happen, please.
 
 **Environment:**
  - OS: [e.g. Ubuntu-16.04]
