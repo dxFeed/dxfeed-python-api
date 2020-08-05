@@ -24,13 +24,9 @@ Package distribution: [pypi.org/project/dxfeed](https://pypi.org/project/dxfeed/
 
 ## Installation
 
-**Requirements:** python >= 3.6, pandas
+**Requirements:** python >= 3.6
 
-```python
-pip3 install pandas, toml
-```
-
-Install package via PyPI
+Install package via PyPI:
 
 ```python
 pip3 install dxfeed
