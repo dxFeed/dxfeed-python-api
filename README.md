@@ -38,6 +38,12 @@ pip3 install dxfeed
 
 ## Installation from sources
 
+Reminder: initialize and pull git submodule after cloning the repo:
+```bash
+git submodule init
+git submodule update
+``` 
+
 To install dxfeed from source you need Poetry, Cython and taskipy in addition to the normal dependencies above.
 Poetry provides a custom installer. This is the recommended way of installing poetry according to
 [documentation](https://python-poetry.org/docs/)
