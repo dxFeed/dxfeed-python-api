@@ -24,17 +24,45 @@ Package distribution: [pypi.org/project/dxfeed](https://pypi.org/project/dxfeed/
 
 ## Installation
 
-**Requirements:** python >= 3.6, pandas
+**Requirements:** python >= 3.6
 
-```python
-pip3 install pandas
-```
-
-Install package via PyPI
+Install package via PyPI:
 
 ```python
 pip3 install dxfeed
 ``` 
+
+## Installation from sources
+
+Reminder: initialize and pull git submodule after cloning the repo:
+```bash
+git submodule init
+git submodule update
+``` 
+
+To install dxfeed from source you need Poetry. It provides a custom installer.
+This is the recommended way of installing poetry according to [documentation](https://python-poetry.org/docs/)
+
+For macOS / Linux / Windows (with bash):
+
+```bash
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+```
+
+In the project root directory (same one where you found this file after
+cloning the git repo), execute:
+
+```bash
+poetry install 
+```
+
+By default package is installed in 
+[development mode](https://pip.pypa.io/en/latest/reference/pip_install.html#editable-installs). To rebuild 
+C extensions, after editing .pyx files:
+
+```bash
+poetry run task build_inplace  # build c extensions
+```
 
 ## Basic usage
 
