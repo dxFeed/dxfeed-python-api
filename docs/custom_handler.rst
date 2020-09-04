@@ -65,38 +65,39 @@ you should also provide time to start subscription from.
             self.volume_changes = DequeWithLock()
             self.counter = 0
 
-        def update(self, event):
-            if not np.isnan(event.ask_volume):  # AskVolume not nan
-                self.counter += 1
-                print(f'Symbol: {event.symbol}')
-                if self.counter == 1:
-                    self.__prev_open = event.open
-                    self.__prev_high = event.high
-                    self.__prev_low = event.low
-                    self.__prev_close = event.close
-                    self.__prev_volume = event.ask_volume
-                    print('First event processed')
-                    print('-------------------')
-                else:
-                    print(f'Open changed by: {event.open - self.__prev_open}')
-                    self.__prev_open = event.open
-                    print(f'High changed by: {event.high - self.__prev_high}')
-                    self.__prev_high = event.high
-                    print(f'Open changed by: {event.low - self.__prev_low}')
-                    self.__prev_low = event.low
-                    print(f'Close changed by: {event.close - self.__prev_close}')
-                    self.__prev_close = event.close
-                    # Volume logic
-                    vol_change = event.ask_volume - self.__prev_volume
-                    self.volume_changes.safe_append(vol_change)
-                    print(f'Volume changed by: {vol_change}, from {self.__prev_volume}, to {event.ask_volume}')
-                    self.__prev_volume = event.ask_volume
-                    print(f'Ask events prcessed: {self.counter}')
-                    print('-------------------')
-                    if self.counter % 10 == 0:
-                        print(f'Average volume change for 10 past ask events is: {sum(self.volume_changes) / len(self.volume_changes)}')
-                        self.volume_changes.clear()
+        def update(self, events):
+            for event in events:
+                if not np.isnan(event.ask_volume):  # AskVolume not nan
+                    self.counter += 1
+                    print(f'Symbol: {event.symbol}')
+                    if self.counter == 1:
+                        self.__prev_open = event.open
+                        self.__prev_high = event.high
+                        self.__prev_low = event.low
+                        self.__prev_close = event.close
+                        self.__prev_volume = event.ask_volume
+                        print('First event processed')
                         print('-------------------')
+                    else:
+                        print(f'Open changed by: {event.open - self.__prev_open}')
+                        self.__prev_open = event.open
+                        print(f'High changed by: {event.high - self.__prev_high}')
+                        self.__prev_high = event.high
+                        print(f'Open changed by: {event.low - self.__prev_low}')
+                        self.__prev_low = event.low
+                        print(f'Close changed by: {event.close - self.__prev_close}')
+                        self.__prev_close = event.close
+                        # Volume logic
+                        vol_change = event.ask_volume - self.__prev_volume
+                        self.volume_changes.safe_append(vol_change)
+                        print(f'Volume changed by: {vol_change}, from {self.__prev_volume}, to {event.ask_volume}')
+                        self.__prev_volume = event.ask_volume
+                        print(f'Ask events prcessed: {self.counter}')
+                        print('-------------------')
+                        if self.counter % 10 == 0:
+                            print(f'Average volume change for 10 past ask events is: {sum(self.volume_changes) / len(self.volume_changes)}')
+                            self.volume_changes.clear()
+                            print('-------------------')
 
 For Candle event type along with base symbol, you should specify an
 aggregation period. You can also set price type. More details:
