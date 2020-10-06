@@ -243,7 +243,7 @@ cdef void order_default_listener(int event_type,
                                    count=order[i].count,
                                    scope=order[i].scope,
                                    side=order[i].side,
-                                   exchange_code=unicode_from_dxf_const_string_t(&order[i].exchange_code),
+                                   exchange_code=unicode_from_dxf_const_string_t(&order[i].exchange_code, size=1),
                                    source=unicode_from_dxf_const_string_t(&order[i].source[0]),
                                    market_maker=unicode_from_dxf_const_string_t(order[i].market_maker),
                                    spread_symbol=unicode_from_dxf_const_string_t(order[i].spread_symbol))
