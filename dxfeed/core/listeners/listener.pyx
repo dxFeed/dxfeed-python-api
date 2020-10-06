@@ -244,7 +244,7 @@ cdef void order_default_listener(int event_type,
                                    scope=order[i].scope,
                                    side=order[i].side,
                                    exchange_code=unicode_from_dxf_const_string_t(&order[i].exchange_code),
-                                   source=unicode_from_dxf_const_string_t(&order[i].source[DXF_RECORD_SUFFIX_SIZE]),
+                                   source=unicode_from_dxf_const_string_t(&order[i].source[0]),
                                    market_maker=unicode_from_dxf_const_string_t(order[i].market_maker),
                                    spread_symbol=unicode_from_dxf_const_string_t(order[i].spread_symbol))
         py_data.cython_internal_update_method(events)
