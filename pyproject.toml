@@ -60,5 +60,5 @@ post_build = 'task clear'
 post_test = 'task clear'
 
 [build-system]
-requires = ['poetry>=0.12', 'cython']
-build-backend = 'poetry.masonry.api'
+requires = ['poetry_core>=1.0.0', 'setuptools']
+build-backend = 'poetry.core.masonry.api'
