@@ -5,7 +5,7 @@ from dxfeed.core.pxd_include.DXTypes cimport *
 from pathlib import Path
 import dxfeed
 
-cdef object unicode_from_dxf_const_string_t(dxf_const_string_t wcs):
+cdef object unicode_from_dxf_const_string_t(dxf_const_string_t wcs, int size=-1):
     """
     Cython function, callable from C to convert dxf_const_string_t(wchar_t) to unicode
     
@@ -13,6 +13,8 @@ cdef object unicode_from_dxf_const_string_t(dxf_const_string_t wcs):
     ----------
     wcs: dxf_const_string_t, wchar_t
         C string
+    size: int
+        Number of characters. By default -1
         
     Returns
     -------
@@ -21,7 +23,7 @@ cdef object unicode_from_dxf_const_string_t(dxf_const_string_t wcs):
     """
     if wcs == NULL:
       return ''
-    ret_val = <object>PyUnicode_FromWideChar(wcs, -1)
+    ret_val = <object>PyUnicode_FromWideChar(wcs, size)
     return ret_val
 
 cdef dxf_const_string_t dxf_const_string_t_from_unicode(object symbol):
