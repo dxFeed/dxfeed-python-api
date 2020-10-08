@@ -22,8 +22,7 @@ exclude = ['dxfeed/dxfeed-c-api/wrappers*',
            'dxfeed/dxfeed-c-api/scripts*',
            'dxfeed/dxfeed-c-api/lib*',
            'dxfeed/dxfeed-c-api/docs*',
-           'dxfeed/dxfeed-c-api/.github*',
-           'setup.py']
+           'dxfeed/dxfeed-c-api/.github*']
 
 [tool.poetry.urls]
 'Source code' = 'https://github.com/dxFeed/dxfeed-python-api'
