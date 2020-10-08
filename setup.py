@@ -5,5 +5,6 @@ global setup_kwargs
 
 setup_kwargs = {}
 
+build_extensions()
 build(setup_kwargs)
 setup(**setup_kwargs)
