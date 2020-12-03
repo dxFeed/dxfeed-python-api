@@ -15,11 +15,11 @@ def dxfeed():
 
 def test_endpoint_no_arguments():
     dxf = dx.Endpoint()
-    assert 'Connected' == dxf.connection_status
+    assert dxf.connection_status in ['Connected', 'Connected and authorized']
 
 
 def test_connection_status_property(dxfeed):
-    assert 'Connected' == dxfeed.connection_status
+    assert dxfeed.connection_status in ['Connected', 'Connected and authorized']
 
 
 def test_create_endpoint_without_connection():
