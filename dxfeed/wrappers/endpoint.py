@@ -31,6 +31,8 @@ class Endpoint(object):
             - multiple addresses: `(host1:port1)(host2)(host3:port3[username=xxx,password=yyy])`
 
             Default: demo.dxfeed.com:7300
+        token: str
+            Connection via token.
         connect: bool
             When True `connect` method  is called during instance creation. Default - True
         """
