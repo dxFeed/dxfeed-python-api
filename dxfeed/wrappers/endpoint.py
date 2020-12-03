@@ -1,7 +1,7 @@
 from dxfeed.core import DXFeedPy as dxp
 from dxfeed.wrappers.subscription import Subscription
 from datetime import datetime
-from typing import Union
+from typing import Union, Optional
 
 
 class Endpoint(object):
@@ -17,7 +17,9 @@ class Endpoint(object):
         Current connection endpoint address
 
     """
-    def __init__(self, connection_address: str = 'demo.dxfeed.com:7300', connect: bool = True):
+    def __init__(self, connection_address: str = 'demo.dxfeed.com:7300',
+                 token: Optional[str] = None,
+                 connect: bool = True):
         """
         Parameters
         ----------
@@ -33,6 +35,7 @@ class Endpoint(object):
             When True `connect` method  is called during instance creation. Default - True
         """
         self.__con_address = connection_address
+        self.__token = token
         self.__connection = dxp.ConnectionClass()
         if connect:
             self.connect()
@@ -67,7 +70,10 @@ class Endpoint(object):
         con_status = dxp.dxf_get_current_connection_status(self.__connection, return_str=True)
 
         if con_status == 'Not connected':
-            self.__connection = dxp.dxf_create_connection(self.address)
+            if self.__token:
+                self.__connection = dxp.dxf_create_connection_auth_bearer(self.address, self.__token)
+            else:
+                self.__connection = dxp.dxf_create_connection(self.address)
 
         return self
 
