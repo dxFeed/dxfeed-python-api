@@ -19,9 +19,9 @@ def connection():
 
 
 def test_connection_status(connection):
-    exp_status = 'Connected'
+    exp_statuses = ['Connected', 'Connected and authorized']
     act_status = dxc.dxf_get_current_connection_status(connection)
-    assert exp_status == act_status
+    assert act_status in exp_statuses
 
 
 def test_connection_address(connection):
