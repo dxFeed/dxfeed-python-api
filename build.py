@@ -43,6 +43,9 @@ if (not os.path.exists(path_to_extract)) or (not os.path.exists(capi_root_dir)):
     print(f'Extracting to "{path_to_extract}"')
     zipfile.extractall(path_to_extract)
 
+print(str(capi_root_dir / 'include') + ':')
+print(os.listdir(capi_root_dir / 'include'))
+
 if current_os == 'windows':
     if is_x64:
         capi_library_dir = str(capi_root_dir / 'bin' / 'x64')
