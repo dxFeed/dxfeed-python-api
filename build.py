@@ -16,6 +16,7 @@ else:
 root_path = Path(__file__).resolve().parent
 source_files_directory = root_path / 'dxfeed' / 'dxfeed-c-api' / 'src'
 source_files_paths = [str(path) for path in source_files_directory.glob('*.c')]
+source_cpp_files_paths = [str(path) for path in source_files_directory.glob('*.cpp')]
 libs = list()
 include_dirs = [str(source_files_directory.parent / 'include'),
                 str(source_files_directory)]
@@ -26,7 +27,7 @@ if platform.system() == 'Windows':
     libs.append('ws2_32')
 else:
     source_files_paths.remove(str(source_files_directory / 'Win32.c'))
-dxfeed_c_lib_args.update({'sources': source_files_paths,
+dxfeed_c_lib_args.update({'sources': source_files_paths + source_cpp_files_paths,
                           'include_dirs': include_dirs})
 
 if platform.system() == 'Darwin':
