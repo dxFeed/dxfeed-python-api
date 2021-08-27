@@ -18,7 +18,6 @@ else:
     use_cython = True
     ext = 'pyx'
 
-# Get all dxfeed c api c files to be compiled into separate lib
 root_path = Path(__file__).resolve().parent
 print(root_path)
 
