@@ -8,7 +8,7 @@ from dxfeed.core.pxd_include.EventData cimport *
 # /* -------------------------------------------------------------------------- */
 
 
-cdef extern from "DXFeed.h":
+cdef extern from "<DXFeed.h>":
     cdef int DXF_SUCCESS = 1
     cdef int DXF_FAILURE = 0
  

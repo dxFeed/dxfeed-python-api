@@ -7,7 +7,7 @@ from dxfeed.core.pxd_include cimport DXTypes as dxt
     #define OUT
 #endif /* OUT */
 
-cdef extern from "EventData.h":
+cdef extern from "<EventData.h>":
     enum dxf_order_action_t:
         dxf_oa_undefined = 0,
         dxf_oa_new = 1,
@@ -26,7 +26,7 @@ cdef extern from "EventData.h":
 #  *	Event type constants
 #  */
 # /* -------------------------------------------------------------------------- */
-cdef extern from "EventData.h":
+cdef extern from "<EventData.h>":
     enum dx_event_id_t:
         dx_eid_begin = 0,
         dx_eid_trade = dx_eid_begin,
@@ -71,10 +71,10 @@ cdef extern from "EventData.h":
 # // The length of record suffix including including the terminating null character
 #define DXF_RECORD_SUFFIX_SIZE 5
 DEF DXF_RECORD_SUFFIX_SIZE = 5
-cdef extern from "EventData.h":
+cdef extern from "<EventData.h>":
     cdef int DXF_RECORD_SUFFIX_SIZE = DXF_RECORD_SUFFIX_SIZE
 
-cdef extern from "EventData.h":
+cdef extern from "<EventData.h>":
     ctypedef enum dx_event_subscr_flag_t:
 #	/// (0x0) Used for default subscription
         dx_esf_default = 0x0u,
@@ -102,7 +102,7 @@ cdef extern from "EventData.h":
 # *	Source suffix array
 # */
 # /* -------------------------------------------------------------------------- */
-cdef extern from "EventData.h":
+cdef extern from "<EventData.h>":
     struct dx_suffix_t:
         dxt.dxf_char_t suffix[DXF_RECORD_SUFFIX_SIZE]
 
@@ -503,7 +503,7 @@ cdef extern from "EventData.h":
 #  *	Various event functions
 #  */
 # /* -------------------------------------------------------------------------- */
-cdef extern from "EventData.h":
+cdef extern from "<EventData.h>":
     cdef dxt.dxf_const_string_t dx_event_type_to_string (int event_type)
     cdef int dx_get_event_data_struct_size (int event_id)
     cdef dx_event_id_t dx_get_event_id_by_bitmask (int event_bitmask)

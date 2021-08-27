@@ -31,7 +31,7 @@ from dxfeed.core.pxd_include.DXTypes cimport *
 #  *	Record type constants
 #  */
 # /* -------------------------------------------------------------------------- */
-cdef extern from "RecordData.h":
+cdef extern from "<RecordData.h>":
     ctypedef enum dx_record_info_id_t:
         dx_rid_begin = 0,
         dx_rid_trade = dx_rid_begin,
@@ -127,7 +127,7 @@ cdef extern from "RecordData.h":
         dxf_const_string_t description
         dxf_const_string_t status_reason
 
-cdef extern from "RecordData.h":
+cdef extern from "<RecordData.h>":
     ctypedef struct dx_market_maker_t:
         dxf_char_t mm_exchange
         dxf_int_t mm_id
