@@ -27,7 +27,7 @@ if platform.system() == 'Windows':
     libs.append('ws2_32')
 else:
     source_files_paths.remove(str(source_files_directory / 'Win32.c'))
-    dxfeed_c_lib_args.update({'extra_compile_args': '-std=c++11'})
+    dxfeed_c_lib_args.update({'extra_compile_args': ['-std=c++11']})
 
 dxfeed_c_lib_args.update({'sources': source_files_paths + source_cpp_files_paths,
                           'include_dirs': include_dirs})
