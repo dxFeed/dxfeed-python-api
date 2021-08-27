@@ -54,14 +54,14 @@ elif current_os == 'macosx':
     if is_x64:
         capi_root_dir = capi_root_dir / f'DXFeedAll-{capi_version}-x64-no-tls'
         capi_library_dir = capi_root_dir / 'bin' / 'x64'
-        capi_library_name = 'libDXFeed_64'
+        capi_library_name = 'DXFeed_64'
     else:
         raise Exception('Unsupported platform')
 else:
     if is_x64:
         capi_root_dir = capi_root_dir / f'DXFeedAll-{capi_version}-x64-no-tls'
         capi_library_dir = capi_root_dir / 'bin' / 'x64'
-        capi_library_name = 'libDXFeed_64'
+        capi_library_name = 'DXFeed_64'
     else:
         raise Exception('Unsupported platform')
 
