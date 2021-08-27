@@ -1,6 +1,14 @@
 from dxfeed.core.pxd_include.DXTypes cimport *
 
 cdef extern from "DXErrorCodes.h":
+    ctypedef enum dx_log_level_t:
+        dx_ll_trace = -2,
+        dx_ll_debug = -1,
+        dx_ll_info = 0,
+        dx_ll_warn = 1,
+        dx_ll_error = 2
+
+cdef extern from "DXErrorCodes.h":
     ctypedef enum dx_error_code_t:
     # # /* common error codes */
     
@@ -176,4 +184,6 @@ cdef extern from "DXErrorCodes.h":
 # # /* -------------------------------------------------------------------------- */
 
 cdef dxf_const_string_t dx_get_error_description (dx_error_code_t code)
+
+cdef dx_log_level_t dx_get_log_level(dx_error_code_t code)
     

@@ -7,6 +7,20 @@ from dxfeed.core.pxd_include cimport DXTypes as dxt
     #define OUT
 #endif /* OUT */
 
+cdef extern from "EventData.h":
+    enum dxf_order_action_t:
+        dxf_oa_undefined = 0,
+        dxf_oa_new = 1,
+        dxf_oa_replace = 2,
+        dxf_oa_modify = 3,
+        dxf_oa_delete = 4,
+        dxf_oa_partial = 5,
+        dxf_oa_execute = 6,
+        dxf_oa_trade = 7,
+        dxf_oa_bust = 8,
+        dxf_oa_last = dxf_oa_bust
+
+
 # /* -------------------------------------------------------------------------- */
 # /*
 #  *	Event type constants
@@ -59,6 +73,30 @@ cdef extern from "EventData.h":
 DEF DXF_RECORD_SUFFIX_SIZE = 5
 cdef extern from "EventData.h":
     cdef int DXF_RECORD_SUFFIX_SIZE = DXF_RECORD_SUFFIX_SIZE
+
+cdef extern from "EventData.h":
+    ctypedef enum dx_event_subscr_flag_t:
+#	/// (0x0) Used for default subscription
+        dx_esf_default = 0x0u,
+#	/// (0x1) Used for subscribing on one record only in case of snapshots
+        dx_esf_single_record = 0x1u,
+#	/// (0x2) Used with #dx_esf_single_record flag and for #dx_eid_order (Order) event
+        dx_esf_sr_market_maker_order = 0x2u,
+#	/// (0x4) Used for time series subscription
+        dx_esf_time_series = 0x4u,
+#	/// (0x8) Used for regional quotes
+        dx_esf_quotes_regional = 0x8u,
+#	/// (0x10) Used for wildcard ("*") subscription
+        dx_esf_wildcard = 0x10u,
+#	/// (0x20) Used for forcing subscription to ticker data
+        dx_esf_force_ticker = 0x20u,
+#	/// (0x40) Used for forcing subscription to stream data
+        dx_esf_force_stream = 0x40u,
+#	/// (0x80) Used for forcing subscription to history data
+        dx_esf_force_history = 0x80u
+
+    ctypedef dx_event_subscr_flag_t dx_event_subscr_flag
+
 # /* -------------------------------------------------------------------------- */
 # /*
 # *	Source suffix array
@@ -109,18 +147,19 @@ cdef extern from "EventData.h":
         dxt.dxf_int_t time_nanos,
         dxt.dxf_char_t exchange_code,
         dxt.dxf_double_t price,
-        dxt.dxf_int_t size,
+        dxt.dxf_double_t size,
         # /* This field is absent in TradeETH */
         dxt.dxf_int_t tick,
-        # /* This field is absent in TradeETH */
         dxt.dxf_double_t change,
-        dxt.dxf_int_t raw_flags,
+        dxt.dxf_dayid_t day_id,
         dxt.dxf_double_t day_volume,
         dxt.dxf_double_t day_turnover,
+        dxt.dxf_int_t raw_flags,
         dxf_direction_t direction,
         dxt.dxf_bool_t is_eth,
         dxf_order_scope_t scope
 
+    ctypedef dxf_trade_t dxf_trade_eth_t
 
 # /* Quote -------------------------------------------------------------------- */
 
@@ -131,11 +170,11 @@ cdef extern from "EventData.h":
         dxt.dxf_long_t bid_time,
         dxt.dxf_char_t bid_exchange_code,
         dxt.dxf_double_t bid_price,
-        dxt.dxf_int_t bid_size,
+        dxt.dxf_double_t bid_size,
         dxt.dxf_long_t ask_time,
         dxt.dxf_char_t ask_exchange_code,
         dxt.dxf_double_t ask_price,
-        dxt.dxf_int_t ask_size,
+        dxt.dxf_double_t ask_size,
         dxf_order_scope_t scope
 
 
@@ -157,7 +196,7 @@ cdef extern from "EventData.h":
         dxt.dxf_dayid_t prev_day_id,
         dxt.dxf_double_t prev_day_close_price,
         dxt.dxf_double_t prev_day_volume,
-        dxt.dxf_int_t open_interest,
+        dxt.dxf_double_t open_interest,
         dxt.dxf_int_t raw_flags,
         dxt.dxf_char_t exchange_code,
         dxf_price_type_t day_close_price_type,
@@ -182,11 +221,11 @@ cdef extern from "EventData.h":
     ctypedef struct dxf_profile_t:
         dxt.dxf_double_t beta,
         dxt.dxf_double_t eps,
-        dxt.dxf_int_t div_freq,
+        dxt.dxf_double_t div_freq,
         dxt.dxf_double_t exd_div_amount,
         dxt.dxf_dayid_t exd_div_date,
-        dxt.dxf_double_t _52_high_price,
-        dxt.dxf_double_t _52_low_price,
+        dxt.dxf_double_t high_52_week_price,
+        dxt.dxf_double_t low_52_week_price,
         dxt.dxf_double_t shares,
         dxt.dxf_double_t free_float,
         dxt.dxf_double_t high_limit_price,
@@ -213,18 +252,26 @@ cdef extern from "EventData.h":
 
 
     ctypedef struct dxf_order_t:
+        dxt.dxf_char_t source[DXF_RECORD_SUFFIX_SIZE],
         dxt.dxf_event_flags_t event_flags,
         dxt.dxf_long_t index,
         dxt.dxf_long_t time,
-        dxt.dxf_int_t time_nanos,
         dxt.dxf_int_t sequence,
+        dxt.dxf_int_t time_nanos,
+        dxf_order_action_t action,
+        dxt.dxf_long_t action_time,
+        dxt.dxf_long_t order_id,
+        dxt.dxf_long_t aux_order_id,
         dxt.dxf_double_t price,
-        dxt.dxf_int_t size,
-        dxt.dxf_int_t count,
-        dxf_order_scope_t scope,
-        dxf_order_side_t side,
+        dxt.dxf_double_t size,
+        dxt.dxf_double_t executed_size,
+        dxt.dxf_double_t count,
+        dxt.dxf_long_t trade_id,
+        dxt.dxf_double_t trade_price,
+        dxt.dxf_double_t trade_size,
         dxt.dxf_char_t exchange_code,
-        dxt.dxf_char_t source[DXF_RECORD_SUFFIX_SIZE],
+        dxf_order_side_t side,
+        dxf_order_scope_t scope,
         # _inner_oso # probably there should be some name (p58 of cython book)
         dxt.dxf_const_string_t market_maker,
         dxt.dxf_const_string_t spread_symbol
@@ -243,7 +290,7 @@ cdef extern from "EventData.h":
         dxt.dxf_long_t time,
         dxt.dxf_char_t exchange_code,
         dxt.dxf_double_t price,
-        dxt.dxf_int_t size,
+        dxt.dxf_double_t size,
         dxt.dxf_double_t bid_price,
         dxt.dxf_double_t ask_price,
         dxt.dxf_const_string_t exchange_sale_conditions,
@@ -274,7 +321,7 @@ cdef extern from "EventData.h":
         dxt.dxf_double_t vwap,
         dxt.dxf_double_t bid_volume,
         dxt.dxf_double_t ask_volume,
-        dxt.dxf_int_t open_interest,
+        dxt.dxf_double_t open_interest,
         dxt.dxf_double_t imp_volatility
 
 
@@ -296,8 +343,16 @@ cdef extern from "EventData.h":
     ctypedef rd.dx_theo_price_t dxf_theo_price_t
 
 # /* Underlying --------------------------------------------------------------- */
-# /* Event and record are the same */
-    ctypedef rd.dx_underlying_t dxf_underlying_t
+    ctypedef struct dxf_underlying_t:
+        dxt.dxf_double_t volatility,
+        dxt.dxf_double_t front_volatility,
+        dxt.dxf_double_t back_volatility,
+        dxt.dxf_double_t call_volume,
+        dxt.dxf_double_t put_volume,
+        dxt.dxf_double_t option_volume,
+        dxt.dxf_double_t put_call_ratio
+
+    ctypedef dxf_underlying_t dxf_underlying
 
 # /* Series ------------------------------------------------------------------- */
     ctypedef struct dxf_series_t:
@@ -307,6 +362,9 @@ cdef extern from "EventData.h":
         dxt.dxf_int_t sequence,
         dxt.dxf_dayid_t expiration,
         dxt.dxf_double_t volatility,
+        dxt.dxf_double_t call_volume,
+        dxt.dxf_double_t put_volume,
+        dxt.dxf_double_t option_volume,
         dxt.dxf_double_t put_call_ratio,
         dxt.dxf_double_t forward_price,
         dxt.dxf_double_t dividend,
@@ -538,7 +596,7 @@ cdef extern from "EventData.h":
 # /* -------------------------------------------------------------------------- */
     ctypedef struct dxf_price_level_element_t:
         dxt.dxf_double_t price
-        dxt.dxf_long_t size
+        dxt.dxf_double_t size
         dxt.dxf_long_t time
 
 

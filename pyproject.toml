@@ -16,13 +16,14 @@ classifiers = ['Development Status :: 4 - Beta',
                'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
                'Natural Language :: English']
 
-include = ['LICENSE', 'dxfeed/**/*.c']
-exclude = ['dxfeed/dxfeed-c-api/wrappers*',
-           'dxfeed/dxfeed-c-api/tests*',
-           'dxfeed/dxfeed-c-api/scripts*',
-           'dxfeed/dxfeed-c-api/lib*',
-           'dxfeed/dxfeed-c-api/docs*',
-           'dxfeed/dxfeed-c-api/.github*']
+include = ['LICENSE']
+#include = ['LICENSE', 'dxfeed/**/*.c']
+#exclude = ['dxfeed/dxfeed-c-api/wrappers*',
+#           'dxfeed/dxfeed-c-api/tests*',
+#           'dxfeed/dxfeed-c-api/scripts*',
+#           'dxfeed/dxfeed-c-api/lib*',
+#           'dxfeed/dxfeed-c-api/docs*',
+#           'dxfeed/dxfeed-c-api/.github*']
 
 [tool.poetry.urls]
 'Source code' = 'https://github.com/dxFeed/dxfeed-python-api'
