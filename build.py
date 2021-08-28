@@ -92,7 +92,7 @@ if platform.system() == 'Windows':
     extra_compiler_args = None
 elif platform.system() == 'Darwin':
     runtime_library_dirs = ['.', str(capi_bin_dir)]
-    extra_compiler_args = None
+    extra_compiler_args = [f'-Wl,-rpath,{str(capi_bin_dir)}']
 else:
     runtime_library_dirs = ["$ORIGIN", '.', str(capi_bin_dir)]
     extra_compiler_args = None
