@@ -90,7 +90,7 @@ def test_symbol_addition(connection):
     dxc.dxf_add_symbols(sc=sub, symbols=symbols)
     actual_symbols = dxc.dxf_get_symbols(sc=sub)
     dxc.dxf_close_subscription(sub)
-    assert symbols == actual_symbols
+    assert set(symbols) == set(actual_symbols)
 
 
 def test_symbol_deletion(connection):
@@ -110,7 +110,7 @@ def test_wrong_symbol_types_ignored(connection):
     dxc.dxf_add_symbols(sc=sub, symbols=symbols + [1, 5.0, [], True, {}, ()])
     actual_symbols = dxc.dxf_get_symbols(sc=sub)
     dxc.dxf_close_subscription(sub)
-    assert symbols == actual_symbols
+    assert set(symbols) == set(actual_symbols)
 
 
 def test_symbol_clearing(connection):
@@ -155,4 +155,4 @@ def test_double_event_handler_attachment(connection):
     dxc.dxf_add_symbols(sub, symbols)
     sub.set_event_handler(handler2)
     assert sub.get_event_handler() is handler2
-    assert dxc.dxf_get_symbols(sub) == symbols
+    assert set(dxc.dxf_get_symbols(sub)) == set(symbols)

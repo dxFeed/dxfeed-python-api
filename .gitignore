@@ -21,3 +21,7 @@ dist
 build/**
 dxfeed/core/**/*.c
 dxfeed/tmp
+
+setup.py
+poetry.lock
+dxfeed.egg-info

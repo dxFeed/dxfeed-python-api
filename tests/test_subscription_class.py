@@ -42,24 +42,24 @@ def test_subscription_timed_event_type_property(subscription_timed):
 
 def test_subscription_event_type_property(subscription):
     subscription = subscription.add_symbols(ValueStorage.symbols)
-    assert subscription.symbols == ValueStorage.symbols
+    assert set(subscription.symbols) == set(ValueStorage.symbols)
 
 
 def test_subscription_timed_event_type_property(subscription_timed):
     subscription = subscription_timed.add_symbols(ValueStorage.symbols)
-    assert subscription.symbols == ValueStorage.symbols
+    assert set(subscription.symbols) == set(ValueStorage.symbols)
 
 
 def test_remove_symbol(subscription):
     subscription = subscription.add_symbols(ValueStorage.symbols) \
                                .remove_symbols([ValueStorage.symbols[0]])
-    assert subscription.symbols == ValueStorage.symbols[1:]
+    assert set(subscription.symbols) == set(ValueStorage.symbols[1:])
 
 
 def test_remove_symbol_timed(subscription_timed):
     subscription_timed = subscription_timed.add_symbols(ValueStorage.symbols) \
                                            .remove_symbols([ValueStorage.symbols[0]])
-    assert subscription_timed.symbols == ValueStorage.symbols[1:]
+    assert set(subscription_timed.symbols) == set(ValueStorage.symbols[1:])
 
 
 def test_remove_all_symbols(subscription):
