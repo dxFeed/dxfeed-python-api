@@ -92,7 +92,7 @@ if platform.system() == 'Windows':
     extra_compiler_args = None
 else:
     runtime_library_dirs = [str(capi_bin_dir)]
-    extra_compiler_args = ['-fPIC -Wl,-rpath=.']
+    extra_compiler_args = [f'-fPIC -Wl,-rpath={str(capi_bin_dir)}']
 
 capi_include_dirs = [str(capi_include_dir)]
 
