@@ -1,6 +1,12 @@
+import os
+import struct
+
 from setuptools import Extension, find_packages
 from setuptools.dist import Distribution
 from pathlib import Path
+from io import BytesIO
+from zipfile import ZipFile
+from urllib.request import urlopen
 import platform
 
 try:
@@ -12,48 +18,87 @@ else:
     use_cython = True
     ext = 'pyx'
 
-# Get all dxfeed c api c files to be compiled into separate lib
 root_path = Path(__file__).resolve().parent
-source_files_directory = root_path / 'dxfeed' / 'dxfeed-c-api' / 'src'
-source_files_paths = [str(path) for path in source_files_directory.glob('*.c')]
-libs = list()
-include_dirs = [str(source_files_directory.parent / 'include'),
-                str(source_files_directory)]
-# Build dxfeed c library
-dxfeed_c_lib_args = dict()
+print(root_path)
+
+capi_version = '8.3.0'
+
+is_x64 = 8 * struct.calcsize("P") == 64
+
 if platform.system() == 'Windows':
-    source_files_paths.remove(str(source_files_directory / 'Linux.c'))
-    libs.append('ws2_32')
+    current_os = 'windows'
+elif platform.system() == 'Darwin':
+    current_os = 'macosx'
 else:
-    source_files_paths.remove(str(source_files_directory / 'Win32.c'))
-dxfeed_c_lib_args.update({'sources': source_files_paths,
-                          'include_dirs': include_dirs})
+    current_os = 'centos'
 
-if platform.system() == 'Darwin':
-    dxfeed_c_lib_args.update({'macros': [('MACOSX', 'TRUE')]})
+path_to_extract = root_path / 'dxfeed' / 'tmp'
+capi_root_dir = path_to_extract / f'dxfeed-c-api-{capi_version}-no-tls'
 
-dxfeed_c = ('dxfeed_c', dxfeed_c_lib_args)
+if (not os.path.exists(path_to_extract)) or (not os.path.exists(capi_root_dir)):
+    url = f'https://github.com/dxFeed/dxfeed-c-api/releases/download/{capi_version}/dxfeed-c-api-{capi_version}-{current_os}-no-tls.zip'
+    print(f'Downloading the "{url}"')
+    resp = urlopen(url)
+    zipfile = ZipFile(BytesIO(resp.read()))
+    print(f'Extracting to "{path_to_extract}"')
+    zipfile.extractall(path_to_extract)
+
+if current_os == 'windows':
+    if is_x64:
+        capi_library_dir = str(capi_root_dir / 'bin' / 'x64')
+        capi_library_name = 'DXFeed_64'
+    else:
+        capi_library_dir = capi_root_dir / 'bin' / 'x86'
+        capi_library_name = 'DXFeed'
+elif current_os == 'macosx':
+    if is_x64:
+        capi_root_dir = capi_root_dir / f'DXFeedAll-{capi_version}-x64-no-tls'
+        capi_library_dir = capi_root_dir / 'bin' / 'x64'
+        capi_library_name = 'DXFeed_64'
+    else:
+        raise Exception('Unsupported platform')
+else:
+    if is_x64:
+        capi_root_dir = capi_root_dir / f'DXFeedAll-{capi_version}-x64-no-tls'
+        capi_library_dir = capi_root_dir / 'bin' / 'x64'
+        capi_library_name = 'DXFeed_64'
+    else:
+        raise Exception('Unsupported platform')
+
+if current_os == 'windows':
+    runtime_library_dirs = []
+else:
+    runtime_library_dirs = [str(capi_library_dir)]
+
+capi_include_dirs = [str(capi_root_dir / 'include'), str(capi_root_dir / 'src')]
+
+libs = [capi_library_name]
+if platform.system() == 'Windows':
+    libs.append('ws2_32')
 
 extensions = [Extension('dxfeed.core.utils.helpers', ['dxfeed/core/utils/helpers.' + ext],
-                        include_dirs=include_dirs),
+                        include_dirs=capi_include_dirs),
               Extension('dxfeed.core.utils.handler', ['dxfeed/core/utils/handler.' + ext],
-                        include_dirs=include_dirs),
+                        include_dirs=capi_include_dirs),
               Extension('dxfeed.core.listeners.listener', ['dxfeed/core/listeners/listener.' + ext],
-                        include_dirs=include_dirs),
-              Extension('dxfeed.core.DXFeedPy', ['dxfeed/core/DXFeedPy.' + ext], libraries=libs,
-                        include_dirs=include_dirs)]
+                        include_dirs=capi_include_dirs),
+              Extension('dxfeed.core.DXFeedPy', ['dxfeed/core/DXFeedPy.' + ext], library_dirs=[str(capi_library_dir)],
+                        runtime_library_dirs=runtime_library_dirs,
+                        libraries=libs,
+                        include_dirs=capi_include_dirs)]
 
 if use_cython:
     extensions = cythonize(extensions, language_level=3)
+
 
 def build(setup_kwargs):
     setup_kwargs.update({
         'ext_modules': extensions,
         'zip_safe': False,
-        'libraries': [dxfeed_c],
         'packages': find_packages(),
-        'include_dirs': include_dirs
+        'include_dirs': capi_include_dirs
     })
+
 
 def build_extensions():
     """

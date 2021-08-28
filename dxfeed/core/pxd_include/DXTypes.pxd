@@ -3,7 +3,7 @@
 #ifndef DX_TYPES_H_INCLUDED
 #define DX_TYPES_H_INCLUDED
 
-cdef extern from "DXTypes.h":
+cdef extern from "<DXTypes.h>":
     ctypedef int ERRORCODE
     ctypedef void* dxf_subscription_t
     ctypedef void* dxf_connection_t
@@ -17,7 +17,7 @@ cdef extern from "DXTypes.h":
 #pxd_include <wchar.h>
 from libc.stddef cimport wchar_t
 
-cdef extern from "DXTypes.h":
+cdef extern from "<DXTypes.h>":
     ctypedef unsigned char      dxf_bool_t           # 8 bit
     ctypedef char               dxf_byte_t           # 8 bit
     ctypedef unsigned char      dxf_ubyte_t  # 8 bit
@@ -61,7 +61,7 @@ cdef extern from "DXTypes.h":
 
 #endif /* _WIN32/POSIX */
 
-cdef extern from "DXTypes.h":
+cdef extern from "<DXTypes.h>":
     ctypedef dxf_uint_t dxf_event_flags_t
 
     ctypedef struct dxf_byte_array_t:

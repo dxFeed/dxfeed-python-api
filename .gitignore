@@ -17,3 +17,7 @@ _build*
 
 Pipfile*
 dist*
+dist
+build/**
+dxfeed/core/**/*.c
+dxfeed/tmp
