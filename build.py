@@ -91,8 +91,9 @@ if platform.system() == 'Windows':
     runtime_library_dirs = None
     extra_compiler_args = None
 else:
-    runtime_library_dirs = [str(capi_bin_dir)]
-    extra_compiler_args = [f'-fPIC -Wl,-rpath,{str(capi_bin_dir)}']
+    runtime_library_dirs = ["$ORIGIN"]
+    extra_compiler_args = None
+print(extra_compiler_args)
 
 capi_include_dirs = [str(capi_include_dir)]
 
