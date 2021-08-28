@@ -89,8 +89,10 @@ if platform.system() == 'Windows':
 
 if platform.system() == 'Windows':
     runtime_library_dirs = None
+    extra_compiler_args = None
 else:
-    runtime_library_dirs = ['.']
+    runtime_library_dirs = [str(capi_bin_dir)]
+    extra_compiler_args = ['-fPIC -Wl,-rpath=.']
 
 capi_include_dirs = [str(capi_include_dir)]
 
@@ -106,6 +108,7 @@ extensions = [Extension('dxfeed.core.utils.helpers', ['dxfeed/core/utils/helpers
                         include_dirs=capi_include_dirs),
               Extension('dxfeed.core.DXFeedPy', ['dxfeed/core/DXFeedPy.' + ext], library_dirs=[str(capi_bin_dir)],
                         runtime_library_dirs=runtime_library_dirs,
+                        extra_compiler_args=extra_compiler_args,
                         libraries=libs,
                         include_dirs=capi_include_dirs)]
 
