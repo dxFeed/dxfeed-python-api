@@ -89,13 +89,13 @@ if platform.system() == 'Windows':
 
 if platform.system() == 'Windows':
     runtime_library_dirs = None
-    extra_compiler_args = None
+    extra_link_args = None
 elif platform.system() == 'Darwin':
-    runtime_library_dirs = ['.', str(capi_bin_dir)]
-    extra_compiler_args = [f'-Wl,-rpath,.', f'-Wl,-rpath,{str(capi_bin_dir)}']
+    runtime_library_dirs = None
+    extra_link_args = [f'-Wl,-rpath,.', f'-Wl,-rpath,{str(capi_bin_dir)}', f'-Wl,-rpath,@loader_path/dxfeed/core']
 else:
     runtime_library_dirs = ["$ORIGIN", '.', str(capi_bin_dir)]
-    extra_compiler_args = None
+    extra_link_args = None
 
 capi_include_dirs = [str(capi_include_dir)]
 
@@ -111,7 +111,7 @@ extensions = [Extension('dxfeed.core.utils.helpers', ['dxfeed/core/utils/helpers
                         include_dirs=capi_include_dirs),
               Extension('dxfeed.core.DXFeedPy', ['dxfeed/core/DXFeedPy.' + ext], library_dirs=[str(capi_bin_dir)],
                         runtime_library_dirs=runtime_library_dirs,
-                        extra_compiler_args=extra_compiler_args,
+                        extra_link_args=extra_link_args,
                         libraries=libs,
                         include_dirs=capi_include_dirs)]
 
