@@ -90,7 +90,7 @@ if platform.system() == 'Windows':
 if platform.system() == 'Windows':
     runtime_library_dirs = None
 else:
-    runtime_library_dirs = [str(capi_bin_dir)]
+    runtime_library_dirs = ['.']
 
 capi_include_dirs = [str(capi_include_dir)]
 
