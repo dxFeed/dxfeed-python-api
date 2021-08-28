@@ -91,10 +91,10 @@ if platform.system() == 'Windows':
     runtime_library_dirs = None
     extra_compiler_args = None
 elif platform.system() == 'Darwin':
-    runtime_library_dirs = ["@loader_path"]
+    runtime_library_dirs = ['.', str(capi_bin_dir)]
     extra_compiler_args = None
 else:
-    runtime_library_dirs = ["$ORIGIN"]
+    runtime_library_dirs = ["$ORIGIN", '.', str(capi_bin_dir)]
     extra_compiler_args = None
 
 capi_include_dirs = [str(capi_include_dir)]
