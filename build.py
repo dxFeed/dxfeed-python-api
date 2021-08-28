@@ -1,6 +1,7 @@
 import os
 import shutil
 import struct
+from subprocess import run
 
 from setuptools import Extension, find_packages
 from setuptools.dist import Distribution
@@ -92,7 +93,9 @@ if platform.system() == 'Windows':
     extra_link_args = None
 elif platform.system() == 'Darwin':
     runtime_library_dirs = None
-    extra_link_args = [f'-Wl,-rpath,.', f'-Wl,-rpath,{str(capi_bin_dir)}', f'-Wl,-rpath,@loader_path/dxfeed/core']
+    extra_link_args = [f'-Wl,-rpath,@loader_path/dxfeed/core', f'-Wl,-rpath,.', f'-Wl,-rpath,{str(capi_bin_dir)}']
+    capi_full_library_file_path = capi_bin_dir / capi_library_file_name
+    run(('install_name_tool', '-id', f'@rpath/{capi_library_file_name}', str(capi_full_library_file_path)))
 else:
     runtime_library_dirs = ["$ORIGIN", '.', str(capi_bin_dir)]
     extra_link_args = None
