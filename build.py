@@ -96,7 +96,7 @@ if platform.system() == 'Windows':
 elif platform.system() == 'Darwin':
     runtime_library_dirs = ['.', str(capi_bin_dir)]
     extra_link_args = [f'-Wl,-rpath,.', f'-Wl,-rpath,{str(capi_bin_dir)}']
-    run(('install_name_tool', '-id', f'@rpath/{capi_library_file_name}', capi_library_file_name))
+    # run(('install_name_tool', '-id', f'@rpath/{capi_library_file_name}', capi_library_file_name))
 else:
     runtime_library_dirs = ['$ORIGIN', '.', str(capi_bin_dir)]
     extra_link_args = None
