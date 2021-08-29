@@ -1,3 +1,4 @@
+import os
 from warnings import warn
 from dxfeed.core.pxd_include.DXErrorCodes cimport *
 from dxfeed.core.pxd_include.DXFeed cimport *
@@ -22,8 +23,8 @@ cdef object unicode_from_dxf_const_string_t(dxf_const_string_t wcs, int size=-1)
         Python unicode string
     """
     if wcs == NULL:
-      return ''
-    ret_val = <object>PyUnicode_FromWideChar(wcs, size)
+        return ''
+    ret_val = <object> PyUnicode_FromWideChar(wcs, size)
     return ret_val
 
 cdef dxf_const_string_t dxf_const_string_t_from_unicode(object symbol):
@@ -88,5 +89,6 @@ def get_include():
         List of paths to header files
     """
     out_dir = list()
-    out_dir.append(str(Path(dxfeed.__file__).resolve().parent.joinpath('dxfeed-c-api', 'include')))
+    out_dir.append(
+        str(os.path.realpath(Path(dxfeed.__file__).resolve().parent / '..' / 'libs' / 'dxfeed-c-api' / 'include')))
     return out_dir
