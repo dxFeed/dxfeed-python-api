@@ -1,10 +1,12 @@
 import os
+import sys
 import shutil
 import struct
 from subprocess import run
 
 from setuptools import Extension, find_packages
 from setuptools.dist import Distribution
+from setuptools.command.build_ext import build_ext
 from pathlib import Path
 from io import BytesIO
 from zipfile import ZipFile
@@ -92,12 +94,12 @@ if platform.system() == 'Windows':
     runtime_library_dirs = None
     extra_link_args = None
 elif platform.system() == 'Darwin':
-    runtime_library_dirs = None
-    extra_link_args = [f'-Wl,-rpath,@loader_path/dxfeed/core', f'-Wl,-rpath,.', f'-Wl,-rpath,{str(capi_bin_dir)}']
-    capi_full_library_file_path = capi_bin_dir / capi_library_file_name
-    run(('install_name_tool', '-id', f'@rpath/{capi_library_file_name}', str(capi_full_library_file_path)))
+    runtime_library_dirs = ['.', str(capi_bin_dir)]
+    extra_link_args = None # [f'-Wl,-rpath,@loader_path/dxfeed/core', f'-Wl,-rpath,.', f'-Wl,-rpath,{str(capi_bin_dir)}']
+    # capi_full_library_file_path = capi_bin_dir / capi_library_file_name
+    # run(('install_name_tool', '-id', f'@rpath/{capi_library_file_name}', str(capi_full_library_file_path)))
 else:
-    runtime_library_dirs = ["$ORIGIN", '.', str(capi_bin_dir)]
+    runtime_library_dirs = ['$ORIGIN', '.', str(capi_bin_dir)]
     extra_link_args = None
 
 capi_include_dirs = [str(capi_include_dir)]
@@ -122,8 +124,27 @@ if use_cython:
     extensions = cythonize(extensions, language_level=3)
 
 
+class custom_build_ext(build_ext):
+    """
+    Add appropriate rpath linker flags (necessary on mac)
+    """
+
+    def finalize_options(self):
+        super().finalize_options()
+        # Special treatment of rpath in case of OSX, to work around python
+        # distutils bug 36353. This constructs proper rpath arguments for clang.
+        # See https://bugs.python.org/issue36353
+        # Workaround from https://github.com/python/cpython/pull/12418
+        if sys.platform[:6] == "darwin":
+            for path in self.rpath:
+                for ext in self.extensions:
+                    ext.extra_link_args.append("-Wl,-rpath," + path)
+            self.rpath[:] = []
+
+
 def build(setup_kwargs):
     setup_kwargs.update({
+        'cmdclass': {'build_ext': custom_build_ext},
         'ext_modules': extensions,
         'zip_safe': False,
         'packages': find_packages(),
