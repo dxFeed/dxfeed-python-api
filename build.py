@@ -94,7 +94,7 @@ if platform.system() == 'Windows':
     runtime_library_dirs = None
     extra_link_args = None
 elif platform.system() == 'Darwin':
-    runtime_library_dirs = ['@loader_path', '.', str(capi_bin_dir)]
+    runtime_library_dirs = None
     extra_link_args = ['-Wl,-rpath,@loader_path']
 else:
     runtime_library_dirs = ['$ORIGIN', '.', str(capi_bin_dir)]
