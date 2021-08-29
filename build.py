@@ -96,8 +96,6 @@ if platform.system() == 'Windows':
 elif platform.system() == 'Darwin':
     runtime_library_dirs = ['.', str(capi_bin_dir)]
     extra_link_args = None # [f'-Wl,-rpath,@loader_path/dxfeed/core', f'-Wl,-rpath,.', f'-Wl,-rpath,{str(capi_bin_dir)}']
-    # capi_full_library_file_path = capi_bin_dir / capi_library_file_name
-    # run(('install_name_tool', '-id', f'@rpath/{capi_library_file_name}', str(capi_full_library_file_path)))
 else:
     runtime_library_dirs = ['$ORIGIN', '.', str(capi_bin_dir)]
     extra_link_args = None
