@@ -25,7 +25,7 @@ else:
 root_path = Path(__file__).resolve().parent
 print(root_path)
 
-capi_version = '8.3.0'
+capi_version = '8.3.1'
 
 is_x64 = 8 * struct.calcsize("P") == 64
 
@@ -44,7 +44,7 @@ path_to_extract = root_path / 'dxfeed' / 'tmp'
 capi_extracted_root_dir = path_to_extract / f'dxfeed-c-api-{capi_version}-no-tls'
 
 if (not os.path.exists(path_to_extract)) or (not os.path.exists(capi_extracted_root_dir)):
-    url = f'https://github.com/dxFeed/dxfeed-c-api/releases/download/{capi_version}/dxfeed-c-api-{capi_version}-' \
+    url = f'https://github.com/ttldtor/dxfeed-c-api/releases/download/{capi_version}/dxfeed-c-api-{capi_version}-' \
           f'{current_os}-no-tls.zip '
     print(f'Downloading the "{url}"')
     resp = urlopen(url)
