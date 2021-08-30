@@ -1,17 +1,96 @@
 import os
-import shutil
+import platform
 import struct
-
+from io import BytesIO
+from pathlib import Path
+from urllib.request import urlopen
+from zipfile import ZipFile
+import shutil
 from setuptools import Extension, find_packages
 from setuptools.dist import Distribution
-from pathlib import Path
-from io import BytesIO
-from zipfile import ZipFile
-from urllib.request import urlopen
-import platform
+import toml
 
-DEFAULT_C_API_VERSION = '8.3.0'
-c_api_version = os.getenv('DXFEED_C_API_VERSION', DEFAULT_C_API_VERSION)
+
+class Downloader(object):
+    def __init__(self, version: str, path_to_extract: Path,
+                 path_to_copy_includes: Path, path_to_copy_libs: Path):
+        self.__version = version
+        self.__path_to_extract = path_to_extract
+        self.__path_to_copy_includes = path_to_copy_includes
+        self.__path_to_copy_libs = path_to_copy_libs
+
+    def download(self) -> str:
+        __c_api_extracted_root_dir = self.__path_to_extract / f'dxfeed-c-api-{self.__version}-no-tls'
+        is_x64 = 8 * struct.calcsize("P") == 64
+
+        if platform.system() == 'Windows':
+            current_os = 'windows'
+        elif platform.system() == 'Darwin':
+            current_os = 'macosx'
+        else:
+            current_os = 'centos'  # Since centos uses an earlier version of libc
+
+        if (not os.path.exists(self.__path_to_extract)) or (not os.path.exists(__c_api_extracted_root_dir)):
+            url = f'https://github.com/dxFeed/dxfeed-c-api/releases/download/{self.__version}/dxfeed-c-api-' \
+                  f'{self.__version}-{current_os}-no-tls.zip '
+            print(f'Downloading the "{url}"')
+            resp = urlopen(url)
+            zipfile = ZipFile(BytesIO(resp.read()))
+            print(f'Extracting to "{self.__path_to_extract}"')
+            zipfile.extractall(self.__path_to_extract)
+
+        if __debug__:
+            # noinspection PyUnreachableCode
+            c_api_debug_suffix = 'd'
+        else:
+            c_api_debug_suffix = ''
+
+        if is_x64:
+            c_api_x64_suffix = '_64'
+        else:
+            c_api_x64_suffix = ''
+
+        __c_api_library_name = f'DXFeed{c_api_debug_suffix}{c_api_x64_suffix}'
+
+        if platform.system() == 'Windows':
+            if is_x64:
+                c_api_extracted_library_dir = __c_api_extracted_root_dir / 'bin' / 'x64'
+                c_api_library_file_name = f'{__c_api_library_name}.dll'
+                c_api_library_file_name2 = f'{__c_api_library_name}.lib'
+            else:
+                c_api_extracted_library_dir = __c_api_extracted_root_dir / 'bin' / 'x86'
+                c_api_library_file_name = f'{__c_api_library_name}.dll'
+                c_api_library_file_name2 = f'{__c_api_library_name}.lib'
+        elif platform.system() == 'Darwin':
+            if is_x64:
+                __c_api_extracted_root_dir = __c_api_extracted_root_dir / f'DXFeedAll-{self.__version}-x64-no-tls'
+                c_api_extracted_library_dir = __c_api_extracted_root_dir / 'bin' / 'x64'
+                c_api_library_file_name = f'lib{__c_api_library_name}.dylib'
+            else:
+                raise Exception('Unsupported platform')
+        else:
+            if is_x64:
+                __c_api_extracted_root_dir = __c_api_extracted_root_dir / f'DXFeedAll-{self.__version}-x64-no-tls'
+                c_api_extracted_library_dir = __c_api_extracted_root_dir / 'bin' / 'x64'
+                c_api_library_file_name = f'lib{__c_api_library_name}.so'
+            else:
+                raise Exception('Unsupported platform')
+
+        if not os.path.exists(self.__path_to_copy_includes):
+            shutil.copytree(__c_api_extracted_root_dir / 'include', self.__path_to_copy_includes)
+        if not os.path.exists(self.__path_to_copy_libs / c_api_library_file_name):
+            if not os.path.exists(self.__path_to_copy_libs):
+                os.makedirs(self.__path_to_copy_libs)
+            shutil.copyfile(c_api_extracted_library_dir / c_api_library_file_name,
+                            self.__path_to_copy_libs / c_api_library_file_name)
+        if platform.system() == 'Windows':
+            # noinspection PyUnboundLocalVariable
+            if not os.path.exists(self.__path_to_copy_libs / c_api_library_file_name2):
+                shutil.copyfile(c_api_extracted_library_dir / c_api_library_file_name2,
+                                self.__path_to_copy_libs / c_api_library_file_name2)
+
+        return __c_api_library_name
+
 
 try:
     from Cython.Build import cythonize
@@ -24,77 +103,18 @@ else:
 
 root_path = Path(__file__).resolve().parent
 
-is_x64 = 8 * struct.calcsize("P") == 64
-
-if platform.system() == 'Windows':
-    current_os = 'windows'
-elif platform.system() == 'Darwin':
-    current_os = 'macosx'
-else:
-    current_os = 'centos'  # Since centos uses an earlier version of libc
+pyproject = toml.load(root_path / 'pyproject.toml')
+c_api_version = pyproject['build']['native-dependencies']['dxfeed_c_api']
+if c_api_version == 'env':
+    c_api_version = os.getenv('DXFEED_C_API_VERSION')
 
 c_api_root_dir = root_path / 'dxfeed' / 'dxfeed-c-api'
+path_to_extract = root_path / 'dxfeed' / 'tmp'
 c_api_include_dir = c_api_root_dir / 'include'
 c_api_bin_dir = root_path / 'dxfeed' / 'core'
-path_to_extract = root_path / 'dxfeed' / 'tmp'
-c_api_extracted_root_dir = path_to_extract / f'dxfeed-c-api-{c_api_version}-no-tls'
 
-if (not os.path.exists(path_to_extract)) or (not os.path.exists(c_api_extracted_root_dir)):
-    url = f'https://github.com/dxFeed/dxfeed-c-api/releases/download/{c_api_version}/dxfeed-c-api-{c_api_version}-' \
-          f'{current_os}-no-tls.zip '
-    print(f'Downloading the "{url}"')
-    resp = urlopen(url)
-    zipfile = ZipFile(BytesIO(resp.read()))
-    print(f'Extracting to "{path_to_extract}"')
-    zipfile.extractall(path_to_extract)
-
-if __debug__:
-    # noinspection PyUnreachableCode
-    c_api_debug_suffix = 'd'
-else:
-    c_api_debug_suffix = ''
-
-if is_x64:
-    c_api_x64_suffix = '_64'
-else:
-    c_api_x64_suffix = ''
-
-c_api_library_name = f'DXFeed{c_api_debug_suffix}{c_api_x64_suffix}'
-
-if platform.system() == 'Windows':
-    if is_x64:
-        c_api_extracted_library_dir = c_api_extracted_root_dir / 'bin' / 'x64'
-        c_api_library_file_name = f'{c_api_library_name}.dll'
-        c_api_library_file_name2 = f'{c_api_library_name}.lib'
-    else:
-        c_api_extracted_library_dir = c_api_extracted_root_dir / 'bin' / 'x86'
-        c_api_library_file_name = f'{c_api_library_name}.dll'
-        c_api_library_file_name2 = f'{c_api_library_name}.lib'
-elif platform.system() == 'Darwin':
-    if is_x64:
-        c_api_extracted_root_dir = c_api_extracted_root_dir / f'DXFeedAll-{c_api_version}-x64-no-tls'
-        c_api_extracted_library_dir = c_api_extracted_root_dir / 'bin' / 'x64'
-        c_api_library_file_name = f'lib{c_api_library_name}.dylib'
-    else:
-        raise Exception('Unsupported platform')
-else:
-    if is_x64:
-        c_api_extracted_root_dir = c_api_extracted_root_dir / f'DXFeedAll-{c_api_version}-x64-no-tls'
-        c_api_extracted_library_dir = c_api_extracted_root_dir / 'bin' / 'x64'
-        c_api_library_name = 'DXFeed_64'
-        c_api_library_file_name = f'lib{c_api_library_name}.so'
-    else:
-        raise Exception('Unsupported platform')
-
-if not os.path.exists(c_api_include_dir):
-    shutil.copytree(c_api_extracted_root_dir / 'include', c_api_include_dir)
-if not os.path.exists(c_api_bin_dir / c_api_library_file_name):
-    #    os.makedirs(c_api_bin_dir)
-    shutil.copyfile(c_api_extracted_library_dir / c_api_library_file_name, c_api_bin_dir / c_api_library_file_name)
-if platform.system() == 'Windows':
-    # noinspection PyUnboundLocalVariable
-    if not os.path.exists(c_api_bin_dir / c_api_library_file_name2):
-        shutil.copyfile(c_api_extracted_library_dir / c_api_library_file_name2, c_api_bin_dir / c_api_library_file_name2)
+downloader = Downloader(c_api_version, path_to_extract, c_api_include_dir, c_api_bin_dir)
+c_api_library_name = downloader.download()
 
 if platform.system() == 'Windows':
     runtime_library_dirs = None
@@ -152,7 +172,3 @@ def build_extensions():
     build_ext_cmd.ensure_finalized()
     build_ext_cmd.inplace = 1
     build_ext_cmd.run()
-
-    print(f'Removing the "{path_to_extract}"')
-    if os.path.exists(path_to_extract):
-        shutil.rmtree(path_to_extract)

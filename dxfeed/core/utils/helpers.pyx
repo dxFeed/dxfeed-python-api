@@ -90,5 +90,5 @@ def get_include():
     """
     out_dir = list()
     out_dir.append(
-        str(os.path.realpath(Path(dxfeed.__file__).resolve().parent / '..' / 'libs' / 'dxfeed-c-api' / 'include')))
+        str(os.path.realpath(Path(dxfeed.__file__).resolve().parent / 'dxfeed-c-api' / 'include')))
     return out_dir

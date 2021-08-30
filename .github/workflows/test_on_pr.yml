@@ -1,13 +1,9 @@
-# This workflow will check package installation and runs tests
-# On Ubuntu, Windows and MacOS
-# Triggered by push to master
-
-name: Test package
+# This workflow will check package installation and runs tests on PR
+name: Test on PR
 
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types: [opened, reopened, synchronize]
 
 jobs:
   installation:
@@ -47,8 +43,8 @@ jobs:
     needs: installation
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.6, 3.7, 3.8]
+        os: [ubuntu-18.04, ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.6, 3.7, 3.8, 3.9]
 
     runs-on: ${{ matrix.os }}
 

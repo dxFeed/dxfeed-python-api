@@ -12,6 +12,10 @@ classifiers = ['Development Status :: 4 - Beta',
                'Operating System :: MacOS',
                'Programming Language :: Cython',
                'Programming Language :: Python :: 3 :: Only',
+               'Programming Language :: Python :: 3.6',
+               'Programming Language :: Python :: 3.7',
+               'Programming Language :: Python :: 3.8',
+               'Programming Language :: Python :: 3.9',
                'Topic :: Office/Business :: Financial',
                'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
                'Natural Language :: English']
@@ -42,6 +46,7 @@ pytest = '^6.2.4'
 sphinx = '^4.1.2'
 sphinx_rtd_theme = '^0.5.2'
 pygments = '^2.10'
+toml = '^0.10.2'
 
 [tool.poetry.extras]
 docs = ['jupyter', 'cython']
@@ -56,5 +61,8 @@ post_build = 'task clear'
 post_test = 'task clear'
 
 [build-system]
-requires = ['poetry_core>=1.0.0', 'setuptools>=57.4.0', 'cython']
+requires = ['poetry_core>=1.0.0', 'setuptools>=57.4.0', 'cython', 'toml>=0.10.2']
 build-backend = 'poetry.core.masonry.api'
+
+[build.native-dependencies]
+dxfeed_c_api = '8.3.0'
