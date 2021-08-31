@@ -39,18 +39,12 @@ class Downloader(object):
             print(f'Extracting to "{self.__path_to_extract}"')
             zipfile.extractall(self.__path_to_extract)
 
-        if __debug__:
-            # noinspection PyUnreachableCode
-            c_api_debug_suffix = 'd'
-        else:
-            c_api_debug_suffix = ''
-
         if is_x64:
             c_api_x64_suffix = '_64'
         else:
             c_api_x64_suffix = ''
 
-        __c_api_library_name = f'DXFeed{c_api_debug_suffix}{c_api_x64_suffix}'
+        __c_api_library_name = f'DXFeed{c_api_x64_suffix}'
 
         if platform.system() == 'Windows':
             if is_x64:
