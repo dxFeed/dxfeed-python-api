@@ -1,20 +1,20 @@
-import glob
-import os
 import shutil
+from pathlib import Path
+from itertools import chain
 
-c_files = glob.glob('dxfeed/core/**/*.c', recursive=True)
-cpp_files = glob.glob('dxfeed/core/**/*.cpp', recursive=True)
-pyd_files = glob.glob('dxfeed/core/**/*.pyd', recursive=True)
-so_files = glob.glob('dxfeed/core/**/*.so', recursive=True)
-dll_files = glob.glob('dxfeed/core/**/*.dll', recursive=True)
-lib_files = glob.glob('dxfeed/core/**/*.lib', recursive=True)
-dylib_files = glob.glob('dxfeed/core/**/*.dylib', recursive=True)
+c_files = Path('dxfeed/core').glob('**/*.c')
+cpp_files = Path('dxfeed/core').glob('**/*.cpp')
+pyd_files = Path('dxfeed/core').glob('**/*.pyd')
+so_files = Path('dxfeed/core').glob('**/*.so')
+dll_files = Path('dxfeed/core').glob('**/*.dll')
+lib_files = Path('dxfeed/core').glob('*.lib')
+dylib_files = Path('dxfeed/core').glob('**/*.dylib')
 
-for file_path in c_files + cpp_files + pyd_files + so_files + dll_files + lib_files + dylib_files:
-    os.remove(file_path)
+for file_path in chain(c_files, cpp_files, pyd_files, so_files, dll_files, lib_files, dylib_files):
+    file_path.unlink()
 
-if os.path.exists('dxfeed/tmp'):
+if Path('dxfeed/tmp').exists():
     shutil.rmtree('dxfeed/tmp')
 
-if os.path.exists('dxfeed/dxfeed-c-api/include'):
+if Path('dxfeed/dxfeed-c-api/include').exists():
     shutil.rmtree('dxfeed/dxfeed-c-api/include')
