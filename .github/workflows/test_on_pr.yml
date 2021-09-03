@@ -9,7 +9,7 @@ jobs:
   installation:
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-18.04, windows-latest, macos-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
 
     runs-on: ${{ matrix.os }}
@@ -43,7 +43,7 @@ jobs:
     needs: installation
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-18.04, windows-latest, macos-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
 
     runs-on: ${{ matrix.os }}
@@ -73,4 +73,4 @@ jobs:
       run: |
         task html_docs
       shell: bash
-      if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.7
+      if: matrix.os == 'ubuntu-18.04' && matrix.python-version == 3.7
