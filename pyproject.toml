@@ -66,3 +66,7 @@ build-backend = 'poetry.core.masonry.api'
 
 [build.native-dependencies]
 dxfeed_c_api = '8.3.0'
+# The URL template for zipped dxFeed C API bundle. Parameters used:
+#   {version} - The C API version
+#   {os}      - The target OS
+dxfeed_c_api_bundle_url_template = 'https://github.com/dxFeed/dxfeed-c-api/releases/download/{version}/dxfeed-c-api-{version}-{os}-no-tls.zip'

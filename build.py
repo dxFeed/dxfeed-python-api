@@ -12,78 +12,114 @@ import toml
 
 
 class Downloader(object):
+    """Class that downloads a dxFeed C API bundle and places the necessary include or lib files"""
+
     def __init__(self, version: str, path_to_extract: Path,
                  path_to_copy_includes: Path, path_to_copy_libs: Path):
+        """
+        Parameters
+        ----------
+        version : str
+            The dxFeed C API version
+        path_to_extract : Path
+            The temporary directory where the bundle should be unpacked
+        path_to_copy_includes : Path
+            The directory where the include files should be placed
+        path_to_copy_libs
+            The directory where the library files should be placed
+        """
+
         self.__version = version
         self.__path_to_extract = path_to_extract
         self.__path_to_copy_includes = path_to_copy_includes
         self.__path_to_copy_libs = path_to_copy_libs
 
-    def download(self) -> str:
-        __c_api_extracted_root_dir = self.__path_to_extract / f'dxfeed-c-api-{self.__version}-no-tls'
-        is_x64 = 8 * struct.calcsize("P") == 64
+    def download(self, dxfeed_c_api_bundle_url_template: str) -> str:
+        """
+        The method that does the bulk of the work of downloading and placement files.
 
-        if platform.system() == 'Windows':
-            current_os = 'windows'
-        elif platform.system() == 'Darwin':
-            current_os = 'macosx'
-        else:
-            current_os = 'centos'  # Since centos uses an earlier version of libc
 
-        if (not os.path.exists(self.__path_to_extract)) or (not os.path.exists(__c_api_extracted_root_dir)):
-            url = f'https://github.com/dxFeed/dxfeed-c-api/releases/download/{self.__version}/dxfeed-c-api-' \
-                  f'{self.__version}-{current_os}-no-tls.zip '
+        Parameters
+        ----------
+        dxfeed_c_api_bundle_url_template: str
+            The URL template for zipped dxFeed C API bundle. Parameters used:
+                {version} - The C API version
+                {os}      - The target OS
+
+        Returns
+        -------
+        : str
+            The resulting name of the library, which is required to build an extension
+
+        """
+        c_api_extracted_root_path = self.__path_to_extract / f'dxfeed-c-api-{self.__version}-no-tls'
+        is_x64 = 8 * struct.calcsize('P') == 64
+
+        url_template_os = 'centos'  # Since centos uses an earlier version of libc
+
+        if platform.system() == 'Darwin':
+            url_template_os = 'macosx'
+        elif platform.system() == 'Windows':
+            url_template_os = 'windows'
+
+        if (not os.path.exists(self.__path_to_extract)) or (not os.path.exists(c_api_extracted_root_path)):
+            url = dxfeed_c_api_bundle_url_template.format(version=self.__version, os=url_template_os)
             print(f'Downloading the "{url}"')
             resp = urlopen(url)
             zipfile = ZipFile(BytesIO(resp.read()))
             print(f'Extracting to "{self.__path_to_extract}"')
             zipfile.extractall(self.__path_to_extract)
 
+        c_api_x64_suffix = '_64' if is_x64 else ''
+        resulting_c_api_library_name = f'DXFeed{c_api_x64_suffix}'
+
+        # Determine and fixing paths for unpacked artifacts.
+        # The workaround is related to the packaging feature on POSIX systems in the dxFeed API' CI\CD.
         if is_x64:
-            c_api_x64_suffix = '_64'
+            if platform.system() != 'Windows':
+                c_api_extracted_root_path = c_api_extracted_root_path / f'DXFeedAll-{self.__version}-x64-no-tls'
+
+            c_api_extracted_library_path = c_api_extracted_root_path / 'bin' / 'x64'
         else:
-            c_api_x64_suffix = ''
-
-        __c_api_library_name = f'DXFeed{c_api_x64_suffix}'
-
-        if platform.system() == 'Windows':
-            if is_x64:
-                c_api_extracted_library_dir = __c_api_extracted_root_dir / 'bin' / 'x64'
-                c_api_library_file_name = f'{__c_api_library_name}.dll'
-                c_api_library_file_name2 = f'{__c_api_library_name}.lib'
+            if platform.system() == 'Windows':
+                c_api_extracted_library_path = c_api_extracted_root_path / 'bin' / 'x86'
             else:
-                c_api_extracted_library_dir = __c_api_extracted_root_dir / 'bin' / 'x86'
-                c_api_library_file_name = f'{__c_api_library_name}.dll'
-                c_api_library_file_name2 = f'{__c_api_library_name}.lib'
-        elif platform.system() == 'Darwin':
-            if is_x64:
-                __c_api_extracted_root_dir = __c_api_extracted_root_dir / f'DXFeedAll-{self.__version}-x64-no-tls'
-                c_api_extracted_library_dir = __c_api_extracted_root_dir / 'bin' / 'x64'
-                c_api_library_file_name = f'lib{__c_api_library_name}.dylib'
-            else:
-                raise Exception('Unsupported platform')
-        else:
-            if is_x64:
-                __c_api_extracted_root_dir = __c_api_extracted_root_dir / f'DXFeedAll-{self.__version}-x64-no-tls'
-                c_api_extracted_library_dir = __c_api_extracted_root_dir / 'bin' / 'x64'
-                c_api_library_file_name = f'lib{__c_api_library_name}.so'
-            else:
-                raise Exception('Unsupported platform')
+                raise RuntimeError('Unsupported platform')
 
-        if not os.path.exists(self.__path_to_copy_includes):
-            shutil.copytree(__c_api_extracted_root_dir / 'include', self.__path_to_copy_includes)
-        if not os.path.exists(self.__path_to_copy_libs / c_api_library_file_name):
-            if not os.path.exists(self.__path_to_copy_libs):
-                os.makedirs(self.__path_to_copy_libs)
-            shutil.copyfile(c_api_extracted_library_dir / c_api_library_file_name,
-                            self.__path_to_copy_libs / c_api_library_file_name)
-        if platform.system() == 'Windows':
-            # noinspection PyUnboundLocalVariable
-            if not os.path.exists(self.__path_to_copy_libs / c_api_library_file_name2):
-                shutil.copyfile(c_api_extracted_library_dir / c_api_library_file_name2,
-                                self.__path_to_copy_libs / c_api_library_file_name2)
+        # Determine possible prefixes and extensions for library files
+        lib_file_name_prefixes = [''] * 2
+        lib_file_name_extensions = ['dll', 'lib']
 
-        return __c_api_library_name
+        if platform.system() != 'Windows':
+            lib_file_name_prefixes = ['lib']
+            lib_file_name_extensions = ['dylib'] if platform.system() == 'Darwin' else ['so']
+
+        # Create paths for libraries to be copied
+        c_api_library_file_source_paths = []
+        c_api_library_file_dest_paths = []
+
+        for idx, prefix in enumerate(lib_file_name_prefixes):
+            file_name = f'{prefix}{resulting_c_api_library_name}.{lib_file_name_extensions[idx]}'
+            c_api_library_file_source_paths.append(c_api_extracted_library_path / file_name)
+            c_api_library_file_dest_paths.append(self.__path_to_copy_libs / file_name)
+
+        print('Copying all headers')
+        # Copying all headers
+        if not Path(self.__path_to_copy_includes).exists():
+            shutil.copytree(c_api_extracted_root_path / 'include', self.__path_to_copy_includes)
+
+        # Create a directory where we will copy libraries, if necessary
+        if not Path(self.__path_to_copy_libs).exists():
+            print(f'Creating the {self.__path_to_copy_libs} path')
+            os.makedirs(self.__path_to_copy_libs)
+
+        print('Copying the required libraries')
+        # Copying the required libraries
+        for idx, path in enumerate(c_api_library_file_source_paths):
+            print(f'  {path} -> {c_api_library_file_dest_paths[idx]}')
+            shutil.copyfile(path, c_api_library_file_dest_paths[idx])
+
+        return resulting_c_api_library_name
 
 
 try:
@@ -108,7 +144,7 @@ c_api_include_dir = c_api_root_dir / 'include'
 c_api_bin_dir = root_path / 'dxfeed' / 'core'
 
 downloader = Downloader(c_api_version, path_to_extract, c_api_include_dir, c_api_bin_dir)
-c_api_library_name = downloader.download()
+c_api_library_name = downloader.download(pyproject['build']['native-dependencies']['dxfeed_c_api_bundle_url_template'])
 
 if platform.system() == 'Windows':
     runtime_library_dirs = None
