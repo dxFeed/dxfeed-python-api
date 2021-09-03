@@ -11,8 +11,8 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.6, 3.7, 3.8]
+        os: [ubuntu-18.04, windows-latest, macos-latest]
+        python-version: [3.6, 3.7, 3.8, 3.9]
 
     runs-on: ${{ matrix.os }}
 
@@ -34,12 +34,11 @@ jobs:
           poetry install --no-root
         shell: bash
       - name: Create tarball
-        if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.7
+        if: matrix.python-version == 3.7
         run: |
           task build -f sdist
         shell: bash
       - name: Create wheel
-        if: matrix.os == 'windows-latest' || matrix.os == 'macos-latest'
         run: |
           task build -f wheel
         shell: bash
@@ -52,7 +51,7 @@ jobs:
 
 
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     needs: build
     steps:
       - uses: actions/checkout@v2

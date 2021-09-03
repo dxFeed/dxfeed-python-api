@@ -31,7 +31,7 @@ from dxfeed.core.pxd_include.DXTypes cimport *
 #  *	Record type constants
 #  */
 # /* -------------------------------------------------------------------------- */
-cdef extern from "RecordData.h":
+cdef extern from "<RecordData.h>":
     ctypedef enum dx_record_info_id_t:
         dx_rid_begin = 0,
         dx_rid_trade = dx_rid_begin,
@@ -74,12 +74,13 @@ cdef extern from "RecordData.h":
         dxf_int_t time_nanos
         dxf_char_t exchange_code
         dxf_double_t price
-        dxf_int_t size
+        dxf_double_t size
         dxf_int_t tick
         dxf_double_t change
-        dxf_int_t flags
+        dxf_dayid_t day_id;
         dxf_double_t day_volume
         dxf_double_t day_turnover
+        dxf_int_t flags
 
     ctypedef dx_trade_t dx_trade_eth_t
 
@@ -89,11 +90,11 @@ cdef extern from "RecordData.h":
         dxf_int_t bid_time
         dxf_char_t bid_exchange_code
         dxf_double_t bid_price
-        dxf_int_t bid_size
+        dxf_double_t bid_size
         dxf_int_t ask_time
         dxf_char_t ask_exchange_code
         dxf_double_t ask_price
-        dxf_int_t ask_size
+        dxf_double_t ask_size
 
     ctypedef struct dx_summary_t:
         dxf_dayid_t day_id
@@ -104,18 +105,18 @@ cdef extern from "RecordData.h":
         dxf_dayid_t prev_day_id
         dxf_double_t prev_day_close_price
         dxf_double_t prev_day_volume
-        dxf_int_t open_interest
+        dxf_double_t open_interest
         dxf_int_t flags
 
 
     ctypedef struct dx_profile_t:
         dxf_double_t beta
         dxf_double_t eps
-        dxf_int_t div_freq
+        dxf_double_t div_freq
         dxf_double_t exd_div_amount
         dxf_dayid_t exd_div_date
-        dxf_double_t _52_high_price
-        dxf_double_t _52_low_price
+        dxf_double_t high_price_52
+        dxf_double_t low_price_52
         dxf_double_t shares
         dxf_double_t free_float
         dxf_double_t high_limit_price
@@ -126,28 +127,35 @@ cdef extern from "RecordData.h":
         dxf_const_string_t description
         dxf_const_string_t status_reason
 
-cdef extern from "RecordData.h":
+cdef extern from "<RecordData.h>":
     ctypedef struct dx_market_maker_t:
         dxf_char_t mm_exchange
         dxf_int_t mm_id
         dxf_int_t mmbid_time
         dxf_double_t mmbid_price
-        dxf_int_t mmbid_size
-        dxf_int_t mmbid_count
+        dxf_double_t mmbid_size
+        dxf_double_t mmbid_count
         dxf_int_t mmask_time
         dxf_double_t mmask_price
-        dxf_int_t mmask_size
-        dxf_int_t mmask_count
+        dxf_double_t mmask_size
+        dxf_double_t mmask_count
 
     ctypedef struct dx_order_t:
         dxf_int_t index
         dxf_int_t time
         dxf_int_t time_nanos
         dxf_int_t sequence
+        dxf_long_t action_time;
+        dxf_long_t order_id;
+        dxf_long_t aux_order_id;
         dxf_double_t price
-        dxf_int_t size
-        dxf_int_t count
+        dxf_double_t size
+        dxf_double_t executed_size;
+        dxf_double_t count
         dxf_int_t flags
+        dxf_long_t trade_id;
+        dxf_double_t trade_price;
+        dxf_double_t trade_size;
         dxf_int_t mmid
 
 
@@ -156,10 +164,17 @@ cdef extern from "RecordData.h":
         dxf_int_t time
         dxf_int_t time_nanos
         dxf_int_t sequence
+        dxf_long_t action_time;
+        dxf_long_t order_id;
+        dxf_long_t aux_order_id;
         dxf_double_t price
-        dxf_int_t size
-        dxf_int_t count
+        dxf_double_t size
+        dxf_double_t executed_size;
+        dxf_double_t count
         dxf_int_t flags
+        dxf_long_t trade_id;
+        dxf_double_t trade_price;
+        dxf_double_t trade_size;
         dxf_const_string_t spread_symbol
 
 
@@ -168,7 +183,7 @@ cdef extern from "RecordData.h":
         dxf_int_t sequence
         dxf_char_t exchange_code
         dxf_double_t price
-        dxf_int_t size
+        dxf_double_t size
         dxf_double_t bid_price
         dxf_double_t ask_price
         dxf_int_t exchange_sale_conditions
@@ -188,7 +203,7 @@ cdef extern from "RecordData.h":
         dxf_double_t vwap
         dxf_double_t bid_volume
         dxf_double_t ask_volume
-        dxf_int_t open_interest
+        dxf_double_t open_interest
         dxf_double_t imp_volatility
 
     ctypedef struct dx_greeks_t:
@@ -216,6 +231,8 @@ cdef extern from "RecordData.h":
         dxf_double_t volatility
         dxf_double_t front_volatility
         dxf_double_t back_volatility
+        dxf_double_t call_volume;
+        dxf_double_t put_volume;
         dxf_double_t put_call_ratio
 
     ctypedef struct dx_series_t:
@@ -224,6 +241,8 @@ cdef extern from "RecordData.h":
         dxf_int_t sequence
         dxf_dayid_t expiration
         dxf_double_t volatility
+        dxf_double_t call_volume;
+        dxf_double_t put_volume;
         dxf_double_t put_call_ratio
         dxf_double_t forward_price
         dxf_double_t dividend

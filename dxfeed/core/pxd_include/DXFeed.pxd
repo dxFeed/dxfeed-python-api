@@ -8,7 +8,7 @@ from dxfeed.core.pxd_include.EventData cimport *
 # /* -------------------------------------------------------------------------- */
 
 
-cdef extern from "DXFeed.h":
+cdef extern from "<DXFeed.h>":
     cdef int DXF_SUCCESS = 1
     cdef int DXF_FAILURE = 0
  
@@ -32,6 +32,10 @@ cdef extern from "DXFeed.h":
                                             dxf_connection_status_t old_status,
                                             dxf_connection_status_t new_status,
                                             void* user_data)
+
+    ctypedef void (*dxf_conn_on_server_heartbeat_notifier_t) (dxf_connection_t connection, dxf_long_t server_millis,
+                                                           dxf_int_t server_lag_mark, dxf_int_t connection_rtt,
+                                                           void * user_data);
 
 # /* the low level callback types, required in case some thread-specific initialization must be performed
 #    on the client side on the thread creation/destruction */
@@ -165,6 +169,24 @@ cdef extern from "DXFeed.h":
                                                        void* user_data,
                                                        dxf_connection_t* connection)
 
+#/**
+# * @ingroup c-api-connection-functions
+# *
+# * @brief Sets a server heartbeat notifier's callback to the connection.
+# *
+# * @details This notifier will be invoked when the new heartbeat arrives from a server and contains non empty payload
+# *
+# * @param[in] connection  The handle of a previously created connection
+# * @param[in] notifier    The notifier callback function pointer
+# * @param[in] user_data   The data to be passed to the callback function
+# *
+# * @return {@link DXF_SUCCESS} on successful set of the heartbeat notifier's or {@link DXF_FAILURE} on error;
+# *         {@link dxf_get_last_error} can be used to retrieve the error code and description in case of failure;
+# */
+    ERRORCODE dxf_set_on_server_heartbeat_notifier(dxf_connection_t connection,
+                                         dxf_conn_on_server_heartbeat_notifier_t notifier,
+                                         void* user_data)
+
 # /*
 #  *	Closes a connection.
 #
@@ -183,6 +205,28 @@ cdef extern from "DXFeed.h":
     ERRORCODE dxf_create_subscription (dxf_connection_t connection, int event_types,
                                               dxf_subscription_t* subscription)
 
+
+#/**
+# * @ingroup c-api-basic-subscription-functions
+# *
+# * @brief Creates a subscription with the specified parameters and the subscription flags.
+# *
+# * @details
+# *
+# * @param[in] connection    A handle of a previously created connection which the subscription will be using
+# * @param[in] event_types   A bitmask of the subscription event types. See {@link dx_event_id_t} and
+# *                          {@link DX_EVENT_BIT_MASK} for information on how to create an event type bitmask
+# * @param[in] subscr_flags  A bitmask of the subscription event flags. See {@link dx_event_subscr_flag}
+# * @param[out] subscription A handle of the created subscription
+# *
+# * @return {@link DXF_SUCCESS} on successful subscription creation or {@link DXF_FAILURE} on error;
+# *         {@link dxf_get_last_error} can be used to retrieve the error code and description in case of failure;
+# *         a handle to newly created subscription is returned via ```subscription``` out parameter
+# */
+    ERRORCODE dxf_create_subscription_with_flags(dxf_connection_t connection, int event_types,
+                                                 dx_event_subscr_flag subscr_flags,
+                                                 dxf_subscription_t* subscription)
+
 # /*
 #  *	Creates a subscription with the specified parameters.
 #
@@ -195,6 +239,27 @@ cdef extern from "DXFeed.h":
     ERRORCODE dxf_create_subscription_timed(dxf_connection_t connection, int event_types, 
                                                    dxf_long_t time,
                                                    dxf_subscription_t* subscription)
+#/**
+# * @ingroup c-api-basic-subscription-functions
+# *
+# * @brief Creates a timed subscription with the specified parameters and the subscription flags.
+# *
+# * @details
+# *
+# * @param[in] connection    A handle of a previously created connection which the subscription will be using
+# * @param[in] event_types   A bitmask of the subscription event types. See {@link dx_event_id_t} and
+# *                          {@link DX_EVENT_BIT_MASK} for information on how to create an event type bitmask
+# * @param[in] time          UTC time in the past (unix time in milliseconds)
+# * @param[in] subscr_flags  A bitmask of the subscription event flags. See {@link dx_event_subscr_flag}
+# * @param[out] subscription A handle of the created subscription
+# *
+# * @return {@link DXF_SUCCESS} on successful subscription creation or {@link DXF_FAILURE} on error;
+# *         {@link dxf_get_last_error} can be used to retrieve the error code and description in case of failure;
+# *         a handle to newly created subscription is returned via ```subscription``` out parameter
+# */
+    ERRORCODE dxf_create_subscription_timed_with_flags(dxf_connection_t connection, int event_types,
+                                                       dxf_long_t time, dx_event_subscr_flag subscr_flags,
+                                                       dxf_subscription_t* subscription)
 
 # /*
 #  *	Closes a subscription.
@@ -375,6 +440,30 @@ cdef extern from "DXFeed.h":
 #  */
     ERRORCODE dxf_initialize_logger (const char* file_name, int rewrite_file, int show_timezone_info, int verbose)
 
+
+#/**
+# * @ingroup c-api-common
+# *
+# * @brief Initializes the internal logger with data transfer logging.
+# *
+# * @details Various actions and events, including the errors, are being logged
+# *          throughout the framework. They may be stored into the file.
+# *
+# * @param[in] file_name          A full path to the file where the log is to be stored
+# * @param[in] rewrite_file       A flag defining the file open mode; if it's nonzero then the log file will be rewritten
+# * @param[in] show_timezone_info A flag defining the time display option in the log file; if it's nonzero then
+# *                               the time will be displayed with the timezone suffix
+# * @param[in] verbose            A flag defining the logging mode; if it's nonzero then the verbose logging will be
+# *                               enabled
+# * @param[in] log_data_transfer  A flag defining the logging mode; if it's nonzero then the data transfer (portions of
+# *                               received and sent data) logging will be enabled
+# *
+# * @return {@link DXF_SUCCESS} on successful logger initialization or {@link DXF_FAILURE} on error;
+# *         {@link dxf_get_last_error} can be used to retrieve the error code and description in case of failure;
+# */
+    ERRORCODE dxf_initialize_logger_v2(const char * file_name, int rewrite_file, int show_timezone_info,
+                                       int verbose, int log_data_transfer)
+
 # /*
 #  *  Clear current sources and add new one to subscription
 #  *  Warning: you must configure order source before dxf_add_symbols/dxf_add_symbol call
@@ -554,6 +643,28 @@ cdef extern from "DXFeed.h":
                                                  dxf_const_string_t symbol, const char** sources,
                                                  dxf_price_level_book_t* book)
 
+#/**
+# * @ingroup c-api-price-level-book
+# *
+# * @brief Creates Price Level book with the specified parameters.
+# *
+# * @details
+# *
+# * @param[in] connection    A handle of a previously created connection which the subscription will be using
+# * @param[in] symbol        The symbol to use
+# * @param[in] sources       Order sources for Order. Each element can be one of following:
+# *                          "NTV", "ntv", "NFX", "ESPD", "XNFI", "ICE", "ISE", "DEA", "DEX", "BYX", "BZX", "BATE",
+# * "CHIX", "CEUX", "BXTR", "IST", "BI20", "ABE", "FAIR", "GLBX", "glbx", "ERIS", "XEUR", "xeur", "CFE", "C2OX", "SMFE",
+# * "smfe", "iex", "MEMX", "memx". NULL-list means "all sources"
+# * @param[in] sources_count The number of sources. 0 means "all sources"
+# * @param[out] book         A handle of the created price level book
+# *
+# * @return {@link DXF_SUCCESS} if price level book has been successfully created or {@link DXF_FAILURE} on error;
+# *         {@link dxf_get_last_error} can be used to retrieve the error code and description in case of failure;
+# *         *price level book* itself is returned via out parameter
+# */
+    ERRORCODE dxf_create_price_level_book_v2(dxf_connection_t connection, dxf_const_string_t symbol,
+                                             const char** sources, int sources_count, dxf_price_level_book_t* book)
 # /*
 #  *  Closes a price level book.
 #  *  All the data associated with it will be freed.
@@ -700,5 +811,15 @@ cdef extern from "DXFeed.h":
 # *  pointer - pointer to memory allocated earlier in some API function from this module
 # */
     ERRORCODE dxf_free(void* pointer)
+
+    dxf_const_string_t dxf_get_order_action_wstring_name(dxf_order_action_t action);
+
+    const char * dxf_get_order_action_string_name(dxf_order_action_t action);
+
+    ERRORCODE dxf_load_config_from_wstring(dxf_const_string_t config);
+
+    ERRORCODE dxf_load_config_from_string(const char * config);
+
+    ERRORCODE dxf_load_config_from_file(const char * file_name);
 
 #endif /*     _H_INCLUDED */
