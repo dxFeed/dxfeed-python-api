@@ -29,7 +29,7 @@ exclude = ['dxfeed/tmp*']
 
 [tool.poetry.dependencies]
 python = '^3.6'
-pandas = {version = '^1.0.0', python = '^3.7'}
+pandas = '^1.0.0'
 toml = '^0.10.2'
 # The following dependencies are used for docs generation when installed as extras
 # (e.g. pip install nornir[docs])
