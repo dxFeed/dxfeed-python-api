@@ -11,37 +11,41 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-18.04, windows-latest, macos-latest]
-        python-version: [3.6, 3.7, 3.8, 3.9]
-
+        os: [ubuntu-20.04, ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.7, 3.8, 3.9]
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
+
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install poetry
-        run: |
-          pip install poetry
-        shell: bash
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2
+
       - name: Set poetry env
         run: |
-          poetry config virtualenvs.create false
-          poetry install --no-root
+          pip install --upgrade pip
+          pip install taskipy cython toml
+          poetry install
         shell: bash
+
       - name: Create tarball
         if: matrix.python-version == 3.7
         run: |
-          task build -f sdist
+          poetry run build -f sdist
         shell: bash
+
       - name: Create wheel
         run: |
-          task build -f wheel
+          poetry run build -f wheel
         shell: bash
+
       - name: Upload artifacts
         if: success()
         uses: actions/upload-artifact@v2
@@ -51,26 +55,29 @@ jobs:
 
 
   publish:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: build
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v1
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
-      - name: Install poetry
-        run: |
-          pip install poetry
-        shell: bash
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2
+
       - name: Clear dist folder
         run: |
           rm -rf dist/
+
       - name: Download
         uses: actions/download-artifact@v2
         with:
           name: artifacts
           path: dist/
+
       - name: Publish to PyPI
         if: success()
         run: |
