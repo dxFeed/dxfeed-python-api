@@ -3,11 +3,18 @@
 [![PyPI](https://img.shields.io/pypi/v/dxfeed)](https://pypi.org/project/dxfeed/)
 [![Documentation Status](https://readthedocs.org/projects/dxfeed/badge/?version=latest)](https://dxfeed.readthedocs.io/en/latest/?badge=latest)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dxfeed)](https://pypi.org/project/dxfeed/)
+![Platform](https://img.shields.io/badge/platform-win--x64%20%7C%20linux--x64%20%7C%20osx--x64-lightgrey)
 [![PyPI - Wheel](https://img.shields.io/pypi/wheel/dxfeed)](https://pypi.org/project/dxfeed/)
 [![PyPI - License](https://img.shields.io/pypi/l/dxfeed)](https://github.com/dxFeed/dxfeed-python-api/blob/master/LICENSE)
 [![Test workflow](https://github.com/dxFeed/dxfeed-python-api/workflows/Test%20package/badge.svg)](https://github.com/dxFeed/dxfeed-python-api/actions)
 
+:warning:
+This library will be superseded by the Graal Python API based on [GraalVM](https://www.graalvm.org/latest/reference-manual/native-image/) 
+(similar to [Graal .NET API](https://github.com/dxFeed/dxfeed-graal-net-api#readme)).\
+The current implementation has a number of architectural limitations that will be fixed in the new one.\
+Please note that feature development has been completely halted in this version.
 
+</br>
 
 This package provides access to [dxFeed](https://www.dxfeed.com/) streaming data.
 The library is build as a thin wrapper over [dxFeed C-API library](https://github.com/dxFeed/dxfeed-c-api).
@@ -26,10 +33,46 @@ Package distribution: [pypi.org/project/dxfeed](https://pypi.org/project/dxfeed/
 
 **Requirements:** python >= 3.6
 
+On Linux, WSL and macOS, we recommend installing python via [pyenv](https://github.com/pyenv/pyenv):
+
+An example of how to install python on Ubuntu 20.04:
+
+```bash
+# Update the package index files on the system
+sudo apt-get update
+
+# Install pyenv dependencies
+sudo apt-get install make build-essential libssl-dev zlib1g-dev \
+libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+
+# Run automatic pyenv installer
+curl https://pyenv.run | bash
+
+# Configure bash shell
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+
+# Restart bash shell
+bash
+
+# Install python 3.9.16
+pyenv install 3.9.16
+
+# Set python 3.9.16 as global
+pyenv global 3.9.16
+
+# Check python version
+python --version
+#>>> Python 3.9.16
+
+```
+
 Install package via PyPI:
 
 ```python
-pip3 install dxfeed
+python -m pip install dxfeed
 ``` 
 
 ## Installation from sources
@@ -37,10 +80,15 @@ pip3 install dxfeed
 To install dxfeed from source you need Poetry. It provides a custom installer.
 This is the recommended way of installing poetry according to [documentation](https://python-poetry.org/docs/)
 
-For macOS / Linux / Windows (with bash):
+For macOS / Linux / Windows (WSL):
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+For Windows (Powershell):
+```powershell
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 ```
 
 In the project root directory (same one where you found this file after

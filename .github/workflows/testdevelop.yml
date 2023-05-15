@@ -12,68 +12,73 @@ jobs:
   installation:
     strategy:
       matrix:
-        os: [ubuntu-18.04, windows-latest, macos-latest]
-        python-version: [3.6, 3.7, 3.8, 3.9]
-
+        os: [ubuntu-20.04, ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.7, 3.8, 3.9]
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
+
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install poetry
-      run: |
-        pip install poetry
-      shell: bash
+
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2
+
     - name: Set poetry env
       run: |
-        poetry config virtualenvs.create false
-        poetry install --no-root --no-dev
-        pip install taskipy cython
+        pip install --upgrade pip
+        pip install taskipy cython toml
+        poetry install --only main
         task build -f sdist
         pip uninstall --yes taskipy cython
       shell: bash
+
     - name: Install package artifact
       run: |
         pip install dist/dxfeed*
         pip uninstall --yes dxfeed
       shell: bash
+
   tests:
     needs: installation
     strategy:
       matrix:
-        os: [ubuntu-18.04, windows-latest, macos-latest]
-        python-version: [3.6, 3.7, 3.8, 3.9]
-
+        os: [ubuntu-20.04, ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.7, 3.8, 3.9]
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
+
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install poetry
-      run: |
-        pip install poetry
-      shell: bash
+
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2
+
     - name: Set poetry env
       run: |
-        poetry config virtualenvs.create false
-        poetry install --no-root
+        pip install --upgrade pip
+        pip install taskipy cython toml
+        poetry install
       shell: bash
+
     - name: Run tests
       run: |
-        task test
+        poetry run task test
       shell: bash
+
     - name: Generate doc
+      if: matrix.os == 'ubuntu-20.04' && matrix.python-version == 3.7
       run: |
-        task html_docs
+        poetry run task html_docs
       shell: bash
-      if: matrix.os == 'ubuntu-18.04' && matrix.python-version == 3.7
