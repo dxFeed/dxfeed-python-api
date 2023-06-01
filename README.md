@@ -31,7 +31,7 @@ Package distribution: [pypi.org/project/dxfeed](https://pypi.org/project/dxfeed/
 
 ## Installation
 
-**Requirements:** python >= 3.6
+**Requirements:** python >= 3.6 and <= 3.9
 
 On Linux, WSL and macOS, we recommend installing python via [pyenv](https://github.com/pyenv/pyenv):
 
