@@ -14,12 +14,12 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -29,10 +29,8 @@ jobs:
     - name: Set poetry env
       run: |
         pip install --upgrade pip
-        pip install taskipy cython toml
-        poetry install --only main
-        task build -f sdist
-        pip uninstall --yes taskipy cython
+        poetry install
+        poetry build -f sdist
       shell: bash
 
     - name: Install package artifact
@@ -50,12 +48,12 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -65,7 +63,6 @@ jobs:
     - name: Set poetry env
       run: |
         pip install --upgrade pip
-        pip install taskipy cython toml
         poetry install
       shell: bash
 
