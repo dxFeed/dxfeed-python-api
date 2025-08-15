@@ -84,7 +84,7 @@ Add tickers
 Symbols that will be processed should be defined. For Candle event type
 along with base symbol, you should specify an aggregation period. You
 can also set price type. More details:
-https://kb.dxfeed.com/display/DS/REST+API#RESTAPI-Candlesymbols.
+https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html#candle-symbols.
 
 .. code:: python3
 
